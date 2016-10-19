@@ -1,4 +1,4 @@
-function [fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, masktexture] = produce_stims
+function [fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, masktexture] = produce_stims(window, windowRect, screenNumber)
 
 % a function to calculate all stimuli and return them in their final
 % format.
@@ -9,7 +9,9 @@ function [fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, masktex
 %
 % Parameters
 % ----------
-% - None
+% - window: the window opened initially with the PsychImaging command
+% - windowRect: the rectangle that is returned together with the window
+% - screenNumber: the screen that is being drawn to
 %
 % Returns
 % ----------
@@ -21,6 +23,12 @@ function [fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, masktex
 % - mask_locs: the locations where a mask will be displayed. 
 % - masktexture: a texture that makes our square checkerboard circular
 %
+%% Function start
+
+[screenXpixels, screenYpixels] = Screen('WindowSize', window)               ; % geting the dimensions of the screen in pixels
+[xCenter, yCenter] = RectCenter(windowRect)                                 ; % getting the center of the screen
+
+white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
 
 
 %-------------------------------------------------------------------------%
@@ -93,7 +101,7 @@ for i = 1:numSquares
 end
 
 % Put the board locations into a matrix to choose from during the procedure
-rect_locs = cat(3, allRectsLeft, allRectsRight)                             ; %  (:,:,1) will be left, (:,:,2) will be right
+rect_locs = cat(3, allRectsLeft, allRectsRight, allRectsCenter)             ; %  (:,:,1) will be left, (:,:,2) will be right, (:,:,3) for center
 
 
 %% Circular apperture to lay over checkerboard
@@ -121,7 +129,7 @@ mask_locs = cat(3, left_mask, right_mask, center_mask)                      ; % 
 mask = Circle(100)                                                          ; % the argument x to Circle(x) determines the 'resolution' of our circle ... if it's too high, it will take too long to compute
 mask(:,:,2) = mask                                                          ; % add a 3rd dimension to the texture to represent alpha levels (transparency)
 mask = ~mask                                                                ; % make sure that interior of circle=0, exterior=1
-mask = double(mask) * grey                                                  ; % color the exterior of the circle grey, as the background of experimental screen. interior of the circle i 0, so it is not affected. 
+mask = double(mask) * white/2                                               ; % color the exterior of the circle grey, as the background of experimental screen. interior of the circle i 0, so it is not affected. 
 mask(:,:,2) = mask(:,:,2) * 2                                               ; % exterior of 2nd layer(=alpha levels) is now also set to 'grey'=0.5 --> we want the exterior of the circle to be 1(0% transparency) 
 
 masktexture = Screen('MakeTexture', window, mask)                           ; % PTB call to make our matrix 'mask' a texture on the main window 

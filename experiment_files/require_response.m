@@ -1,9 +1,10 @@
-function [picked_loc, reward_bool, rt] = require_response
+function [picked_loc, reward_bool, rt] = require_response(left_lottery, right_lottery)
 % a function to inquire about keypressed and their timings
 %
 % Parameters
 % ----------
-% - None
+% - left_lottery: the lottery connected to button [left]
+% - right_lottery: the lottery connected to button [right]
 %
 % Returns
 % ----------
