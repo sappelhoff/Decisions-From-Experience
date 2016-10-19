@@ -103,7 +103,10 @@ lottery_option2 = [ones(1,3), zeros(1,7)]                                   ; % 
 %                         Text Presentation                               %
 %-------------------------------------------------------------------------%
 
-%% General instructions
+%% produce the texts
+
+texts = produce_texts; % separate function which outputs a "container.Map"
+
 
 % these texts will be relevant for multiple conditions
 breakText = sprintf('Now there will be a short break\n\nbefore we continue with the next task.\n\n\nPress a key if you want to continue.');
@@ -113,16 +116,9 @@ SPaddUrn = sprintf('This outcome will be added\nto your final urn.');
 SPfinalUrn1 = sprintf('This task is done.\n\nNow there will be 4 random draws\n\nwith replacement from your final urn.');
 SPfinalUrn2 = sprintf('These 4 random draws will\n\nbe summed up to determine\n\nyour payoff. Remember a "win"\n\noutcome is worth 13, and a\n\n "lose" outcome is worth 0.');
 
-%% Active Partial Feedback Paradigm
-activePFP1 = sprintf('Active PFP\n\n\nWhenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
-activePFP2 = sprintf('Active PFP\n\n\nEach "win" outcome will be worth 1.\n\nEach "lose" outcome will be worth 0.');
-activePFPShuffle = sprintf('Active PFP\n\n\nThe lotteries have been shuffled.');
-activePFPPayoff = sprintf('You earned: ');
 
 %% Passive Partial Feedback Paradigm
 
-passivePFP1 = sprintf('Passive PFP\n\n\nThe computer will choose the lotteries for you.\n\nPlease just observe.');
-passivePFP2 = sprintf('Passive PFP\n\n\nEach "win" outcome will be worth 1.\n\nEach "lose" outcome will be worth 0.');
 passivePFPShuffle = sprintf('Passive PFP\n\n\nThe lotteries have been shuffled.');
 passivePFPPayoff = sprintf('The computer earned the\n\nfollowing amount for you: ');
 
@@ -146,11 +142,6 @@ passiveSP5 = sprintf('A "win" outcome drawn from\n\nyour accumulated "final urn"
 passiveSPShuffle = sprintf('Passive SP\n\nThe lotteries have been shuffled.');
 
 
-%% Goodbye
-
-ending = sprintf('You are done.\n\nThank you for participating!\n\n\nPress a key to close.');
-
-
 %-------------------------------------------------------------------------%
 %                         Experimental Loop                               %
 %-------------------------------------------------------------------------%
@@ -168,66 +159,75 @@ current_condi = condi_order(condi_idx)                                      ; % 
 switch current_condi
     
 case 1
-%% Active PFP
+%% Active Partial Feedback Paradigm (aPFP)
 
 % here we can save the data
-activePFP_mat = nan(5,pfp_trials,(overall_trials / pfp_trials))    ; % for each bandit run, we have one 2D matrix ... each bandit run is one sheet(3D)
+aPFP_mat = nan(5,pfp_trials,(overall_trials / pfp_trials))                  ; % for each bandit run, we have one 2D matrix ... each bandit run is one sheet(3D)
 
 % Here we save the preferred lottery data --> which one is preferred
 % (1=left, 2=right), is it the good one? (0/1), how quickly was it chosen
 % (rt)
-activePFP_prefLottery_mat = nan(3,1,(overall_trials/pfp_trials))      ; 
-
-
-[left_lottery, right_lottery, good_lottery_loc] = ...
-        determine_lottery_loc(lottery_option1, lottery_option2)             ; % place good and bad lottery randomly either left or right
+aPFP_prefLottery_mat = nan(3,1,(overall_trials/pfp_trials))                 ; 
 
     
-% Active Bandit Instructions
-DrawFormattedText(window,activePFP1, 'center', 'center', white)          ;
+% Active PFP Instructions
+DrawFormattedText(window,texts('next_intro'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,activePFP2, 'center', 'center', white)          ;
+DrawFormattedText(window,texts('aPFP_intro1'), 'center', 'center', white)   ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window,texts('aPFP_intro2'), 'center', 'center', white)   ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window,texts('aPFP_intro3'), 'center', 'center', white)   ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
 
-    for bandit_run = 1:(overall_trials / pfp_trials)
+    for pfp_run = 1:(overall_trials / pfp_trials)
 
-
-    % starting a new bandit
-    DrawFormattedText(window,activePFPShuffle, 'center', 'center', white);
+    
+    [left_lottery, right_lottery, good_lottery_loc] = ...
+        determine_lottery_loc(lottery_option1, lottery_option2)             ; % place good and bad lottery randomly either left or right
+ 
+    % starting a new PFP
+    DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ;
         
         
 
     % actual loop
-    for bandit_idx = 1:pfp_trials
+    for pfp_idx = 1:pfp_trials
 
         % drawing trialcounter
-        trial_counter = strcat(num2str(bandit_idx),'/', num2str(pfp_trials)) ; % The bandit counter always shows current draw out of all draws within one game
+        trial_counter = strcat(num2str(pfp_idx),'/',num2str(pfp_trials))    ; % The pfp counter always shows current draw out of all draws within one game
         DrawFormattedText(window, trial_counter, 'center', 'center', white) ;
         Screen('Flip', window)                                              ;
 
         % drawing the fixcross
         Screen('DrawLines', window, fixCoords,...
-            fixWidth, white, [xCenter yCenter], 2)                      ;
+            fixWidth, white, [xCenter yCenter], 2)                          ;
 
         WaitSecs(2)                                                         ; % show trial counter for 2 seconds
         Screen('Flip', window)                                              ; % then show fixcross
 
         % start decision process
         KbEventFlush                                                        ; % clear all keyboard events
-        [picked_loc, reward_bool, rt] = require_response(left_lottery, right_lottery)                    ;
+        [picked_loc, reward_bool, ...
+            rt] = require_response(left_lottery, right_lottery)             ;
 
         % drawing the fixcross
         Screen('DrawLines', window, fixCoords,...
-            fixWidth, white, [xCenter yCenter], 2)                      ;
+            fixWidth, white, [xCenter yCenter], 2)                          ;
 
-        % drawing the checkerboard stim at the chosen location. The reward_bool
-        % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
+        % drawing the checkerboard stim at the chosen location. The reward
+        % bool tells us win(1) or loss(0) ... we add 1 so we get win=2,
+        % loss=1
 
         Screen('FillRect', window, reward(:,:,reward_bool+1),...
             rect_locs(:,:,picked_loc))                                      ;
@@ -236,12 +236,12 @@ KbStrokeWait                                                                ;
             mask_locs(:,:,picked_loc))                                      ;
 
 
-    % even id, blue is win 
-        activePFP_mat(1,bandit_idx,bandit_run) = picked_loc                         ; % which location was picked: 1, left - 2, right
-        activePFP_mat(2,bandit_idx,bandit_run) = rt                                 ; % how quickly was it picked in ms
-        activePFP_mat(3,bandit_idx,bandit_run) = (good_lottery_loc == picked_loc)   ; % boolean whether good or bad lottery was chosen
-        activePFP_mat(4,bandit_idx,bandit_run) = reward_bool                        ; % boolean whether is was rewarded or not
-        activePFP_mat(5,bandit_idx,bandit_run) = (~mod(subj_id,2) + reward_bool)    ; % which color was the stim: 1: red ...  0/2: blue
+        % even id, blue is win 
+        aPFP_mat(1,pfp_idx,pfp_run) = picked_loc                         ; % which location was picked: 1, left - 2, right
+        aPFP_mat(2,pfp_idx,pfp_run) = rt                                 ; % how quickly was it picked in ms
+        aPFP_mat(3,pfp_idx,pfp_run) = (good_lottery_loc == picked_loc)   ; % boolean whether good or bad lottery was chosen
+        aPFP_mat(4,pfp_idx,pfp_run) = reward_bool                        ; % boolean whether is was rewarded or not
+        aPFP_mat(5,pfp_idx,pfp_run) = (~mod(subj_id,2) + reward_bool)    ; % which color was the stim: 1: red ...  0/2: blue
 
 
         WaitSecs(1)                                                         ; % after choice, wait 1 sec before displaying result
@@ -251,8 +251,8 @@ KbStrokeWait                                                                ;
     end
 
     % Tell the subject how much she has earned
-    payoff = sum(activePFP_mat(4,:,bandit_run))                          ; % the overall payoff 
-    payoff_str = strcat(activePFPPayoff, num2str(payoff))                ;    
+    payoff = sum(aPFP_mat(4,:,pfp_run))                                     ; % the overall payoff 
+    payoff_str = strcat(texts('payoff'), num2str(payoff))                   ;    
     DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ; % show payoff for 2 secs
@@ -261,165 +261,68 @@ KbStrokeWait                                                                ;
     
 
     % Ask the subject, which lottery was better
-    DrawFormattedText(window, PFP_PrefLot, 'center', 'center', white)     ;
+    DrawFormattedText(window, texts('aPFP_PrefLot'), ...
+        'center', 'center', white)                                          ;
     Screen('Flip', window)                                                  ;
 
 
 
     % start decision process
     KbEventFlush                                                            ; % clear all keyboard events
-    [picked_loc, ~, rt] = require_response(left_lottery, right_lottery)                                  ;
+    [picked_loc, ~, rt] = require_response(left_lottery, right_lottery)     ;
 
     
     % Record timing and whether preferred lottery was correct
-    activePFP_prefLottery_mat(1,1,bandit_run) = picked_loc                       ; % Which lottery was preferred? 1=left, 2=right
-    activePFP_prefLottery_mat(2,1,bandit_run) = rt                               ; % rt to select preferred lottery
-    activePFP_prefLottery_mat(3,1,bandit_run) = picked_loc == good_lottery_loc   ; % boolean whether correct lottery was preferred
+    aPFP_prefLottery_mat(1,1,pfp_run) = picked_loc                       ; % Which lottery was preferred? 1=left, 2=right
+    aPFP_prefLottery_mat(2,1,pfp_run) = rt                               ; % rt to select preferred lottery
+    aPFP_prefLottery_mat(3,1,pfp_run) = picked_loc == good_lottery_loc   ; % boolean whether correct lottery was preferred
     
     
     
     end % end of bandit game loop
 
-if condi_idx ~= 4
-% Now there will be a short break before we go to the next
-DrawFormattedText(window, breakText, 'center', 'center', white)             ;
+% Now there will be a short break before we go to the next task
+DrawFormattedText(window, texts('break'), 'center', 'center', white)        ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
-end
+
 
 case 2
-%% Passive Bandit
-
-[left_lottery, right_lottery, good_lottery_loc] = ...
-        determine_lottery_loc(lottery_option1, lottery_option2)             ; % place good and bad lottery randomly either left or right
-
-
-% here we can save the data
-% The data is saved per bandit run (3rd dimension)
-passiveBandit_mat = nan(5,pfp_trials,(overall_trials / pfp_trials))   ; % for each bandit run, we have one 2D matrix ... each bandit run is one sheet(3D)
-
-% Here we save the preferred lottery data --> which one is preferred
-% (1=left, 2=right), is it the good one? (0/1), how quickly was it chosen
-% (rt)
-passiveBandit_prefLottery_mat = nan(3,1,(overall_trials/pfp_trials))     ; 
-
-    
+%% Passive PFP ... showing the replay of active PFP
+   
 
 % Passive Bandit Instructions
-DrawFormattedText(window,passivePFP1, 'center', 'center', white)         ;
+DrawFormattedText(window,texts('next_intro'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,passivePFP2, 'center', 'center', white)         ;
+DrawFormattedText(window,texts('replay1'), 'center', 'center', white)       ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window,texts('replay2'), 'center', 'center', white)       ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window,texts('replay3'), 'center', 'center', white)       ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
 
-for bandit_run = 1:(overall_trials / pfp_trials)
-
-    
-    % starting a new bandit
-    DrawFormattedText(window,passivePFPShuffle,'center','center',white)  ;
-    Screen('Flip', window)                                                  ;
-    WaitSecs(2)                                                             ;
-        
-        
-        
-    
-    % actual loop
-    for bandit_idx = 1:pfp_trials
-
-        % drawing the trial counter
-        trial_counter = strcat(num2str(bandit_idx),'/', num2str(pfp_trials)) ;
-        DrawFormattedText(window, trial_counter, 'center', 'center', white) ;
-        Screen('Flip', window)                                              ;
-
-        % drawing the fixcross
-        Screen('DrawLines', window, fixCoords,...
-            fixWidth, white, [xCenter yCenter], 2)                      ;
-
-        WaitSecs(2)                                                         ; % show trial counter for 2 seconds
-        Screen('Flip', window)                                              ; % then show fixcross
-
-        
-        % Passive Bandit, so the computer decides
-        picked_loc = randsample([2 1], 1)                                   ; % in the passive viewing, the computer draws randomly from a location: 1=left, 2=right
-
-        if picked_loc == 1
-            reward_bool = Sample(left_lottery);
-        else
-            reward_bool = Sample(right_lottery);
-        end
-
-        current_interval = 1 + rand                                         ; % wait for a randomly determined time to mimic some decision interval
-        WaitSecs(current_interval)                                          ; 
-
-
-        % drawing the fixcross
-        Screen('DrawLines', window, fixCoords,...
-            fixWidth, white, [xCenter yCenter], 2);
-
-        % drawing the checkerboard stim at the chosen location. The reward_bool
-        % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
-
-        Screen('FillRect', window, reward(:,:,reward_bool+1),...
-            rect_locs(:,:,picked_loc));
-
-        Screen('DrawTextures', window, masktexture, [],...
-            mask_locs(:,:,picked_loc));
-
-
-    % even id, blue is win 
-        passiveBandit_mat(1,bandit_idx, bandit_run) = picked_loc                            ; % which location was picked: 1, left - 2, right
-        passiveBandit_mat(2,bandit_idx, bandit_run) = current_interval                      ; % no rt ... but how long was the mimic decision interval
-        passiveBandit_mat(3,bandit_idx, bandit_run) = (good_lottery_loc == picked_loc)      ; % boolean whether good or bad lottery was chosen
-        passiveBandit_mat(4,bandit_idx, bandit_run) = reward_bool                           ; % boolean whether is was rewarded or not
-        passiveBandit_mat(5,bandit_idx, bandit_run) = (~mod(subj_id,2) + reward_bool)       ; % which color was the stim: 1: red ... 0 or 2: blue
-        
-
-
-        WaitSecs(1)                                                         ; % after choice, wait 1 sec before displaying result
-        Screen('Flip', window)                                              ;
-
-        WaitSecs(2)                                                         ; % feedback displayed for 2 secs
-
-    end
-
-    % Tell the subject how much she has earned
-    payoff = sum(passiveBandit_mat(4,:,bandit_run))                         ; % the overall payoff
-    payoff_str = strcat(passivePFPPayoff, num2str(payoff))               ;
-    DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
-    Screen('Flip', window)                                                  ;
-    WaitSecs(2)                                                             ; % Display payoff for 2 secs
-
-    % Ask the subject, which lottery was better
-    DrawFormattedText(window, PFP_PrefLot, 'center', 'center', white)     ;
-    Screen('Flip', window)                                                  ;
-
-
-    % start decision process
-    KbEventFlush                                                            ; % clear all keyboard events
-    [picked_loc, ~, rt] = require_response(left_lottery, right_lottery);
-
- 
-    % Record timing and whether preferred lottery was correct
-    passiveBandit_prefLottery_mat(1,1,bandit_run) = picked_loc                       ; % Which lottery was preferred? 1=left, 2=right
-    passiveBandit_prefLottery_mat(2,1,bandit_run) = rt                               ; % rt to select preferred lottery
-    passiveBandit_prefLottery_mat(3,1,bandit_run) = picked_loc == good_lottery_loc   ; % boolean whether correct lottery was preferred
-    
-    
-end % end of bandit game loop
+% Show the replay!
+show_pfp_replay(aPFP_mat, texts, reward, window, white, masktexture, ...
+    mask_locs, rect_locs)                                                   ;
 
 
 if condi_idx ~= 4
-% Now there will be a short break before we go to the next
+% Now there will be a short break before we go to the next task
 DrawFormattedText(window, breakText, 'center', 'center', white)             ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 end
 
 case 3
-%% Active DFE
+%% Active Sampling Paradigm (aSP)
 
 
 % here we can save the data
@@ -650,15 +553,13 @@ KbStrokeWait                                                                ;
 
 
 
-if condi_idx ~= 4
-% Now there will be a short break before we go to the next
+% Now there will be a short break before we go to the next task
 DrawFormattedText(window, breakText, 'center', 'center', white);
 Screen('Flip', window);
 KbStrokeWait                                                                ;
-end                                                                         ;
 
 case 4
-%% Passive DFE
+%% Passive SP ... showing the replay of active SP
 
 % here we can save the data --> response, mimiced decision interval by 
 % computer, rewarded or not, color of stim, lottery_type that is at that 
@@ -897,7 +798,7 @@ KbStrokeWait                                                                ;
 
 
 if condi_idx ~= 4
-% Now there will be a short break before we go to the next
+% Now there will be a short break before we go to the next task
 DrawFormattedText(window, breakText, 'center', 'center', white)             ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
@@ -915,7 +816,7 @@ end % ending for loop implementing the random choice of games
 %% Finishing up
 
 
-DrawFormattedText(window, ending,'center', 'center', white)                 ;
+DrawFormattedText(window, texts('end'),'center', 'center', white)                 ;
 
 Screen('Flip', window)                                                      ;
 
@@ -972,8 +873,8 @@ passiveSP.choiceData = passiveDFE_prefLottery_mat                          ;
 passiveSP.payoff = passiveDFE_payoff                                       ;
 passiveSP.readme = SP_Readme                                              ;
 
-activePFP.sampleData = activePFP_mat                                  ;
-activePFP.choiceData = activePFP_prefLottery_mat                      ;
+activePFP.sampleData = aPFP_mat                                  ;
+activePFP.choiceData = aPFP_prefLottery_mat                      ;
 activePFP.readme = PFP_Readme                                         ;
 
 passivePFP.sampleData = passiveBandit_mat                                ;
@@ -988,13 +889,24 @@ data.activeSP = activeSP                                                  ;
 data.passiveSP = passiveSP                                                ;
 data.activePFP = activePFP                                            ;
 data.passivePFP = passivePFP                                          ;
-data.experimentalVars = experimentalVars                                    ;        %#ok ... need to suppress linter here, because it doesn't recognize the 'save' call
+data.experimentalVars = experimentalVars                                    ;   
 
 % Save all the data with an appropriate file name 
 
 cd ..                                                                       ; % data dir is a sibling of the current working dir, not a child
-cur_time = datestr(datetime('now','Format','d_MMM_y_HH_mm_ss'))             ; % the current time and date
-data_dir = fullfile(pwd, 'DFE_data')                                        ;
+
+% make sure we get the correct data dir
+if exist(fullfile(pwd, 'data'),'dir')==7
+    data_dir = fullfile(pwd, 'data')                                        ;
+    sprintf('Saving in data dir: %s', data_dir)         
+else
+    mkdir(data)
+    data_dir = fullfile(pwd, 'data')                                        ;  
+    sprintf('creating new data dir: %s', data_dir) 
+end
+
+% saving it to the data dir
+cur_time = datestr(datetime('now','Format','d_MMM_y_HH_mm_ss'))             ; % the current time and date                                          
 fname = fullfile(data_dir, strcat('subj_', sprintf('%03d_', subj_id), ...
     cur_time, '.mat'))                                                      ; % fname consists of subj_id and datetime to avoid overwriting files
 save(fname, 'data')                                                         ; % save it!
