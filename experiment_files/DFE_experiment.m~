@@ -106,7 +106,26 @@ lottery_option2 = [ones(1,3), zeros(1,7)]                                   ; % 
 
 %% produce the texts
 
-texts = produce_texts                                                       ; % separate function which outputs a "container.Map"
+texts = produce_texts; % separate function which outputs a "container.Map"
+
+
+% these texts will be relevant for multiple conditions
+breakText = sprintf('Now there will be a short break\n\nbefore we continue with the next task.\n\n\nPress a key if you want to continue.');
+SPchoice = sprintf('From which lottery do\nyou want to draw your payoff?\n[left] or [right]\n\nPress twice!');
+SPaddUrn = sprintf('This outcome will be added\nto your final urn.');
+SPfinalUrn1 = sprintf('This task is done.\n\nNow there will be 4 random draws\n\nwith replacement from your final urn.');
+SPfinalUrn2 = sprintf('These 4 random draws will\n\nbe summed up to determine\n\nyour payoff. Remember a "win"\n\noutcome is worth 13, and a\n\n "lose" outcome is worth 0.');
+
+
+
+%% Passive Sampling Paradigm
+
+passiveSP1 = sprintf('Passive SP\n\n\nThe computer will choose the lotteries for you.\n\nPlease just observe.');
+passiveSP2 = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
+passiveSP3 = sprintf('Once you have observed enough samples\n\nto know whether a certain lottery is profitable,\n\nyou can stop sampling and choose a lottery');
+passiveSP4 = sprintf('Upon choice, the outcome is added\n\nto a "final urn". After that,\n\nyou can continue to sample.\n\nOnce you have drawn\n\nall your samples, 4 outcomes\n\nwill be drawn from your personal\n\n"final urn" with replacement.');
+passiveSP5 = sprintf('A "win" outcome drawn from\n\nyour accumulated "final urn" will\n\nbe worth 13. A "lose" outcome\n\ndrawn from your accumulated\n\n"final urn" will be worth 0.');
+passiveSPShuffle = sprintf('Passive SP\n\nThe lotteries have been shuffled.');
 
 
 %-------------------------------------------------------------------------%
@@ -255,7 +274,7 @@ case 2
 %% Passive PFP ... showing the replay of active PFP
    
 
-% Passive PFP Instructions
+% Passive Bandit Instructions
 DrawFormattedText(window,texts('next_intro'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
@@ -436,19 +455,13 @@ while sp_idx_max >= 1                                                       ; % 
                 sp_idx_max = sp_idx_max + 1                                 ; % making a choice doesn't count into the trials. As usual, sp_idx_max will be reduced at end of the procedure one ... so +1 -1 = 0 difference
                 break                                                       ; % To make a choice, we have to break the for loop
                 
-        end % end switch. Continue with new question: choice or sample?
+        end % end switch procedure ... continue with new question: choice or sample?
     end % end of for loop of drawing samples
 
  
     % If 'right' (=2) was selected or there are no trials left, start the
     % choice procedure
-    
-    if sp_idx_max >= 1 % if this is the last trial, tell the subject so
-        DrawFormattedText(window, texts('aSP_final'), 'center', ...
-            'center', white)                                                ;
-        Screen('Flip', window)                                              ;
-        KbStrokeWait                                                        ;
-    end
+
     
     % Ask the subject, which lottery she wants to select
     DrawFormattedText(window, texts('aSP_choice'), 'center', ...
@@ -494,7 +507,7 @@ while sp_idx_max >= 1                                                       ; % 
     WaitSecs(2)                                                             ; % show feedback for 2 seconds
     
     
-    % Tell the subject how much she has earned 
+    % "YOU EARNED ..." 
     payoff_str = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))   ;
     DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
     Screen('Flip', window)                                                  ;
@@ -505,9 +518,9 @@ while sp_idx_max >= 1                                                       ; % 
     % Now the subject has completed one SP run. We calculate, how many
     % trials remain to start a new trial or go on to the next task.
     sp_idx_max = sp_idx_max - sp_idx                                        ;
-    sp_trial_count = sp_trial_count + 1                                     ; 
+    sp_trial_count = sp_trial_count + 1                                         ; 
     
-end % end of while loop implmenting all possible SP runs
+end % end of while loop implmenting all possible DFE runs
 
 
 
@@ -519,28 +532,238 @@ KbStrokeWait                                                                ;
 case 4
 %% Passive SP ... showing the replay of active SP
 
+% here we can save the data --> response, mimiced decision interval by 
+% computer, rewarded or not, color of stim, lottery_type that is at that 
+% location, number of dfe run
+passiveDFE_mat = nan(6,overall_trials); 
 
-% Passive SP Instructions
-DrawFormattedText(window,texts('next_intro'), 'center', 'center', white)    ;
+% Here we save the preferred lottery data --> which one is preferred
+% (1=left, 2=right), is it the good one? (0/1), how quickly was it chosen
+% (rt), was it rewarded or not? (0/1)
+passiveDFE_prefLottery_mat = nan(6,1)                                       ; % we cannot preallocate exactly, but there will be at least ONE choice in DFE
+
+
+
+
+
+% Passive DFE Instructions
+DrawFormattedText(window, passiveSP1, 'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,texts('replay1'), 'center', 'center', white)       ;
+DrawFormattedText(window, passiveSP2, 'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,texts('replay2'), 'center', 'center', white)       ;
+DrawFormattedText(window, passiveSP3, 'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,texts('replay3'), 'center', 'center', white)       ;
+DrawFormattedText(window, passiveSP4, 'center', 'center', white)           ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window, passiveSP5, 'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
 
-% Show the replay!
-show_sp_replay(aPFP_mat, texts, reward, window, white, masktexture, ...
-    mask_locs, rect_locs)                                                   ;
+sp_idx_max = overall_trials                                                ;
+sp_trial_count = 1                                                         ;
+dat_idx_count = 1                                                        ; % to know where in our data matrix to place the responses
+sp_choice_count = 1                                                        ; % also a data matrix counter to place the preferred lotteries
+
+
+while sp_idx_max >= 1 % while we have at least one dfe trial remaining, keep starting new DFE runs
+
+    
+    
+    [left_lottery, right_lottery, good_lottery_loc] = ...
+            determine_lottery_loc(lottery_option1, lottery_option2)         ; % place good and bad lottery randomly either left or right
+
+    
+    
+    % starting a new DFE
+        DrawFormattedText(window, passiveSPShuffle, 'center', ...
+            'center', white)                                                ;
+        Screen('Flip', window)                                              ;
+        WaitSecs(2)                                                         ;
+    
+    
+
+
+    % actual loop
+    for sp_idx = 1:sp_idx_max
+
+        if sp_idx ~= 1
+            % Drawing the text options for sample vs choice decision      
+            textwin1 = [screenXpixels*.1, screenYpixels*.5, screenXpixels*.4, screenYpixels*.5]; % windows to center the formatted text in
+            textwin2 = [screenXpixels*.6, screenYpixels*.5, screenXpixels*.9, screenYpixels*.5]; % left top right bottom
+
+            DrawFormattedText(window, 'Do you want to', ...
+                'center', .25*screenYpixels, white)                         ;
+
+            DrawFormattedText(window, 'observe a\nrandom sample', ...
+                'center', 'center', white, [], [], [], [], [], textwin1)    ;
+
+            DrawFormattedText(window, 'make a choice', ...
+                'center', 'center', white, [], [], [], [], [], textwin2)    ;
+
+            Screen('Flip', window)                                          ;
+            
+            % start decision process ... this time, only location is relevant
+            [picked_loc] = require_response(left_lottery, right_lottery)                                 ;
+
+        else
+            picked_loc = 1                                                  ; %In first trial, always draw a sample
+        end
+        
+        switch picked_loc
+            
+            case 1 % =left ... observe a sample drawn by the computer
+
+                trial_counter = strcat(num2str(overall_trials-(sp_idx_max-sp_idx)),'/', num2str(overall_trials));
+
+                DrawFormattedText(window, trial_counter, 'center', 'center', white);
+                Screen('Flip', window);
+
+                % drawing the fixcross
+                Screen('DrawLines', window, fixCoords,...
+                    fixWidth, white, [xCenter yCenter], 2)              ;
+
+                WaitSecs(2); % show trial counter for 2 seconds
+                Screen('Flip', window)                                      ; % Draw the fixcross
+ 
+                % Passive DFE, so the computer decides
+                picked_loc = randsample([2 1], 1)                           ; % in the passive viewing, the computer draws randomly from a location: 1=left, 2=right
+
+                if picked_loc == 1
+                    reward_bool = Sample(left_lottery)                      ;
+                else
+                    reward_bool = Sample(right_lottery)                     ;
+                end
+
+                current_interval = .5 + rand                                ; % this mimics some "decision interval" by the computer and will be used for "wait" below
+                
+                % drawing the fixcross
+                Screen('DrawLines', window, fixCoords,...
+                    fixWidth, white, [xCenter yCenter], 2)              ;
+
+                % drawing the checkerboard stim at the chosen location. The reward_bool
+                % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
+
+                Screen('FillRect', window, reward(:,:,reward_bool+1),...
+                    rect_locs(:,:,picked_loc))                              ;
+ 
+                Screen('DrawTextures', window, masktexture, [],...
+                    mask_locs(:,:,picked_loc))                              ;
+
+
+                % even id, blue is win 
+                passiveDFE_mat(1,dat_idx_count) = picked_loc                                        ; % which location was picked: 1, left - 2, right
+                passiveDFE_mat(2,dat_idx_count) = current_interval                                  ; % % no rt ... but how long was the mimic decision interval
+                passiveDFE_mat(3,dat_idx_count) = reward_bool                                       ; % boolean whether is was rewarded or not
+                passiveDFE_mat(4,dat_idx_count) = (good_lottery_loc == picked_loc)                  ; % boolean whether good or bad lottery was chosen
+                passiveDFE_mat(5,dat_idx_count) = (~mod(subj_id,2) + reward_bool)                   ; % which color was the stim: 1: red ... 0 or 2: blue
+                passiveDFE_mat(6,dat_idx_count) = sp_trial_count                                      ; % current SP run
+
+                dat_idx_count = dat_idx_count + 1                     ; % update our data index counter
+                WaitSecs(current_interval)                                  ;   % after choice, wait 1 sec before displaying result
+                Screen('Flip', window)                                      ;
+
+                WaitSecs(2)                                                 ; % feedback displayed for 2 secs
+
+        
+        
+            case 2 % =right ... make a choice 
+                sp_idx_max = sp_idx_max + 1                               ; % making a choice doesn't count into the trials. As usual, dfe_idx_max will be reduced at end of the procedure one ... so +1 -1 = 0 difference
+                break                                                       ; % To make a choice, we have to break the for loop  
+        end % end switch procedure ... continue with new question: choice or sample?
+    end % end of for loop of drawing samples
+
+    
+
+
+    % Start choice procedure
+    
+    % Ask the subject, which lottery she wants to select
+    DrawFormattedText(window, SPchoice, 'center', 'center', white)         ;
+    Screen('Flip', window)                                                  ;
+    KbStrokeWait; 
+    % start decision process
+    [picked_loc, reward_bool, rt] = require_response(left_lottery, right_lottery);
+
+    % Prepare a feedback screen
+    DrawFormattedText(window, SPaddUrn, 'center', ...
+        .25*screenYpixels, white)                                           ; % Text before feedback of preferred lottery
+    Screen('DrawLines', window, fixCoords,...
+        fixWidth, white, [xCenter yCenter], 2)                          ; % draw a fixcross
+    Screen('Flip', window)                                                  ;
+    
+    
+        
+    % Save rt of selecting preferred lottery and whether it was good/bad
+    passiveDFE_prefLottery_mat(1,sp_choice_count) = picked_loc                         ;
+    passiveDFE_prefLottery_mat(2,sp_choice_count) = rt                                 ;
+    passiveDFE_prefLottery_mat(3,sp_choice_count) = reward_bool                        ;
+    passiveDFE_prefLottery_mat(4,sp_choice_count) = picked_loc == good_lottery_loc     ;
+    passiveDFE_prefLottery_mat(5,sp_choice_count) = (~mod(subj_id,2) + reward_bool)    ;
+    passiveDFE_prefLottery_mat(6,sp_choice_count) = sp_choice_count                   ;
+    
+    sp_choice_count = sp_choice_count + 1                                 ; % update the counter of the preferred lottery data matrix
+    
+
+    WaitSecs(1)                                                             ; % Wait one second before displaying the actual feedback
+    % Recreate screen from above but this time with feedback
+    DrawFormattedText(window, SPaddUrn, 'center', ...
+        .25*screenYpixels, white)                                           ; % Text before feedback of preferred lottery
+    Screen('DrawLines', window, fixCoords,...
+        fixWidth, white, [xCenter yCenter], 2)                          ;
+
+    % drawing the checkerboard stim at the chosen location. The reward_bool
+    % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
+    Screen('FillRect', window, reward(:,:,reward_bool+1),...
+        rect_locs(:,:,picked_loc))                                          ;
+
+    Screen('DrawTextures', window, masktexture, [],...
+        mask_locs(:,:,picked_loc))                                          ;
+
+
+    Screen('Flip', window)                                                  ;
+    WaitSecs(2)                                                             ;
+
+
+    
+    % Now the subject has completed one DFE run. We calculate, how many
+    % trials remain to start a new trial or go on to the next task.
+    sp_idx_max = sp_idx_max - sp_idx                                     ;
+    sp_trial_count = sp_trial_count + 1                                   ;  
+    
+end % end of while loop implmenting all possible DFE runs
+
+% All DFE samples have been taken. Now there are four final draws from all
+% the results of the previous choices, thus from 
+% passiveDFE_prefLottery_mat(3,:)
+% the outcome of the uniform draw from this urn will be multiplied by 13
+% and will be the payoff for this game.
+
+passiveDFE_payoff_urn = repmat(passiveDFE_prefLottery_mat(3,:),1,4)         ; % this step is necessary to avoid randsample(0,4,true), which throws an error
+passiveDFE_payoff = randsample(passiveDFE_payoff_urn, 4)                    ; % repeating the payoff urn with 4 and drawing without replacement = not repeating the urn and drawing 4 times with replacement
+passiveDFE_payoff_sum = sum(passiveDFE_payoff*13)                           ; % overall payoff value
+
+DrawFormattedText(window, SPfinalUrn1, 'center', 'center', white)          ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ; 
+
+DrawFormattedText(window, SPfinalUrn2, 'center', 'center', white)          ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window, sprintf('You earned: %d', passiveDFE_payoff_sum), ...
+    'center', 'center', white)                                              ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
 
 
 if condi_idx ~= 4
@@ -549,9 +772,7 @@ DrawFormattedText(window, breakText, 'center', 'center', white)             ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 end
-
-
-
+    
     
 %% End the condition randomization
 end % ending switch procedure to choose current game protocol

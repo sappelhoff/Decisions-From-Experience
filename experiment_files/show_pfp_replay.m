@@ -91,7 +91,7 @@ for replay_run = 1:pfp_runs
     
     % Tell the subject how much was earned
     payoff = sum(aPFP_mat(4,:,pfp_run))                                     ; % the overall payoff
-    payoff_str = strcat(texts('payoff'), num2str(payoff))                   ;
+    payoff_str = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))   ;
     DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ; % Display payoff for 2 secs    

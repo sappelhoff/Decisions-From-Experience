@@ -28,6 +28,7 @@ texts('replay3') = sprintf('At the end, you will be asked, whether\n\nthe reward
 
 % Active PFP specific texts
 texts('aPFP_PrefLot') = sprintf('Which lottery do you think was more profitable?\nPress [left] or [right].');
+
 texts('aPFP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
 texts('aPFP_intro2') = sprintf('Each "win" outcome will be worth 1.\n\nEach "lose" outcome will be worth 0.');
 texts('aPFP_intro3') = sprintf('Try to maximize your "win" outcomes.\n\nYou need to balance exploration\n\nand exploitation of your options.');
@@ -35,6 +36,7 @@ texts('aPFP_intro3') = sprintf('Try to maximize your "win" outcomes.\n\nYou need
 
 % Active SP specific texts
 texts('aSPchoice') = sprintf('From which lottery do\nyou want to draw your payoff?\nPress [left] or [right]');
+texts('aSPfinal') = sprintf('You have reached the final\ntrial. You are granted one\nlast choice towards your payoff.');
 
 texts('aSP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
 texts('aSP_intro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
