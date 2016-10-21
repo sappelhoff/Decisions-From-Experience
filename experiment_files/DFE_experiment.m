@@ -15,10 +15,11 @@ function DFE_experiment
 
 %% Function start
 
-experiment_start = datestr(now)                                             ; % Get time of start of the experiment
+exp_start = datestr(now)                                                    ; % Get time of start of the experiment
 
 subj_id = inquire_user                                                      ; % get a user ID        
 total_earnings = 0                                                          ; % total earnings of user
+euro_factor = 0.25                                                          ; % factor to convert points to Euros
 
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
@@ -57,7 +58,7 @@ Screen('TextStyle', window, 0)                                              ; %0
 %-------------------------------------------------------------------------%
 
 [fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, ...
-    masktexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for this to avoid clutter
+    masktexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 %-------------------------------------------------------------------------%
 %                         Experimental Conditions                         %
@@ -108,7 +109,6 @@ lottery_option2 = [ones(1,3), zeros(1,7)]                                   ; % 
 
 texts = produce_texts                                                       ; % separate function which outputs a "container.Map"
 
-
 %-------------------------------------------------------------------------%
 %                         Experimental Loop                               %
 %-------------------------------------------------------------------------%
@@ -116,7 +116,7 @@ texts = produce_texts                                                       ; % 
 %% Welcome screen
 
 general_instructions(window, white, reward, masktexture, rect_locs, ...
-    mask_locs)                                                              ; % This will display the welcome screen and some general instructions
+    mask_locs, euro_factor)                                                 ; % This will display the welcome screen and some general instructions
 
 %% condition selection
 
@@ -230,19 +230,14 @@ KbStrokeWait                                                                ;
         'center', 'center', white)                                          ;
     Screen('Flip', window)                                                  ;
 
-
-
     % start decision process
     [picked_loc, ~, rt] = require_response(left_lottery, right_lottery)     ;
-
-    
+  
     % Record timing and whether preferred lottery was correct
     aPFP_prefLot_mat(1,1,pfp_run) = picked_loc                              ; % Which lottery was preferred? 1=left, 2=right
     aPFP_prefLot_mat(2,1,pfp_run) = rt                                      ; % rt to select preferred lottery
     aPFP_prefLot_mat(3,1,pfp_run) = picked_loc == good_lottery_loc          ; % boolean whether correct lottery was preferred
-    
-    
-    
+      
     end % end of bandit game loop
 
 % Now there will be a short break before we go to the next task
@@ -329,7 +324,7 @@ KbStrokeWait                                                                ;
 % if subject always goes to choice in first attempt
 
 sp_idx_max = overall_trials                                                 ;
-sp_trial_count = 1                                                          ; % defines an SP "run", i.e., all samples taken before a choice belong to a run
+sp_run_count = 1                                                          ; % defines an SP "run", i.e., all samples taken before a choice belong to a run
 dat_idx_count = 1                                                           ; % to know where in our data matrix to place the responses
 sp_choice_count = 1                                                         ; % also a data matrix counter to place the preferred lotteries
 prev_samples = 0                                                            ; % variable to calculate number of samples prior to a choice
@@ -341,7 +336,7 @@ while sp_idx_max >= 1                                                       ; % 
             determine_lottery_loc(lottery_option1, lottery_option2)         ; % place good and bad lottery randomly either left or right
 
             
-    % starting a new SP
+    % starting a new SP by shuffling the lotteries
     DrawFormattedText(window, texts('shuffled'), 'center', 'center', white) ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ;
@@ -423,7 +418,7 @@ while sp_idx_max >= 1                                                       ; % 
                 aSP_mat(2,dat_idx_count) = rt                               ; % how quickly was it picked in ms
                 aSP_mat(3,dat_idx_count) = reward_bool                      ; % boolean whether is was rewarded or not
                 aSP_mat(4,dat_idx_count) = (good_lottery_loc == picked_loc) ; % boolean whether good or bad lottery was chosen
-                aSP_mat(5,dat_idx_count) = sp_trial_count                   ; % current sp "run"
+                aSP_mat(5,dat_idx_count) = sp_run_count                   ; % current sp "run"
 
                 dat_idx_count = dat_idx_count + 1                           ; % update our data index counter
                 WaitSecs(1)                                                 ; % after choice, wait 1 sec before displaying result
@@ -495,6 +490,13 @@ while sp_idx_max >= 1                                                       ; % 
     
     
     % Tell the subject how much she has earned 
+    switch reward_bool
+        case 0
+            payoff = -3;
+        case 1
+            payoff = 10;
+    end
+    
     payoff_str = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))   ;
     DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
     Screen('Flip', window)                                                  ;
@@ -505,7 +507,7 @@ while sp_idx_max >= 1                                                       ; % 
     % Now the subject has completed one SP run. We calculate, how many
     % trials remain to start a new trial or go on to the next task.
     sp_idx_max = sp_idx_max - sp_idx                                        ;
-    sp_trial_count = sp_trial_count + 1                                     ; 
+    sp_run_count = sp_run_count + 1                                     ; 
     
 end % end of while loop implmenting all possible SP runs
 
@@ -550,111 +552,38 @@ Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 end
 
-
-
-    
 %% End the condition randomization
 end % ending switch procedure to choose current game protocol
 end % ending for loop implementing the random choice of games
 
-
 %-------------------------------------------------------------------------%
 %                         Closing the Experiment                          %
 %-------------------------------------------------------------------------%
-%% Finishing up
+%% Finishing up and showing final payoff
 
-
-DrawFormattedText(window, texts('end'),'center', 'center', white)                 ;
-
+DrawFormattedText(window, texts('end'),'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ; 
+
+payoff_str = strcat(texts('total_payoff'), sprintf(' %d?', ...
+    total_earnings*euro_factor))                                            ; % This displays the total earnings of the participant
+DrawFormattedText(window, payoff_str, 'center', 'center', white)            ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ; % Wait for a key press to close the window and clear the screen
 
 
-% Wait for a key press to close the window and clear the screen
-KbStrokeWait                                                                ;
+
 
 % Get time of end of the experiment
-experiment_end = datestr(now)                                               ; % ... it's good to know the time when the experiment ended
+exp_end = datestr(now)                                                      ; % ... it's good to know the time when the experiment ended
 
-sca                                                                         ;
-
+sca                                                                         ; % shut down Psychtoolbox
 
 %% Saving all the data
+% use a separate function for this, which creates a "package" in form of a
+% matlab structure out of all the data of the experiment and saves it
+% neatly together with a readme in form of a matlab cell.
 
-
-% data 'readme' cells for quick reference in data analysis part
-
-SP_Readme = cell(6,1);
-SP_Readme(1,1) = cellstr('row1: which location was picked? 1=left 2=right');
-SP_Readme(2,1) = cellstr('row2: how quickly was it picked in ms? (for passive DFE: how long was the jitter)');
-SP_Readme(3,1) = cellstr('row3: was it rewarded? 0=no, 1=yes');
-SP_Readme(4,1) = cellstr('row4: was the good lottery chosen? 0=no, 1=yes') ;
-SP_Readme(5,1) = cellstr('row5: what is the current "run" in SP / counts the samples previous to choice');
-SP_Readme(6,1) = cellstr('*Additional INFO*: the "payoff" array describes the four final draws from the reward urn');
-
-
-% In Bandit, we do not have a feedback for the last 'draw' of indicating
-% your preferred lottery. Thus, there are two cells less in the choice
-% Bandit (whether feedback was rewarded, and which color it had) compared
-% to the sample bandit.
-% Furthermore, the Bandit data structure has separate bandit runs encoded
-% in the 3rd dimension, whereas the DFE data structure does this in 2D
-PFP_Readme = cell(5,1);
-PFP_Readme(1,1) = cellstr('row1: which location was picked? 1=left 2=right');
-PFP_Readme(2,1) = cellstr('row2: how quickly was it picked in ms? (for passive Bandit: how long was the jitter)');
-PFP_Readme(3,1) = cellstr('row3: was the good lottery chosen? 0=no, 1=yes');
-PFP_Readme(4,1) = cellstr('row4: *Only for sample*: was it rewarded? 0=no, 1=yes');
-PFP_Readme(5,1) = cellstr('*Additional INFO*: separate bandit runs are encoded in the 3rd dimension of the data structure');
-
-
-% one data structure with every game type as a nested structure, which then
-% contains the data
-
-activeSP.sampleData = aSP_mat                                        ;
-activeSP.choiceData = aSP_prefLot_mat                            ;
-activeSP.payoff = activeDFE_payoff                                         ;
-activeSP.readme = SP_Readme                                               ;
-
-passiveSP.sampleData = passiveDFE_mat                                      ;
-passiveSP.choiceData = passiveDFE_prefLottery_mat                          ;
-passiveSP.payoff = passiveDFE_payoff                                       ;
-passiveSP.readme = SP_Readme                                              ;
-
-activePFP.sampleData = aPFP_mat                                  ;
-activePFP.choiceData = aPFP_prefLot_mat                      ;
-activePFP.readme = PFP_Readme                                         ;
-
-passivePFP.sampleData = passiveBandit_mat                                ;
-passivePFP.choiceData = passiveBandit_prefLottery_mat                    ;
-passivePFP.readme = PFP_Readme                                        ;
-
-experimentalVars.expStart = experiment_start                                ;
-experimentalVars.expEnd = experiment_end                                    ;
-experimentalVars.subj_id = subj_id                                          ;
-
-data.activeSP = activeSP                                                  ;
-data.passiveSP = passiveSP                                                ;
-data.activePFP = activePFP                                            ;
-data.passivePFP = passivePFP                                          ;
-data.experimentalVars = experimentalVars                                    ;   
-
-% Save all the data with an appropriate file name 
-
-cd ..                                                                       ; % data dir is a sibling of the current working dir, not a child
-
-% make sure we get the correct data dir
-if exist(fullfile(pwd, 'data'),'dir')==7
-    data_dir = fullfile(pwd, 'data')                                        ;
-    sprintf('Saving in data dir: %s', data_dir)         
-else
-    mkdir(data)
-    data_dir = fullfile(pwd, 'data')                                        ;  
-    sprintf('creating new data dir: %s', data_dir) 
-end
-
-% saving it to the data dir
-cur_time = datestr(datetime('now','Format','d_MMM_y_HH_mm_ss'))             ; % the current time and date                                          
-fname = fullfile(data_dir, strcat('subj_', sprintf('%03d_', subj_id), ...
-    cur_time, '.mat'))                                                      ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'data')                                                         ; % save it!
+save_data(exp_start, exp_end, total_earnings, subj_id)                      ; % data located in /data ... sibling dir of /experiment_files
 
 end % function end

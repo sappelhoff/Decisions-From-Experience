@@ -6,6 +6,15 @@ function texts = produce_texts
 % the text strings with a specific key.
 % 
 % see: http://de.mathworks.com/help/matlab/ref/containers.map-class.html
+%
+% Parameters
+% ----------
+% - None
+%
+% Returns
+% ----------
+% - texts: a container.Map with all necessary strings for the experiment
+
 
 %% Function start
 
@@ -17,8 +26,8 @@ texts('break') = sprintf('Now there will be a short break\n\nbefore we continue 
 texts('end') = sprintf('You are done.\n\nThank you for participating!\n\n\nPress a key to close.');
 texts('shuffled') = sprintf('The lotteries have been shuffled.');
 texts('payoff') = sprintf('You earned: ');
+texts('total_payoff') = sprintf('Your overall payoff\nwill be: ');
 texts('next_intro') = sprintf('Welcome to the next task.\n\nPlease carefully read the following instructions.');
-
 
 % Passive conditions texts
 texts('replay1') = sprintf('You will now see a replay of\n\nsomeone''s performance on the previous task.\n\nThe same rules as before apply.');
@@ -42,7 +51,7 @@ texts('aSP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [r
 texts('aSP_intro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
 texts('aSP_intro3') = sprintf('Once you have taken enough samples\n\nto know whether a certain lottery is profitable,\n\nyou can stop sampling and choose a lottery');
 texts('aSP_intro4') = sprintf('Upon choice, the outcome is added\n\nto your payoff. After that,\n\nyou can continue to sample.\n\nHowever, the lotteries will be shuffled.');
-texts('aSP_intro5') = sprintf('A "win" outcome upon choice will be worth 10.\n\nA "lose" outcome upon choice will be worth 0.');
+texts('aSP_intro5') = sprintf('A "win" outcome upon choice will be worth 10.\n\nA "lose" outcome upon choice will be worth -3.');
 texts('aSP_intro6') = sprintf('Feel free to explore your options through sampling.\n\nThe outcomes will only affect your reward once you finally decide for one option.');
 
 end

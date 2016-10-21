@@ -1,4 +1,4 @@
-function general_instructions(window, white, reward, masktexture, rect_locs, mask_locs)
+function general_instructions(window, white, reward, masktexture, rect_locs, mask_locs, euro_factor)
 
 % a function to display the initial instructions to the participants
 
@@ -11,6 +11,7 @@ function general_instructions(window, white, reward, masktexture, rect_locs, mas
 % - masktexture: required to make the stimuli seem circular
 % - rect_locs: locations of the stimuli
 % - mask_locs: locations of the masks to make the stimuli seem circular
+% - euro_factor: the factor that converts points into euros
 %
 % Returns
 % ----------
@@ -26,6 +27,7 @@ instruct4 = sprintf('Although the following tasks might differ slightly,\n\nyour
 instruct5 = sprintf('On the following screens, you will be\n\nshown, what a "win" and a "lose" outcome\n\nlook like.\n\n\nRemember these outcomes well.');
 showWin = sprintf('This outcome signifies "win"');
 showLose = sprintf('This outcome signifies "lose"');
+instruct6 = sprintf('Depending on the task, the outcomes\n\nwill be worth several points.\n\nAt the end of the experiment,\n\nyour overall points will be\n\n multiplied by %0.2f to\n\ndetermine your payoff.', euro_factor);
 leadOver = sprintf('Before each task, you will receive\n\nmore detailed instructions.\n\n\nIf you have any questions,\n\nplease ask the experimenter.\n\n\nIf you are ready, press any key to start.');
 
 
@@ -67,6 +69,10 @@ Screen('FillRect', window, reward(:,:,1), rect_locs(:,:,3))                 ;
 Screen('DrawTextures', window, masktexture, [], mask_locs(:,:,3))           ;
 Screen('Flip', window)                                                      ;
 WaitSecs(2)                                                                 ; % force people to look at it for at least 2 seconds
+KbStrokeWait                                                                ;
+
+DrawFormattedText(window, instruct6,'center', 'center', white)              ;
+Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
 % Leading over to real experiment
