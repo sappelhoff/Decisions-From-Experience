@@ -205,7 +205,7 @@ KbStrokeWait                                                                ;
         % even id, blue is win 
         aPFP_mat(1,pfp_idx,pfp_run) = picked_loc                            ; % which location was picked: 1, left - 2, right
         aPFP_mat(2,pfp_idx,pfp_run) = rt                                    ; % how quickly was it picked in ms
-        aPFP_mat(3,pfp_idx,pfp_run) = (good_lottery_loc == picked_loc)      ; % boolean whether good or bad lottery was chosen
+        aPFP_mat(3,pfp_idx,pfp_run) = (good_lottery_loc == picked_loc)      ; % boolean was the good lottery chosen? 0=no, 1=yes
         aPFP_mat(4,pfp_idx,pfp_run) = reward_bool                           ; % boolean whether is was rewarded or not
 
 
@@ -285,7 +285,7 @@ case 3
 
 
 % here we can save the data
-aSP_mat = nan(5,overall_trials)                                             ;
+aSP_mat = nan(4,overall_trials)                                             ;
 
 % Here we save the preferred lottery data
 aSP_prefLot_mat = nan(5,1)                                                  ; % we cannot preallocate exactly, but there will be at least ONE choice in DFE
@@ -368,6 +368,20 @@ while sp_idx_max >= 1                                                       ; % 
 
             % start decision process. This time, only location is relevant
             [picked_loc] = require_response(left_lottery, right_lottery)    ;
+            
+            % show the chosen option
+            if picked_loc == 1
+                DrawFormattedText(window, 'draw another sample', ...
+                    'center', 'center', white, [], [], [], [], [],textwin1) ;
+                Screen('Flip', window)                                      ;
+                WaitSecs(2)                                                 ; % show chosen option for 1 sec
+
+            elseif picked_loc == 2
+                DrawFormattedText(window, 'make a choice', ...
+                    'center', 'center', white, [], [], [], [], [],textwin2) ;
+                Screen('Flip', window)                                      ;
+                WaitSecs(2)                                                 ; % show chosen option for 1 sec
+            end
         
         else
             picked_loc = 1                                                  ; % If it's the first draw of a new game, take a sample, without asking whether subject actually wants 'choice'
@@ -418,7 +432,6 @@ while sp_idx_max >= 1                                                       ; % 
                 aSP_mat(2,dat_idx_count) = rt                               ; % how quickly was it picked in ms
                 aSP_mat(3,dat_idx_count) = reward_bool                      ; % boolean whether is was rewarded or not
                 aSP_mat(4,dat_idx_count) = (good_lottery_loc == picked_loc) ; % boolean whether good or bad lottery was chosen
-                aSP_mat(5,dat_idx_count) = sp_run_count                   ; % current sp "run"
 
                 dat_idx_count = dat_idx_count + 1                           ; % update our data index counter
                 WaitSecs(1)                                                 ; % after choice, wait 1 sec before displaying result
