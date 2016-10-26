@@ -39,8 +39,7 @@ texts('replay3') = sprintf('At the end, you will be asked, whether\n\nthe reward
 texts('aPFP_PrefLot') = sprintf('Which lottery do you think was more profitable?\nPress [left] or [right].');
 
 texts('aPFP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
-texts('aPFP_intro2') = sprintf('Each "win" outcome will be worth 1.\n\nEach "lose" outcome will be worth 0.');
-texts('aPFP_intro3') = sprintf('Try to maximize your "win" outcomes.\n\nYou need to balance exploration\n\nand exploitation of your options.');
+texts('aPFP_intro2') = sprintf('Try to maximize your "win" outcomes.\n\nYou need to balance exploration\n\nand exploitation of your options.');
 
 
 % Active SP specific texts
@@ -51,7 +50,6 @@ texts('aSP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [r
 texts('aSP_intro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
 texts('aSP_intro3') = sprintf('Once you have taken enough samples\n\nto know whether a certain lottery is profitable,\n\nyou can stop sampling and choose a lottery');
 texts('aSP_intro4') = sprintf('Upon choice, the outcome is added\n\nto your payoff. After that,\n\nyou can continue to sample.\n\nHowever, the lotteries will be shuffled.');
-texts('aSP_intro5') = sprintf('A "win" outcome upon choice will be worth 10.\n\nA "lose" outcome upon choice will be worth -3.');
-texts('aSP_intro6') = sprintf('Feel free to explore your options through sampling.\n\nThe outcomes will only affect your reward once you finally decide for one option.');
+texts('aSP_intro5') = sprintf('Feel free to explore your options\n\nthrough sampling.The outcomes\n\nwill only affect your reward\n\n once you finally decide for one option.');
 
 end

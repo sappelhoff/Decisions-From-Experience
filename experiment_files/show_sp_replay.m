@@ -1,18 +1,18 @@
-function show_sp_replay(aSP_mat, aSP_prefLot_mat, texts, reward, window, white, masktexture, mask_locs, rect_locs, screenXpixels, screenYpixels)
+function show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, screenXpixels, screenYpixels)
 
 % This function executes a replay
 %
 % Parameters
 % ----------
-% - aSP_mat: The aSP_mat from which a previous game can be deduced.
-% - aSP_prefLot_mat: needed for reproducing choice trials
+% - aSPmat: The aSP_mat from which a previous game can be deduced.
+% - aSPprefLotMat: needed for reproducing choice trials
 % - texts: a container.Map with all texts for display
 % - reward: the stimuli matrix that encodes the rewards
 % - the window that we draw to
 % - white: the color ...
-% - masktexture: texture to make our stimuli seem circular
-% - mask_locs: locations of the mask texture
-% - rect_locs: locations of the stimuli
+% - maskTexture: texture to make our stimuli seem circular
+% - maskLocs: locations of the mask texture
+% - rectLocs: locations of the stimuli
 % - screenXpixels: width of screen
 % - screenYpixels: height of screen
 %
@@ -23,9 +23,9 @@ function show_sp_replay(aSP_mat, aSP_prefLot_mat, texts, reward, window, white, 
 %% Function start
 
 % Getting our indices ready for the replay
-prev_samples = aSP_prefLot_mat(5,:)                                         ; % vector containing samples taken before a choice
-all_choices = length(prev_samples)                                          ; % number of choices in whole SP task
-aSP_data_idx = 1                                                            ; % to access the sample data throughout the loops with right idx
+prevSamples = aSPprefLotMat(5,:)                                            ; % vector containing samples taken before a choice
+allChoices = length(prevSamples)                                            ; % number of choices in whole SP task
+aSPdataIdx = 1                                                              ; % to access the sample data throughout the loops with right idx
 
 
 % Drawing the text options for sample vs choice decision      
@@ -35,20 +35,20 @@ textwin2 = [screenXpixels*.6, screenYpixels*.5, ...
     screenXpixels*.9, screenYpixels*.5]                                     ; % left top right bottom
 
 
-for choice_run = 1:all_choices % before each choice, there is a number of samples drawn. 
+for choiceRun = 1:allChoices % before each choice, there is a number of samples drawn. 
 
     % Pretend the lotteries have been shuffled
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ;
     
-    for samples = 1:prev_samples(choice_run) % the number of samples can be obtained here by indexing with the choice of interest
+    for samples = 1:prevSamples(choiceRun) % the number of samples can be obtained here by indexing with the choice of interest
    
         % start with a pick
-        picked_loc = aSP_mat(1, aSP_data_idx)                               ;
-        rt = aSP_mat(2, aSP_data_idx)                                       ;
-        reward_bool = aSP_mat(3, aSP_data_idx)                              ;
-        aSP_data_idx = aSP_data_idx + 1                                     ; % increment our data index for next display
+        pickedLoc = aSPmat(1, aSPdataIdx)                                   ;
+        rt = aSPmat(2, aSPdataIdx)                                          ;
+        rewardBool = aSPmat(3, aSPdataIdx)                                  ;
+        aSPdataIdx = aSPdataIdx + 1                                         ; % increment our data index for next display
         
         % Replay decision process originally, as long as it is [1,3]sec
         if rt < 1 ||  rt > 3
@@ -74,11 +74,11 @@ for choice_run = 1:all_choices % before each choice, there is a number of sample
         % drawing the checkerboard stim at the chosen location. The
         % reward_bool tells us win(1) or loss(0) ... we add 1 so we get
         % win=2, loss=1
-        Screen('FillRect', window, reward(:,:,reward_bool+1),...
-            rect_locs(:,:,picked_loc))                                      ;
+        Screen('FillRect', window, reward(:,:,rewardBool+1),...
+            rectLocs(:,:,pickedLoc))                                      ;
 
-        Screen('DrawTextures', window, masktexture, [],...
-            mask_locs(:,:,picked_loc))                                      ;            
+        Screen('DrawTextures', window, maskTexture, [],...
+            maskLocs(:,:,pickedLoc))                                      ;            
         Screen('Flip', window)                                              ;
         WaitSecs(2)                                                         ; % show feedback for 2 seconds
             
@@ -101,7 +101,7 @@ for choice_run = 1:all_choices % before each choice, there is a number of sample
         
         % answer ... depending on "samples" idx whether another sample or
         % choice
-        if samples ~= prev_samples(choice_run)
+        if samples ~= prevSamples(choiceRun)
             % if samples idx is not at its max, just sample ...
             DrawFormattedText(window, 'draw another sample', ...
                 'center', 'center', white, [], [], [], [], [], textwin1)    ;
@@ -118,9 +118,9 @@ for choice_run = 1:all_choices % before each choice, there is a number of sample
             WaitSecs(1+rand)                                                ; % For this, just wait briefly above 1 sec 
             
             % get the historical values from our data
-            picked_loc = aSP_prefLot_mat(1, choice_run)                     ;
-            rt = aSP_prefLot_mat(2, choice_run)                             ; % see a few lines below for checking the RT to be reasonable
-            reward_bool = aSP_prefLot_mat(3, choice_run)                    ;
+            pickedLoc = aSPprefLotMat(1, choiceRun)                     ;
+            rt = aSPprefLotMat(2, choiceRun)                             ; % see a few lines below for checking the RT to be reasonable
+            rewardBool = aSPprefLotMat(3, choiceRun)                    ;
             
             
             % Replay decision process originally, as long as it is [1,3]sec
@@ -144,11 +144,11 @@ for choice_run = 1:all_choices % before each choice, there is a number of sample
             % drawing the checkerboard stim at the chosen location. The
             % reward_bool tells us win(1) or loss(0) ... we add 1 so we get
             % win=2, loss=1
-            Screen('FillRect', window, reward(:,:,reward_bool+1),...
-                rect_locs(:,:,picked_loc))                                  ;
+            Screen('FillRect', window, reward(:,:,rewardBool+1),...
+                rectLocs(:,:,pickedLoc))                                  ;
 
-            Screen('DrawTextures', window, masktexture, [],...
-                mask_locs(:,:,picked_loc))                                  ;            
+            Screen('DrawTextures', window, maskTexture, [],...
+                maskLocs(:,:,pickedLoc))                                  ;            
             Screen('Flip', window)                                          ;
             WaitSecs(2)                                                     ; % show feedback for 2 seconds
             

@@ -1,18 +1,18 @@
-function save_data(exp_start, exp_end, total_earnings, subj_id, aPFP_mat, aPFP_prefLot_mat, aSP_mat, aSP_prefLot_mat)
+function save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, aPFPprefLotMat, aSPmat, aSPprefLotMat)
 
 % a function that neatly saves all data of the experiment and adds some
 % readme information.
 %
 % Parameters
 % ----------
-% - exp_start: start of experiment (date time)
-% - exp_end: end of experiment (date time)
-% - total_earnings: the total amount of points gathered in the experiment
-% - subj_id: ID of the subject
-% - aPFP_mat: containing the data from the active Partial feedback Paradigm
-% - aPFP_prefLot_mat: containing the "what was the best lottery" data
-% - aSP_mat: containing the samples data from the active Sampling Paradigm
-% - aSP_prefLot_mat: containing the choice data from the aSP
+% - expStart: start of experiment (date time)
+% - expEnd: end of experiment (date time)
+% - totalEarnings: the total amount of points gathered in the experiment
+% - subjId: ID of the subject
+% - aPFPmat: containing the data from the active Partial feedback Paradigm
+% - aPFPprefLotMat: containing the "what was the best lottery" data
+% - aSPmat: containing the samples data from the active Sampling Paradigm
+% - aSPprefLotMat: containing the choice data from the aSP
 %
 % Returns
 % ----------
@@ -54,22 +54,22 @@ SP_Readme(5,1) = cellstr('row5: Counts the samples previous to choice');
 % contains the data
 
 % Partial Feedback Paradigm Data
-aPFP.sampleData = aPFP_mat                                                  ;
-aPFP.prefLotData = aPFP_prefLot_mat                                         ;
+aPFP.sampleData = aPFPmat                                                   ;
+aPFP.prefLotData = aPFPprefLotMat                                           ;
 aPFP.readme = PFPreadme                                                     ;
 
 
 % Sampling Paradigm Data
-aSP.sampleData = aSP_mat                                                    ;
-aSP.choiceData = aSP_prefLot_mat                                            ;
+aSP.sampleData = aSPmat                                                     ;
+aSP.choiceData = aSPprefLotMat                                              ;
 aSP.readme = SP_Readme                                                      ;
 
 
 % other variables of interest
-experimentalVars.expStart = exp_start                                       ;
-experimentalVars.expEnd = exp_end                                           ;
-experimentalVars.subj_id = subj_id                                          ;
-experimentalVars.total_earnings = total_earnings                            ;
+experimentalVars.expStart = expStart                                        ;
+experimentalVars.expEnd = expEnd                                            ;
+experimentalVars.subj_id = subjId                                           ;
+experimentalVars.total_earnings = totalEarnings                             ;
 
 
 % Now the overarching data structure
@@ -95,7 +95,7 @@ end
 
 % saving it to the data dir
 cur_time = datestr(datetime('now','Format','d_MMM_y_HH_mm_ss'))             ; % the current time and date                                          
-fname = fullfile(data_dir, strcat('subj_', sprintf('%03d_', subj_id), ...
+fname = fullfile(data_dir, strcat('subj_', sprintf('%03d_', subjId), ...
     cur_time, '.mat'))                                                      ; % fname consists of subj_id and datetime to avoid overwriting files
 save(fname, 'data')                                                         ; % save it!
 

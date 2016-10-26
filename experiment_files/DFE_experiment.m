@@ -15,11 +15,11 @@ function DFE_experiment
 
 %% Function start
 
-exp_start = datestr(now)                                                    ; % Get time of start of the experiment
+expStart = datestr(now)                                                     ; % Get time of start of the experiment
 
-subj_id = inquire_user                                                      ; % get a user ID        
-total_earnings = 0                                                          ; % total earnings of user
-euro_factor = 0.25                                                          ; % factor to convert points to Euros
+subjId = inquire_user                                                       ; % get a user ID        
+totalEarnings = 0                                                           ; % total earnings of user
+euroFactor = 0.25                                                           ; % factor to convert points to Euros
 
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
@@ -57,8 +57,8 @@ Screen('TextStyle', window, 0)                                              ; %0
 %                      Preparing all Stimuli                              %
 %-------------------------------------------------------------------------%
 
-[fixWidth, fixCoords, colors_1, colors_2, rect_locs, mask_locs, ...
-    masktexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
+[fixWidth, fixCoords, colors1, colors2, rectLocs, maskLocs, ...
+    maskTexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 %-------------------------------------------------------------------------%
 %                         Experimental Conditions                         %
@@ -69,8 +69,8 @@ Screen('TextStyle', window, 0)                                              ; %0
 % SP game. If participants finish earlier, they get the next game of SP
 % and so on, until the overall trials are reached. For PFP games, there
 % are x PFP draws per game and thus (overall_trials/x) PFP games overall
-overall_trials = 10                                                         ; 
-pfp_trials = 5                                                              ; 
+overallTrials = 4                                                           ; 
+pfpTrials = 2                                                               ; 
 
 % selection whether blue or red stimulus will represent the reward;
 % colors_1 is red, colors_2 is blue. The selection is depending on subject
@@ -88,18 +88,18 @@ pfp_trials = 5                                                              ;
 % 3 = active SP
 % 4 = passive SP (replay of active SP)
 
-if ~mod(subj_id,2)                                                       
-    reward = cat(3, colors_1, colors_2)                                     ; % even ID ... put red as loss ... put blue as win ... start with SP
-    condi_order = [3, 4, 1, 2]                                              ; % use this variable later for a 'switch' procedure
+if ~mod(subjId,2)                                                       
+    reward = cat(3, colors1, colors2)                                       ; % even ID ... put red as loss ... put blue as win ... start with SP
+    condiOrder = [3, 4, 1, 2]                                               ; % use this variable later for a 'switch' procedure
 else 
-    reward = cat(3, colors_2, colors_1)                                     ; % odd ID ... put blue as loss ... put red as win ... start with PFP
-    condi_order = [1, 2, 3, 4]                                              ; % use this variable later for a 'switch' procedure
+    reward = cat(3, colors2, colors1)                                       ; % odd ID ... put blue as loss ... put red as win ... start with PFP
+    condiOrder = [1, 2, 3, 4]                                               ; % use this variable later for a 'switch' procedure
 end
 
 
 % Create some lotteries - these are stable and hardcoded across the study
-lottery_option1 = [ones(1,7), zeros(1,3)]                                   ; % p(win)=.7 --> good lottery
-lottery_option2 = [ones(1,3), zeros(1,7)]                                   ; % p(win)=.3 --> bad lottery
+lotteryOption1 = [ones(1,7), zeros(1,3)]                                    ; % p(win)=.7 --> good lottery
+lotteryOption2 = [ones(1,3), zeros(1,7)]                                    ; % p(win)=.3 --> bad lottery
 
 %-------------------------------------------------------------------------%
 %                         Text Presentation                               %
@@ -115,26 +115,26 @@ texts = produce_texts                                                       ; % 
 
 %% Welcome screen
 
-general_instructions(window, white, reward, masktexture, rect_locs, ...
-    mask_locs, euro_factor)                                                 ; % This will display the welcome screen and some general instructions
+general_instructions(window, white, reward, maskTexture, rectLocs, ...
+    maskLocs, euroFactor)                                                   ; % This will display the welcome screen and some general instructions
 
 %% condition selection
 
 for condi_idx = 1:4
-current_condi = condi_order(condi_idx)                                      ; % condi_order has been set up before according to odd/even id of subj
+currentCondi = condiOrder(condi_idx)                                        ; % condi_order has been set up before according to odd/even id of subj
 
-switch current_condi
+switch currentCondi
     
 case 1
 %% Active Partial Feedback Paradigm (aPFP)
 
 % here we can save the data
-aPFP_mat = nan(4,pfp_trials,(overall_trials / pfp_trials))                  ; % for each bandit run, we have one 2D matrix ... each bandit run is one sheet(3D)
+aPFPmat = nan(4, pfpTrials, (overallTrials / pfpTrials))                    ; % for each bandit run, we have one 2D matrix ... each bandit run is one sheet(3D)
 
 % Here we save the preferred lottery data --> which one is preferred
 % (1=left, 2=right), is it the good one? (0/1), how quickly was it chosen
 % (rt)
-aPFP_prefLot_mat = nan(3,1,(overall_trials/pfp_trials))                     ; 
+aPFPprefLotMat = nan(3, 1, (overallTrials / pfpTrials))                     ; 
 
     
 % Active PFP Instructions
@@ -150,16 +150,12 @@ DrawFormattedText(window,texts('aPFP_intro2'), 'center', 'center', white)   ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window,texts('aPFP_intro3'), 'center', 'center', white)   ;
-Screen('Flip', window)                                                      ;
-KbStrokeWait                                                                ;
 
-
-    for pfp_run = 1:(overall_trials / pfp_trials)
+    for pfpRun = 1:(overallTrials / pfpTrials)
 
     
-    [left_lottery, right_lottery, good_lottery_loc] = ...
-        determine_lottery_loc(lottery_option1, lottery_option2)             ; % place good and bad lottery randomly either left or right
+    [leftLottery, rightLottery, goodLotteryLoc] = ...
+        determine_lottery_loc(lotteryOption1, lotteryOption2)               ; % place good and bad lottery randomly either left or right
  
     % starting a new PFP
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
@@ -169,11 +165,11 @@ KbStrokeWait                                                                ;
         
 
     % actual loop
-    for pfp_idx = 1:pfp_trials
+    for pfpIdx = 1:pfpTrials
 
         % drawing trialcounter
-        trial_counter = strcat(num2str(pfp_idx),'/',num2str(pfp_trials))    ; % The pfp counter always shows current draw out of all draws within one game
-        DrawFormattedText(window, trial_counter, 'center', 'center', white) ;
+        trialCounter = strcat(num2str(pfpIdx),'/',num2str(pfpTrials))       ; % The pfp counter always shows current draw out of all draws within one game
+        DrawFormattedText(window, trialCounter, 'center', 'center', white)  ;
         Screen('Flip', window)                                              ;
 
         % drawing the fixcross
@@ -184,8 +180,8 @@ KbStrokeWait                                                                ;
         Screen('Flip', window)                                              ; % then show fixcross
 
         % start decision process
-        [picked_loc, reward_bool, ...
-            rt] = require_response(left_lottery, right_lottery)             ;
+        [pickedLoc, rewardBool, ...
+            rt] = require_response(leftLottery, rightLottery)               ;
 
         % drawing the fixcross
         Screen('DrawLines', window, fixCoords,...
@@ -195,18 +191,18 @@ KbStrokeWait                                                                ;
         % bool tells us win(1) or loss(0) ... we add 1 so we get win=2,
         % loss=1
 
-        Screen('FillRect', window, reward(:,:,reward_bool+1),...
-            rect_locs(:,:,picked_loc))                                      ;
+        Screen('FillRect', window, reward(:,:,rewardBool+1),...
+            rectLocs(:,:,pickedLoc))                                        ;
 
-        Screen('DrawTextures', window, masktexture, [],...
-            mask_locs(:,:,picked_loc))                                      ;
+        Screen('DrawTextures', window, maskTexture, [],...
+            maskLocs(:,:,pickedLoc))                                        ;
 
 
         % even id, blue is win 
-        aPFP_mat(1,pfp_idx,pfp_run) = picked_loc                            ; % which location was picked: 1, left - 2, right
-        aPFP_mat(2,pfp_idx,pfp_run) = rt                                    ; % how quickly was it picked in ms
-        aPFP_mat(3,pfp_idx,pfp_run) = (good_lottery_loc == picked_loc)      ; % boolean was the good lottery chosen? 0=no, 1=yes
-        aPFP_mat(4,pfp_idx,pfp_run) = reward_bool                           ; % boolean whether is was rewarded or not
+        aPFPmat(1,pfpIdx,pfpRun) = pickedLoc                                ; % which location was picked: 1, left - 2, right
+        aPFPmat(2,pfpIdx,pfpRun) = rt                                       ; % how quickly was it picked in ms
+        aPFPmat(3,pfpIdx,pfpRun) = (goodLotteryLoc == pickedLoc)            ; % boolean was the good lottery chosen? 0=no, 1=yes
+        aPFPmat(4,pfpIdx,pfpRun) = rewardBool                               ; % boolean whether is was rewarded or not
 
 
         WaitSecs(1)                                                         ; % after choice, wait 1 sec before displaying result
@@ -216,12 +212,12 @@ KbStrokeWait                                                                ;
     end
 
     % Tell the subject how much she has earned
-    payoff = sum(aPFP_mat(4,:,pfp_run))                                     ; % the overall payoff 
-    payoff_str = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))   ;    
-    DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
+    payoff = sum(aPFPmat(4,:,pfpRun))                                       ; % the overall payoff 
+    payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;    
+    DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ; % show payoff for 2 secs
-    total_earnings = total_earnings + payoff                                ; % increment the total earnings of the participant
+    totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
     
     
 
@@ -231,12 +227,12 @@ KbStrokeWait                                                                ;
     Screen('Flip', window)                                                  ;
 
     % start decision process
-    [picked_loc, ~, rt] = require_response(left_lottery, right_lottery)     ;
+    [pickedLoc, ~, rt] = require_response(leftLottery, rightLottery)        ;
   
     % Record timing and whether preferred lottery was correct
-    aPFP_prefLot_mat(1,1,pfp_run) = picked_loc                              ; % Which lottery was preferred? 1=left, 2=right
-    aPFP_prefLot_mat(2,1,pfp_run) = rt                                      ; % rt to select preferred lottery
-    aPFP_prefLot_mat(3,1,pfp_run) = picked_loc == good_lottery_loc          ; % boolean whether correct lottery was preferred
+    aPFPprefLotMat(1,1,pfpRun) = pickedLoc                                  ; % Which lottery was preferred? 1=left, 2=right
+    aPFPprefLotMat(2,1,pfpRun) = rt                                         ; % rt to select preferred lottery
+    aPFPprefLotMat(3,1,pfpRun) = pickedLoc == goodLotteryLoc                ; % boolean whether correct lottery was preferred
       
     end % end of bandit game loop
 
@@ -269,8 +265,8 @@ KbStrokeWait                                                                ;
 
 
 % Show the replay!
-show_pfp_replay(aPFP_mat, texts, reward, window, white, masktexture, ...
-    mask_locs, rect_locs)                                                   ;
+show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, ...
+    maskLocs, rectLocs)                                                     ;
 
 
 if condi_idx ~= 4
@@ -285,10 +281,10 @@ case 3
 
 
 % here we can save the data
-aSP_mat = nan(4,overall_trials)                                             ;
+aSPmat = nan(4,overallTrials)                                               ;
 
 % Here we save the preferred lottery data
-aSP_prefLot_mat = nan(5,1)                                                  ; % we cannot preallocate exactly, but there will be at least ONE choice in DFE
+aSPprefLotMat = nan(5,1)                                                    ; % we cannot preallocate exactly, but there will be at least ONE choice in DFE
 
 
 % Active DFE Instructions
@@ -316,24 +312,20 @@ DrawFormattedText(window, texts('aSP_intro5'), 'center', 'center', white)   ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro6'), 'center', 'center', white)   ;
-Screen('Flip', window)                                                      ;
-KbStrokeWait                                                                ;
-
 % while loop implementing all possible SP games ... i.e., overall_trials, 
 % if subject always goes to choice in first attempt
 
-sp_idx_max = overall_trials                                                 ;
-sp_run_count = 1                                                          ; % defines an SP "run", i.e., all samples taken before a choice belong to a run
-dat_idx_count = 1                                                           ; % to know where in our data matrix to place the responses
-sp_choice_count = 1                                                         ; % also a data matrix counter to place the preferred lotteries
-prev_samples = 0                                                            ; % variable to calculate number of samples prior to a choice
+spIdxMax = overallTrials                                                    ;
+spRunCount = 1                                                              ; % defines an SP "run", i.e., all samples taken before a choice belong to a run
+datIdxCount = 1                                                             ; % to know where in our data matrix to place the responses
+spChoiceCount = 1                                                           ; % also a data matrix counter to place the preferred lotteries
+prevSamples = 0                                                             ; % variable to calculate number of samples prior to a choice
 
-while sp_idx_max >= 1                                                       ; % while we have at least one dfe trial remaining, keep starting new SP runs
+while spIdxMax >= 1                                                         ; % while we have at least one sp trial remaining, keep starting new SP runs
 
     
-    [left_lottery, right_lottery, good_lottery_loc] = ...
-            determine_lottery_loc(lottery_option1, lottery_option2)         ; % place good and bad lottery randomly either left or right
+    [leftLottery, rightLottery, goodLotteryLoc] = ...
+            determine_lottery_loc(lotteryOption1, lotteryOption2)           ; % place good and bad lottery randomly either left or right
 
             
     % starting a new SP by shuffling the lotteries
@@ -344,9 +336,9 @@ while sp_idx_max >= 1                                                       ; % 
         
 
     % actual loop
-    for sp_idx = 1:sp_idx_max
+    for spIdx = 1:spIdxMax
 
-        if sp_idx ~= 1                                                      ; % this option only for draws that are NOT the first draw for newly shuffled lotteries  
+        if spIdx ~= 1                                                       ; % this option only for draws that are NOT the first draw for newly shuffled lotteries  
             
             % Drawing the text options for sample vs choice decision      
             textwin1 = [screenXpixels*.1, screenYpixels*.5, ...
@@ -367,16 +359,16 @@ while sp_idx_max >= 1                                                       ; % 
             Screen('Flip', window)                                          ;
 
             % start decision process. This time, only location is relevant
-            [picked_loc] = require_response(left_lottery, right_lottery)    ;
+            [pickedLoc] = require_response(leftLottery, rightLottery)       ;
             
             % show the chosen option
-            if picked_loc == 1
+            if pickedLoc == 1
                 DrawFormattedText(window, 'draw another sample', ...
                     'center', 'center', white, [], [], [], [], [],textwin1) ;
                 Screen('Flip', window)                                      ;
                 WaitSecs(2)                                                 ; % show chosen option for 1 sec
 
-            elseif picked_loc == 2
+            elseif pickedLoc == 2
                 DrawFormattedText(window, 'make a choice', ...
                     'center', 'center', white, [], [], [], [], [],textwin2) ;
                 Screen('Flip', window)                                      ;
@@ -384,20 +376,20 @@ while sp_idx_max >= 1                                                       ; % 
             end
         
         else
-            picked_loc = 1                                                  ; % If it's the first draw of a new game, take a sample, without asking whether subject actually wants 'choice'
+            pickedLoc = 1                                                   ; % If it's the first draw of a new game, take a sample, without asking whether subject actually wants 'choice'
         end
         
         
-        switch picked_loc
+        switch pickedLoc
             
             case 1 % =left ... draw a sample
                 
                 % draw trial counter
-                trial_counter = ...
-                    strcat(num2str(overall_trials-(sp_idx_max-sp_idx)))     ;
+                trialCounter = ...
+                    strcat(num2str(overallTrials-(spIdxMax-spIdx)))         ;
                 
                 
-                DrawFormattedText(window, trial_counter, 'center', ...
+                DrawFormattedText(window, trialCounter, 'center', ...
                     'center', white)                                        ;
                 Screen('Flip', window)                                      ;
 
@@ -410,8 +402,8 @@ while sp_idx_max >= 1                                                       ; % 
 
 
                 % start decision process
-                [picked_loc, reward_bool, ...
-                    rt] = require_response(left_lottery, right_lottery)     ;
+                [pickedLoc, rewardBool, ...
+                    rt] = require_response(leftLottery, rightLottery)       ;
 
                 % drawing the fixcross
                 Screen('DrawLines', window, fixCoords,...
@@ -420,20 +412,20 @@ while sp_idx_max >= 1                                                       ; % 
                 % drawing the checkerboard stim at the chosen location. The
                 % reward_ bool tells us win(=1) or loss(=0) ... we add 1 so
                 % we get win=2, loss=1
-                Screen('FillRect', window, reward(:,:,reward_bool+1),...
-                    rect_locs(:,:,picked_loc))                              ;
+                Screen('FillRect', window, reward(:,:,rewardBool+1),...
+                    rectLocs(:,:,pickedLoc))                                ;
 
-                Screen('DrawTextures', window, masktexture, [],...
-                    mask_locs(:,:,picked_loc))                              ;
+                Screen('DrawTextures', window, maskTexture, [],...
+                    maskLocs(:,:,pickedLoc))                                ;
 
 
                 % even id, blue is win 
-                aSP_mat(1,dat_idx_count) = picked_loc                       ; % which location was picked: 1, left - 2, right
-                aSP_mat(2,dat_idx_count) = rt                               ; % how quickly was it picked in ms
-                aSP_mat(3,dat_idx_count) = reward_bool                      ; % boolean whether is was rewarded or not
-                aSP_mat(4,dat_idx_count) = (good_lottery_loc == picked_loc) ; % boolean whether good or bad lottery was chosen
+                aSPmat(1,datIdxCount) = pickedLoc                           ; % which location was picked: 1, left - 2, right
+                aSPmat(2,datIdxCount) = rt                                  ; % how quickly was it picked in ms
+                aSPmat(3,datIdxCount) = rewardBool                          ; % boolean whether is was rewarded or not
+                aSPmat(4,datIdxCount) = (goodLotteryLoc == pickedLoc)       ; % boolean whether good or bad lottery was chosen
 
-                dat_idx_count = dat_idx_count + 1                           ; % update our data index counter
+                datIdxCount = datIdxCount + 1                               ; % update our data index counter
                 WaitSecs(1)                                                 ; % after choice, wait 1 sec before displaying result
                 Screen('Flip', window)                                      ;
                 WaitSecs(2)                                                 ; % feedback displayed for 2 secs
@@ -441,7 +433,7 @@ while sp_idx_max >= 1                                                       ; % 
                 
                 
             case 2 % =right ... make a choice 
-                sp_idx_max = sp_idx_max + 1                                 ; % making a choice doesn't count into the trials. As usual, sp_idx_max will be reduced at end of the procedure one ... so +1 -1 = 0 difference
+                spIdxMax = spIdxMax + 1                                     ; % making a choice doesn't count into the trials. As usual, sp_idx_max will be reduced at end of the procedure one ... so +1 -1 = 0 difference
                 break                                                       ; % To make a choice, we have to break the for loop
                 
         end % end switch. Continue with new question: choice or sample?
@@ -451,8 +443,8 @@ while sp_idx_max >= 1                                                       ; % 
     % If 'right' (=2) was selected or there are no trials left, start the
     % choice procedure
     
-    if sp_idx_max >= 1 % if this is the last trial, tell the subject so
-        DrawFormattedText(window, texts('aSP_final'), 'center', ...
+    if spIdxMax == 1 % if this is the last trial, tell the subject so
+        DrawFormattedText(window, texts('aSPfinal'), 'center', ...
             'center', white)                                                ;
         Screen('Flip', window)                                              ;
         KbStrokeWait                                                        ;
@@ -465,8 +457,8 @@ while sp_idx_max >= 1                                                       ; % 
     KbStrokeWait                                                            ;
     
     % start decision process
-    [picked_loc, reward_bool, ...
-        rt] = require_response(left_lottery, right_lottery)                 ;
+    [pickedLoc, rewardBool, ...
+        rt] = require_response(leftLottery, rightLottery)                   ;
 
     % draw fixcross
     Screen('DrawLines', window, fixCoords,...
@@ -476,25 +468,25 @@ while sp_idx_max >= 1                                                       ; % 
     
     % drawing the checkerboard stim at the chosen location. The reward_bool
     % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
-    Screen('FillRect', window, reward(:,:,reward_bool+1),...
-        rect_locs(:,:,picked_loc))                                          ;
+    Screen('FillRect', window, reward(:,:,rewardBool+1),...
+        rectLocs(:,:,pickedLoc))                                            ;
 
-    Screen('DrawTextures', window, masktexture, [],...
-        mask_locs(:,:,picked_loc))                                          ;
+    Screen('DrawTextures', window, maskTexture, [],...
+        maskLocs(:,:,pickedLoc))                                            ;
 
     
     
     % Measure timing and whether preferred lottery was correct
-    prev_samples = size(aSP_mat,2)-sum(isnan(mean(aSP_mat)))-prev_samples   ; % counts cols filled in since last check
+    prevSamples = size(aSPmat,2)-sum(isnan(mean(aSPmat)))-prevSamples       ; % counts cols filled in since last check
     
-    aSP_prefLot_mat(1,sp_choice_count) = picked_loc                         ; % which loc was picked? left=1, right=2
-    aSP_prefLot_mat(2,sp_choice_count) = rt                                 ; % how quickly was it picked in ms
-    aSP_prefLot_mat(3,sp_choice_count) = reward_bool                        ; % was it rewarded=1 or not=0
-    aSP_prefLot_mat(4,sp_choice_count) = picked_loc == good_lottery_loc     ; % was the "good lottery" picked?
-    aSP_prefLot_mat(5,sp_choice_count) = prev_samples                       ; % How many samples preceeded this choice?
+    aSPprefLotMat(1,spChoiceCount) = pickedLoc                              ; % which loc was picked? left=1, right=2
+    aSPprefLotMat(2,spChoiceCount) = rt                                     ; % how quickly was it picked in ms
+    aSPprefLotMat(3,spChoiceCount) = rewardBool                             ; % was it rewarded=1 or not=0
+    aSPprefLotMat(4,spChoiceCount) = pickedLoc == goodLotteryLoc            ; % was the "good lottery" picked?
+    aSPprefLotMat(5,spChoiceCount) = prevSamples                            ; % How many samples preceeded this choice?
 
     
-    sp_choice_count = sp_choice_count + 1                                   ; % update the counter of the preferred lottery data matrix
+    spChoiceCount = spChoiceCount + 1                                       ; % update the counter of the preferred lottery data matrix
 
    
     WaitSecs(1)                                                             ; % wait for one second before displaying feedback
@@ -503,24 +495,24 @@ while sp_idx_max >= 1                                                       ; % 
     
     
     % Tell the subject how much she has earned 
-    switch reward_bool
+    switch rewardBool
         case 0
             payoff = -3;
         case 1
             payoff = 10;
     end
     
-    payoff_str = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))   ;
-    DrawFormattedText(window, payoff_str, 'center', 'center', white)        ;
+    payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;
+    DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
     KbStrokeWait                                                            ;
-    total_earnings = total_earnings + payoff                                ; % increment the total earnings of the participant
+    totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
  	
 
     % Now the subject has completed one SP run. We calculate, how many
     % trials remain to start a new trial or go on to the next task.
-    sp_idx_max = sp_idx_max - sp_idx                                        ;
-    sp_run_count = sp_run_count + 1                                     ; 
+    spIdxMax = spIdxMax - spIdx                                             ;
+    spRunCount = spRunCount + 1                                             ; 
     
 end % end of while loop implmenting all possible SP runs
 
@@ -554,8 +546,8 @@ KbStrokeWait                                                                ;
 
 
 % Show the replay!
-show_sp_replay(aPFP_mat, texts, reward, window, white, masktexture, ...
-    mask_locs, rect_locs)                                                   ;
+show_sp_replay(aPFPmat, texts, reward, window, white, maskTexture, ...
+    maskLocs, rectLocs)                                                     ;
 
 
 if condi_idx ~= 4
@@ -578,9 +570,9 @@ DrawFormattedText(window, texts('end'),'center', 'center', white)           ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ; 
 
-payoff_str = strcat(texts('total_payoff'), sprintf(' %d?', ...
-    total_earnings*euro_factor))                                            ; % This displays the total earnings of the participant
-DrawFormattedText(window, payoff_str, 'center', 'center', white)            ;
+payoffStr = strcat(texts('total_payoff'), sprintf(' %.2f', ...
+    totalEarnings*euroFactor))                                              ; % This displays the total earnings of the participant
+DrawFormattedText(window, payoffStr, 'center', 'center', white)             ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ; % Wait for a key press to close the window and clear the screen
 
@@ -588,7 +580,7 @@ KbStrokeWait                                                                ; % 
 
 
 % Get time of end of the experiment
-exp_end = datestr(now)                                                      ; % ... it's good to know the time when the experiment ended
+expEnd = datestr(now)                                                       ; % ... it's good to know the time when the experiment ended
 
 sca                                                                         ; % shut down Psychtoolbox
 
@@ -597,6 +589,6 @@ sca                                                                         ; % 
 % matlab structure out of all the data of the experiment and saves it
 % neatly together with a readme in form of a matlab cell.
 
-save_data(exp_start, exp_end, total_earnings, subj_id)                      ; % data located in /data ... sibling dir of /experiment_files
+save_data(expStart, expEnd, totalEarnings, subjId)                          ; % data located in /data ... sibling dir of /experiment_files
 
 end % function end
