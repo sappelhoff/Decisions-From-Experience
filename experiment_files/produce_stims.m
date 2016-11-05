@@ -1,4 +1,4 @@
-function [fixWidth, fixCoords, colors1, colors2, rectLocs, maskLocs, maskTexture] = produce_stims(window, windowRect, screenNumber)
+function [fixWidth, fixCoords, colors1, colors2, colors3, rectLocs, maskLocs, maskTexture] = produce_stims(window, windowRect, screenNumber)
 
 % a function to calculate all stimuli and return them in their final
 % format.
@@ -52,6 +52,7 @@ squares = 10                                                                ; % 
 stimSize = 200                                                              ; % how large the checkerboard stimuli should be
 checkerColor1 = [1, 0, 0]                                                   ; % color for stim 1: red
 checkerColor2 = [0, 0, 1]                                                   ; % color for stim 2: blue
+checkerColor3 = [0, 1, 0]                                                   ; % color for stim 3: green ... distraction stim
 checkerBackground = [1, 1, 1]                                               ; % background for both stims: white
 
 % Make the coordinates for our grid of squares
@@ -78,12 +79,15 @@ checkerYposRight = yPos .* dim + yCenter                                    ;
 checkerXposCenter = xPos .* dim + xCenter                                   ; % central checkerboard will be needed for instruction screen
 checkerYposCenter = yPos .* dim + screenYpixels * 0.75                      ;
 
-% Setting colors of the checkerboards - 1 is red, 2 is blue
+% Setting colors of the checkerboards - 1 is red, 2 is blue, 3 is green
 colors1 = repmat([checkerColor1',checkerBackground'],1,numSquares/2-.5)     ; % concatenate a vector where stimcolor and stimbackground change for each rect in the checkerboard
 colors1 = [colors1, checkerColor1']                                         ; % append one more color, because our checkerboards have odd numbers of rects
 
 colors2 = repmat([checkerColor2',checkerBackground'],1,numSquares/2-.5)     ;
 colors2 = [colors2, checkerColor2']                                         ;
+
+colors3 = repmat([checkerColor3',checkerBackground'],1,numSquares/2-.5)     ;
+colors3 = [colors3, checkerColor3']                                         ;
 
 
 % Make our rectangle coordinates

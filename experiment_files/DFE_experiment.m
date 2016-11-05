@@ -20,6 +20,7 @@ expStart = datestr(now)                                                     ; % 
 subjId = inquire_user                                                       ; % get a user ID        
 totalEarnings = 0                                                           ; % total earnings of user
 euroFactor = 0.25                                                           ; % factor to convert points to Euros
+pDistr = 0.5                                                              ; % probability that a distractor might occur
 
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
@@ -57,7 +58,7 @@ Screen('TextStyle', window, 0)                                              ; %0
 %                      Preparing all Stimuli                              %
 %-------------------------------------------------------------------------%
 
-[fixWidth, fixCoords, colors1, colors2, rectLocs, maskLocs, ...
+[fixWidth, fixCoords, colors1, colors2, colors3, rectLocs, maskLocs, ...
     maskTexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 %-------------------------------------------------------------------------%
@@ -89,13 +90,15 @@ pfpTrials = 2                                                               ;
 % 4 = passive SP (replay of active SP)
 
 if ~mod(subjId,2)                                                       
-    reward = cat(3, colors1, colors2)                                       ; % even ID ... put red as loss ... put blue as win ... start with SP
+    reward = cat(3, colors1, colors2, colors3)                              ; % even ID ... put red as loss ... put blue as win ... start with SP. colors3 is the distractor condition
     condiOrder = [3, 4, 1, 2]                                               ; % use this variable later for a 'switch' procedure
 else 
-    reward = cat(3, colors2, colors1)                                       ; % odd ID ... put blue as loss ... put red as win ... start with PFP
+    reward = cat(3, colors2, colors1, colors3)                              ; % odd ID ... put blue as loss ... put red as win ... start with PFP. colors3 is the distractor condition
     condiOrder = [1, 2, 3, 4]                                               ; % use this variable later for a 'switch' procedure
 end
 
+% Here we will save the reaction times to the distractors
+distractorMat = []                                                          ; % the recognize_distractor function will update this variable
 
 % Create some lotteries - these are stable and hardcoded across the study
 lotteryOption1 = [ones(1,7), zeros(1,3)]                                    ; % p(win)=.7 --> good lottery
@@ -116,7 +119,7 @@ texts = produce_texts                                                       ; % 
 %% Welcome screen
 
 general_instructions(window, white, reward, maskTexture, rectLocs, ...
-    maskLocs, euroFactor)                                                   ; % This will display the welcome screen and some general instructions
+    maskLocs)                                                               ; % This will display the welcome screen and some general instructions
 
 %% condition selection
 
@@ -181,7 +184,7 @@ KbStrokeWait                                                                ;
 
         % start decision process
         [pickedLoc, rewardBool, ...
-            rt] = require_response(leftLottery, rightLottery)               ;
+            rt] = require_response(leftLottery, rightLottery, pDistr)       ;
 
         % drawing the fixcross
         Screen('DrawLines', window, fixCoords,...
@@ -207,13 +210,25 @@ KbStrokeWait                                                                ;
 
         WaitSecs(1)                                                         ; % after choice, wait 1 sec before displaying result
         Screen('Flip', window)                                              ;
-        WaitSecs(2)                                                         ; % feedback displayed for 2 secs
+        
+        if rewardBool == 2
+            distractorMat = recognize_distractor(distractorMat)             ; % if this trial was a distractor, measure the RT to it 
+        end
+        
+        WaitSecs(2)                                                          ; % feedback displayed for 2 secs
 
+        
+        
     end
-
+    
     % Tell the subject how much she has earned
-    payoff = sum(aPFPmat(4,:,pfpRun))                                       ; % the overall payoff 
-    payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;    
+    dummy = aPFPmat(4,:,pfpRun)                                             ; % create a dummy from our data matrix to calculate payoff
+    dummy(dummy == 2) = 0                                                   ; % disregard the distractors
+    payoff = sum(dummy)                                                     ; % the overall payoff is the sum of our edited dummy
+    clear dummy                                                             ; % get rid of the dummy
+    
+    payoffStr = strcat(texts('payoff'), sprintf(' %d', payoff))             ;    
+    
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
     WaitSecs(2)                                                             ; % show payoff for 2 secs
@@ -227,7 +242,7 @@ KbStrokeWait                                                                ;
     Screen('Flip', window)                                                  ;
 
     % start decision process
-    [pickedLoc, ~, rt] = require_response(leftLottery, rightLottery)        ;
+    [pickedLoc, ~, rt] = require_response(leftLottery, rightLottery)        ; % here, we do not want a distractor to occur ... so no p_distr argument
   
     % Record timing and whether preferred lottery was correct
     aPFPprefLotMat(1,1,pfpRun) = pickedLoc                                  ; % Which lottery was preferred? 1=left, 2=right
@@ -265,13 +280,13 @@ KbStrokeWait                                                                ;
 
 
 % Show the replay!
-show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, ...
-    maskLocs, rectLocs)                                                     ;
+distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, ...
+    maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)              ;
 
 
 if condi_idx ~= 4
 % Now there will be a short break before we go to the next task
-DrawFormattedText(window, breakText, 'center', 'center', white)             ;
+DrawFormattedText(window, texts('break'), 'center', 'center', white)        ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 end
@@ -292,23 +307,23 @@ DrawFormattedText(window, texts('next_intro'), 'center', 'center', white)   ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro1'), 'center', 'center', white)   ;
+DrawFormattedText(window, texts('aSPintro1'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro2'), 'center', 'center', white)   ;
+DrawFormattedText(window, texts('aSPintro2'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro3'), 'center', 'center', white)   ;
+DrawFormattedText(window, texts('aSPintro3'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro4'), 'center', 'center', white)   ;
+DrawFormattedText(window, texts('aSPintro4'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
-DrawFormattedText(window, texts('aSP_intro5'), 'center', 'center', white)   ;
+DrawFormattedText(window, texts('aSPintro5'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
@@ -359,7 +374,7 @@ while spIdxMax >= 1                                                         ; % 
             Screen('Flip', window)                                          ;
 
             % start decision process. This time, only location is relevant
-            [pickedLoc] = require_response(leftLottery, rightLottery)       ;
+            [pickedLoc] = require_response(leftLottery, rightLottery)       ; % we do not enter p_distr - we are not interested in outcomes
             
             % show the chosen option
             if pickedLoc == 1
@@ -402,15 +417,15 @@ while spIdxMax >= 1                                                         ; % 
 
 
                 % start decision process
-                [pickedLoc, rewardBool, ...
-                    rt] = require_response(leftLottery, rightLottery)       ;
+                [pickedLoc, rewardBool, rt] = require_response( ...
+                    leftLottery, rightLottery, pDistr)                     ; % during the SP sampling, getting a distractor is possible
 
                 % drawing the fixcross
                 Screen('DrawLines', window, fixCoords,...
                     fixWidth, white, [xCenter yCenter], 2)                  ;
 
                 % drawing the checkerboard stim at the chosen location. The
-                % reward_ bool tells us win(=1) or loss(=0) ... we add 1 so
+                % reward_bool tells us win(=1) or loss(=0) ... we add 1 so
                 % we get win=2, loss=1
                 Screen('FillRect', window, reward(:,:,rewardBool+1),...
                     rectLocs(:,:,pickedLoc))                                ;
@@ -428,6 +443,11 @@ while spIdxMax >= 1                                                         ; % 
                 datIdxCount = datIdxCount + 1                               ; % update our data index counter
                 WaitSecs(1)                                                 ; % after choice, wait 1 sec before displaying result
                 Screen('Flip', window)                                      ;
+                                    
+                if rewardBool == 2
+                    distractorMat = recognize_distractor(distractorMat)   ; % if this trial was a distractor, measure the RT to it 
+                end  
+                
                 WaitSecs(2)                                                 ; % feedback displayed for 2 secs
 
                 
@@ -451,14 +471,14 @@ while spIdxMax >= 1                                                         ; % 
     end
     
     % Ask the subject, which lottery she wants to select
-    DrawFormattedText(window, texts('aSP_choice'), 'center', ...
+    DrawFormattedText(window, texts('aSPchoice'), 'center', ...
         'center', white)                                                    ;
     Screen('Flip', window)                                                  ;
     KbStrokeWait                                                            ;
     
     % start decision process
     [pickedLoc, rewardBool, ...
-        rt] = require_response(leftLottery, rightLottery)                   ;
+        rt] = require_response(leftLottery, rightLottery)                   ; % during the choice procedure of the SP, getting a distractor is impossible
 
     % draw fixcross
     Screen('DrawLines', window, fixCoords,...
@@ -495,14 +515,9 @@ while spIdxMax >= 1                                                         ; % 
     
     
     % Tell the subject how much she has earned 
-    switch rewardBool
-        case 0
-            payoff = -3;
-        case 1
-            payoff = 10;
-    end
+    payoff = rewardBool                                                     ;
     
-    payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;
+    payoffStr = strcat(texts('payoff'), sprintf(' %d', payoff))             ;
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
     KbStrokeWait                                                            ;
@@ -519,7 +534,7 @@ end % end of while loop implmenting all possible SP runs
 
 
 % Now there will be a short break before we go to the next task
-DrawFormattedText(window, breakText, 'center', 'center', white)             ;
+DrawFormattedText(window, texts('break'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
@@ -546,13 +561,13 @@ KbStrokeWait                                                                ;
 
 
 % Show the replay!
-show_sp_replay(aPFPmat, texts, reward, window, white, maskTexture, ...
-    maskLocs, rectLocs)                                                     ;
+distractorMat = show_sp_replay(aPFPmat, texts, reward, window, white, ...
+    maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)              ;
 
 
 if condi_idx ~= 4
 % Now there will be a short break before we go to the next task
-DrawFormattedText(window, breakText, 'center', 'center', white)             ;
+DrawFormattedText(window, texts('break'), 'center', 'center', white)        ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 end
@@ -589,6 +604,7 @@ sca                                                                         ; % 
 % matlab structure out of all the data of the experiment and saves it
 % neatly together with a readme in form of a matlab cell.
 
-save_data(expStart, expEnd, totalEarnings, subjId)                          ; % data located in /data ... sibling dir of /experiment_files
+save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, ...
+    aPFPprefLotMat, aSPmat, aSPprefLotMat, distactor_mat)                   ; % data located in /data ... sibling dir of /experiment_files
 
 end % function end

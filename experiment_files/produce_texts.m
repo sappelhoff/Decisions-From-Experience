@@ -46,10 +46,10 @@ texts('aPFP_intro2') = sprintf('Try to maximize your "win" outcomes.\n\nYou need
 texts('aSPchoice') = sprintf('From which lottery do\nyou want to draw your payoff?\nPress [left] or [right]');
 texts('aSPfinal') = sprintf('You have reached the final\ntrial. You are granted one\nlast choice towards your payoff.');
 
-texts('aSP_intro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
-texts('aSP_intro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
-texts('aSP_intro3') = sprintf('Once you have taken enough samples\n\nto know whether a certain lottery is profitable,\n\nyou can stop sampling and choose a lottery');
-texts('aSP_intro4') = sprintf('Upon choice, the outcome is added\n\nto your payoff. After that,\n\nyou can continue to sample.\n\nHowever, the lotteries will be shuffled.');
-texts('aSP_intro5') = sprintf('Feel free to explore your options\n\nthrough sampling.The outcomes\n\nwill only affect your reward\n\n once you finally decide for one option.');
+texts('aSPintro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
+texts('aSPintro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
+texts('aSPintro3') = sprintf('Once you have taken enough samples\n\nto know whether a certain lottery is profitable,\n\nyou can stop sampling and choose a lottery');
+texts('aSPintro4') = sprintf('Upon choice, the outcome is added\n\nto your payoff. After that,\n\nyou can continue to sample.\n\nHowever, the lotteries will be shuffled.');
+texts('aSPintro5') = sprintf('Feel free to explore your options\n\nthrough sampling.The outcomes\n\nwill only affect your reward\n\n once you finally decide for one option.');
 
 end

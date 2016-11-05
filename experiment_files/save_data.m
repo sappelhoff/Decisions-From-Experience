@@ -1,4 +1,4 @@
-function save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, aPFPprefLotMat, aSPmat, aSPprefLotMat)
+function save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, aPFPprefLotMat, aSPmat, aSPprefLotMat, distractorMat)
 
 % a function that neatly saves all data of the experiment and adds some
 % readme information.
@@ -13,6 +13,7 @@ function save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, aPFPprefLot
 % - aPFPprefLotMat: containing the "what was the best lottery" data
 % - aSPmat: containing the samples data from the active Sampling Paradigm
 % - aSPprefLotMat: containing the choice data from the aSP
+% - distractor_mat: containing all RTs to distractors
 %
 % Returns
 % ----------
@@ -68,9 +69,9 @@ aSP.readme = SP_Readme                                                      ;
 % other variables of interest
 experimentalVars.expStart = expStart                                        ;
 experimentalVars.expEnd = expEnd                                            ;
-experimentalVars.subj_id = subjId                                           ;
-experimentalVars.total_earnings = totalEarnings                             ;
-
+experimentalVars.subjId = subjId                                            ;
+experimentalVars.totalEarnings = totalEarnings                              ;
+experimentalVars.distractorRTs = distractorMat                              ;
 
 % Now the overarching data structure
 data.activePartialFeedbackParadigm = aPFP                                   ;

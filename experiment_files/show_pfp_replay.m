@@ -1,4 +1,4 @@
-function show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs)
+function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)
 
 % This function executes a replay
 %
@@ -12,10 +12,12 @@ function show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, mas
 % - maskTexture: texture to make our stimuli seem circular
 % - maskLocs: locations of the mask texture
 % - rectLocs: locations of the stimuli
+% - distractorMat: to save RTs of distractor trials
+% - fixCoords: for the fixcross
 %
 % Returns
 % ----------
-% - None
+% - distractorMat: an updated distractor mat
 
 %% Function start
 
@@ -61,14 +63,6 @@ for replayRun = 1:pfpRuns
     end
     
     
-    %%
-    %%%%%
-    % Here we need something to visually indicate that left or right has
-    % been selected ...
-    %%%%%        
-    
-    %%
-    
     % drawing the fixcross
     Screen('DrawLines', window, fixCoords,...
     fixWidth, white, [xCenter yCenter], 2)                                  ;
@@ -85,6 +79,7 @@ for replayRun = 1:pfpRuns
 
     WaitSecs(1)                                                             ; % after choice, wait 1 sec before displaying result
     Screen('Flip', window)                                                  ;
+
     WaitSecs(2)                                                             ; % feedback displayed for 2 secs
     
     end

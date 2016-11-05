@@ -1,4 +1,4 @@
-function show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, screenXpixels, screenYpixels)
+function distractorMat = show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, screenXpixels, screenYpixels, distractorMat, fixCoords)
 
 % This function executes a replay
 %
@@ -15,10 +15,12 @@ function show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, mas
 % - rectLocs: locations of the stimuli
 % - screenXpixels: width of screen
 % - screenYpixels: height of screen
+% - distractorMat: to save RTs of distractor trials
+% - fixCoords: for the fixcross
 %
 % Returns
 % ----------
-% - None
+% - distractor_mat: an updated distractor mat
 
 %% Function start
 
@@ -75,11 +77,17 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
         % reward_bool tells us win(1) or loss(0) ... we add 1 so we get
         % win=2, loss=1
         Screen('FillRect', window, reward(:,:,rewardBool+1),...
-            rectLocs(:,:,pickedLoc))                                      ;
+            rectLocs(:,:,pickedLoc))                                        ;
 
         Screen('DrawTextures', window, maskTexture, [],...
-            maskLocs(:,:,pickedLoc))                                      ;            
+            maskLocs(:,:,pickedLoc))                                        ;            
         Screen('Flip', window)                                              ;
+        
+        if rewardBool == 3
+            distractorMat = recognize_distractor(distractorMat)           ; % if this trial was a distractor, measure the RT to it 
+        end  
+
+        
         WaitSecs(2)                                                         ; % show feedback for 2 seconds
             
         

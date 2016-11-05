@@ -22,15 +22,15 @@ function [leftLottery, rightLottery, goodLotteryLoc] = determine_lottery_loc(lot
 
 %% Function start
 
-goodLotteryLoc = randi(2,1)                                              ; % determine whether good lottery will be left(1) or right(2)
+goodLotteryLoc = randi(2,1)                                                 ; % determine whether good lottery will be left(1) or right(2)
 
 if goodLotteryLoc == 1
-    allLotteries = cat(3, lotteryOption1, lotteryOption2)               ; % put all lotteries into 3D matrix so that we can pick randomly
+    allLotteries = cat(3, lotteryOption1, lotteryOption2)                   ; % put all lotteries into 3D matrix so that we can pick randomly
 else
-    allLotteries = cat(3, lotteryOption2, lotteryOption1)               ;
+    allLotteries = cat(3, lotteryOption2, lotteryOption1)                   ;
 end
 
-leftLottery = allLotteries(:,:,1)                                        ;
-rightLottery = allLotteries(:,:,2)                                       ;
+leftLottery = allLotteries(:,:,1)                                           ;
+rightLottery = allLotteries(:,:,2)                                          ;
 
 end
