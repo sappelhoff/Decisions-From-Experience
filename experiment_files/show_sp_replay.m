@@ -1,4 +1,4 @@
-function distractorMat = show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, screenXpixels, screenYpixels, distractorMat, fixCoords)
+function distractorMat = show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, screenXpixels, screenYpixels, distractorMat, fixCoords, tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff, tChosenOpt)
 
 % This function executes a replay
 %
@@ -17,6 +17,12 @@ function distractorMat = show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, wi
 % - screenYpixels: height of screen
 % - distractorMat: to save RTs of distractor trials
 % - fixCoords: for the fixcross
+% - tShuffled: the time after the participants are being told that lotteries have been shuffled
+% - tTrialCount: time that the trial counter is shown
+% - tOutcomePresent: time after a choice before outcome is presented
+% - tFeedback: time that the feedback is displayed
+% - tShowPayoff: time that the payoff is shown
+% - tChosenOpt: in SP, the time that the chosen option is "shown"
 %
 % Returns
 % ----------
@@ -42,7 +48,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
     % Pretend the lotteries have been shuffled
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(2)                                                             ;
+    WaitSecs(tShuffled)                                                     ;
     
     for samples = 1:prevSamples(choiceRun) % the number of samples can be obtained here by indexing with the choice of interest
    
@@ -52,9 +58,9 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
         rewardBool = aSPmat(3, aSPdataIdx)                                  ;
         aSPdataIdx = aSPdataIdx + 1                                         ; % increment our data index for next display
         
-        % Replay decision process originally, as long as it is [1,3]sec
-        if rt < 1 ||  rt > 3
-            rt = randi(2,1,1)+rand                                          ; % if actual RT differs, create a conforming random RT
+        % Replay decision process originally, as long as it is <3sec
+        if rt > 3
+            rt = rand+rand                                                  ; % if actual RT differs, create a conforming random RT
         end
         
         
@@ -84,11 +90,11 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
         Screen('Flip', window)                                              ;
         
         if rewardBool == 3
-            distractorMat = recognize_distractor(distractorMat)           ; % if this trial was a distractor, measure the RT to it 
+            distractorMat = recognize_distractor(distractorMat)             ; % if this trial was a distractor, measure the RT to it 
         end  
 
         
-        WaitSecs(2)                                                         ; % show feedback for 2 seconds
+        WaitSecs(tFeedback)                                                 ; % briefly show feedback
             
         
 
@@ -104,7 +110,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
 
         Screen('Flip', window)                                              ;
         
-        WaitSecs(1+rand)                                                    ; % For this, just wait briefly above 1 sec, we have no RT to replay accurately
+        WaitSecs(rand+rand)                                                 ; % For this, just wait briefly above 1 sec, we have no RT to replay accurately
             
         
         % answer ... depending on "samples" idx whether another sample or
@@ -114,7 +120,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             DrawFormattedText(window, 'draw another sample', ...
                 'center', 'center', white, [], [], [], [], [], textwin1)    ;
             Screen('Flip', window)                                          ;
-            WaitSecs(1+rand)                                                ; % For this, just wait briefly above 1 sec 
+            WaitSecs(tChosenOpt)                                            ; % Briefly show the chosen option
 
             % now start from "samples" loop again
             
@@ -123,12 +129,12 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             DrawFormattedText(window, 'make a choice', ...
                 'center', 'center', white, [], [], [], [], [], textwin2)    ;
             Screen('Flip', window)                                          ;
-            WaitSecs(1+rand)                                                ; % For this, just wait briefly above 1 sec 
+            WaitSecs(tChosenOpt)                                            ; % Briefly show the chosen option
             
             % get the historical values from our data
-            pickedLoc = aSPprefLotMat(1, choiceRun)                     ;
-            rt = aSPprefLotMat(2, choiceRun)                             ; % see a few lines below for checking the RT to be reasonable
-            rewardBool = aSPprefLotMat(3, choiceRun)                    ;
+            pickedLoc = aSPprefLotMat(1, choiceRun)                         ;
+            rt = aSPprefLotMat(2, choiceRun)                                ; % see a few lines below for checking the RT to be reasonable
+            rewardBool = aSPprefLotMat(3, choiceRun)                        ;
             
             
             % Replay decision process originally, as long as it is [1,3]sec
@@ -153,12 +159,12 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             % reward_bool tells us win(1) or loss(0) ... we add 1 so we get
             % win=2, loss=1
             Screen('FillRect', window, reward(:,:,rewardBool+1),...
-                rectLocs(:,:,pickedLoc))                                  ;
+                rectLocs(:,:,pickedLoc))                                    ;
 
             Screen('DrawTextures', window, maskTexture, [],...
-                maskLocs(:,:,pickedLoc))                                  ;            
+                maskLocs(:,:,pickedLoc))                                    ;            
             Screen('Flip', window)                                          ;
-            WaitSecs(2)                                                     ; % show feedback for 2 seconds
+            WaitSecs(tFeedback)                                             ; % briefly show feedback
             
             % Now shuffle lotteries (i.e., advance in outer loop)
             

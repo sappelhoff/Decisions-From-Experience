@@ -14,7 +14,7 @@ function general_instructions(window, white, reward, maskTexture, rectLocs, mask
 %
 % Returns
 % ----------
-% - None
+% - None, but directly presents the text
 %
 %
 %% Function start
@@ -28,8 +28,11 @@ instruct5 = sprintf('On the following screens, you will be\n\nshown, what a "win
 showWin = sprintf('This outcome signifies "win"');
 showLose = sprintf('This outcome signifies "lose"');
 instruct6 = sprintf('Depending on the task, the outcomes\n\nwill have different values.\n\nAt the end of the experiment,\n\nyour overall points will be normalized\n\nand multiplied by a factor to\n\ndetermine your payoff.');
+instruct7 = sprintf('Next to performing the task of\n\nchoosing lotteries, you will have\n\nto look out for a special outcome.\n\nReact quickly once you see it.');
+showDistract = sprintf('Whenever you see this, press [space]!');
 leadOver = sprintf('Before each task, you will receive\n\nmore detailed instructions.\n\n\nIf you have any questions,\n\nplease ask the experimenter.\n\n\nIf you are ready, press any key to start.');
 
+%% present the text
 
 DrawFormattedText(window, welcome,'center', 'center', white)                ;
 Screen('Flip', window)                                                      ;
@@ -74,6 +77,19 @@ Screen('DrawTextures', window, maskTexture, [], maskLocs(:,:,3))            ;
 Screen('Flip', window)                                                      ;
 WaitSecs(2)                                                                 ; % force people to look at it for at least 2 seconds
 KbStrokeWait                                                                ;
+
+DrawFormattedText(window, instruct7,'center', 'center', white)              ;
+Screen('Flip', window)                                                      ;
+KbStrokeWait                                                                ;
+
+% Show "distract" outcome
+DrawFormattedText(window, showDistract, 'center', 'center', white)          ;
+Screen('FillRect', window, reward(:,:,3), rectLocs(:,:,3))                  ;
+Screen('DrawTextures', window, maskTexture, [], maskLocs(:,:,3))            ;
+Screen('Flip', window)                                                      ;
+WaitSecs(2)                                                                 ; % force people to look at it for at least 2 seconds
+KbStrokeWait                                                                ;
+
 
 DrawFormattedText(window, instruct6,'center', 'center', white)              ;
 Screen('Flip', window)                                                      ;

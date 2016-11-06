@@ -1,4 +1,4 @@
-function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)
+function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff)
 
 % This function executes a replay
 %
@@ -14,6 +14,12 @@ function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, 
 % - rectLocs: locations of the stimuli
 % - distractorMat: to save RTs of distractor trials
 % - fixCoords: for the fixcross
+% - tShuffled: the time after the participants are being told that lotteries have been shuffled
+% - tTrialCount: time that the trial counter is shown
+% - tOutcomePresent: time after a choice before outcome is presented
+% - tFeedback: time that the feedback is displayed
+% - tShowPayoff: time that the payoff is shown
+%
 %
 % Returns
 % ----------
@@ -30,7 +36,7 @@ for replayRun = 1:pfpRuns
     % Pretend something has been shuffled
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(2)                                                             ;
+    WaitSecs(tShuffled)                                                     ;
         
     
     for replayTrial = 1:pfpTrials
@@ -44,7 +50,7 @@ for replayRun = 1:pfpRuns
     % drawing the fixcross
     Screen('DrawLines', window, fixCoords,...
         fixWidth, white, [xCenter yCenter], 2)                              ;
-    WaitSecs(2)                                                             ; % show trial counter for 2 seconds
+    WaitSecs(tTrialCount)                                                   ; % briefly show trial counter 
     Screen('Flip', window)                                                  ; % then show fixcross
 
     
@@ -56,10 +62,10 @@ for replayRun = 1:pfpRuns
 
     
     % Replay decision process originally, as long as it is reasonable
-    if rt >= 1 && rt <= 3
-        WaitSecs(rt)                                                        ; % RTs between 1 and 3 seconds are reasonable
+    if rt <= 3
+        WaitSecs(rt)                                                        ; % RTs below 3 seconds are reasonable
     else
-        WaitSecs(randi(2,1,1)+rand)                                         ; % if actual RT differs, create a conforming random RT
+        WaitSecs(rand+rand)                                                 ; % if actual RT differs, create a conforming random RT
     end
     
     
@@ -77,10 +83,10 @@ for replayRun = 1:pfpRuns
     maskLocs(:,:,pickedLoc))                                                ;
 
 
-    WaitSecs(1)                                                             ; % after choice, wait 1 sec before displaying result
+    WaitSecs(tOutcomePresent)                                               ; % after choice, wait briefly before displaying result
     Screen('Flip', window)                                                  ;
 
-    WaitSecs(2)                                                             ; % feedback displayed for 2 secs
+    WaitSecs(tFeedback)                                                     ; % briefly display feedback 
     
     end
     
@@ -89,7 +95,7 @@ for replayRun = 1:pfpRuns
     payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(2)                                                             ; % Display payoff for 2 secs    
+    WaitSecs(tShowPayoff)                                                   ; % briefly display payoff
     
     
  

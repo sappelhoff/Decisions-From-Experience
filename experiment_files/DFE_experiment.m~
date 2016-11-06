@@ -15,20 +15,20 @@ function DFE_experiment
 
 %% Function start
 
-% basic information
 expStart = datestr(now)                                                     ; % Get time of start of the experiment
+
 [subjId, winStim, startCond] = inquire_user                                 ; % Get user info and experiment environment specs
 totalEarnings = 0                                                           ; % total earnings of user
 euroFactor = 0.25                                                           ; % factor to convert points to Euros
 pDistr = 0.5                                                                ; % probability that a distractor might occur
 
-% timings in seconds
-tShuffled = 2                                                               ; % the time after the participants are being told that lotteries have been shuffled
-tTrialCount = 2                                                             ; % time that the trial counter is shown
-tOutcomePresent = 1                                                         ; % time after a choice before outcome is presented
-tFeedback = 2                                                               ; % time that the feedback is displayed
-tShowPayoff = 2                                                             ; % time that the payoff is shown
-tChosenOpt = 2                                                              ; % in SP, the time that the chosen option is "shown"
+% Timings in seconds
+tShuffled = 2; % the time after the participants are being told that lotteries have been shuffled
+tTrialCount = 2; % time that the trial counter is shown
+tOutcomePresent = 1; % time after a choice before outcome is presented
+tFeedback = 2; % time that the feedback is displayed
+tShowPayoff = 2; % time that the payoff is shown
+tChosenOpt = 2; % in SP, the time that the chosen option is "shown"
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
 %-------------------------------------------------------------------------%
@@ -223,14 +223,14 @@ KbStrokeWait                                                                ;
         aPFPmat(4,pfpIdx,pfpRun) = rewardBool                               ; % boolean whether is was rewarded or not
 
 
-        WaitSecs(tOutcomePresent)                                           ; % after choice, wait before displaying result
+        WaitSecs(tOutcomePresent)                                           ; % after choice, wait 1 sec before displaying result
         Screen('Flip', window)                                              ;
         
         if rewardBool == 2
             distractorMat = recognize_distractor(distractorMat)             ; % if this trial was a distractor, measure the RT to it 
         end
         
-        WaitSecs(tFeedback)                                                 ; % feedback briefly displayed
+        WaitSecs(tFeedback)                                                 ; % feedback displayed for 2 secs
 
         
         
@@ -396,13 +396,13 @@ while spIdxMax >= 1                                                         ; % 
                 DrawFormattedText(window, 'draw another sample', ...
                     'center', 'center', white, [], [], [], [], [],textwin1) ;
                 Screen('Flip', window)                                      ;
-                WaitSecs(tChosenOpt)                                        ; % briefly show chosen option
+                WaitSecs(tChosenOpt)                                        ; % show chosen option for 1 sec
 
             elseif pickedLoc == 2
                 DrawFormattedText(window, 'make a choice', ...
                     'center', 'center', white, [], [], [], [], [],textwin2) ;
                 Screen('Flip', window)                                      ;
-                WaitSecs(tChosenOpt)                                        ; % briefly show chosen option
+                WaitSecs(tChosenOpt)                                        ; % show chosen option for 1 sec
             end
         
         else
@@ -426,7 +426,7 @@ while spIdxMax >= 1                                                         ; % 
                 % drawing the fixcross
                 Screen('DrawLines', window, fixCoords,...
                     fixWidth, white, [xCenter yCenter], 2)                  ;
-                WaitSecs(tTrialCount)                                       ; % briefly show trial counter
+                WaitSecs(tTrialCount)                                       ; % show trial counter for 2 seconds
                 Screen('Flip', window)                                      ; % then show fixcross
 
 
@@ -456,14 +456,14 @@ while spIdxMax >= 1                                                         ; % 
                 aSPmat(4,datIdxCount) = (goodLotteryLoc == pickedLoc)       ; % boolean whether good or bad lottery was chosen
 
                 datIdxCount = datIdxCount + 1                               ; % update our data index counter
-                WaitSecs(tOutcomePresent)                                   ; % after choice, wait before displaying result
+                WaitSecs(tOutcomePresent)                                   ; % after choice, wait 1 sec before displaying result
                 Screen('Flip', window)                                      ;
                                     
                 if rewardBool == 2
                     distractorMat = recognize_distractor(distractorMat)     ; % if this trial was a distractor, measure the RT to it 
                 end  
                 
-                WaitSecs(tFeedback)                                          ; % feedback briefly displayed
+                WaitSecs(tFeedback)                                          ; % feedback displayed for 2 secs
 
                 
                 
@@ -526,7 +526,7 @@ while spIdxMax >= 1                                                         ; % 
    
     WaitSecs(tOutcomePresent)                                               ; % wait for one second before displaying feedback
     Screen('Flip', window)                                                  ;
-    WaitSecs(tFeedback)                                                     ; % briefly show feedback 
+    WaitSecs(tFeedback)                                                        ; % show feedback for 2 seconds
     
     
     % Tell the subject how much she has earned 
@@ -549,7 +549,7 @@ end % end of while loop implmenting all possible SP runs
 
 
 % Now there will be a short break before we go to the next task
-DrawFormattedText(window, texts('break'), 'center', 'center', white)        ;
+DrawFormattedText(window, texts('break'), 'center', 'center', white)    ;
 Screen('Flip', window)                                                      ;
 KbStrokeWait                                                                ;
 
