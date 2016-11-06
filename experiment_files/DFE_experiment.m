@@ -17,10 +17,10 @@ function DFE_experiment
 
 expStart = datestr(now)                                                     ; % Get time of start of the experiment
 
-subjId = inquire_user                                                       ; % get a user ID        
+[subjId, winStim, startCond] = inquire_user                                 ; % Get user info and experiment environment specs
 totalEarnings = 0                                                           ; % total earnings of user
 euroFactor = 0.25                                                           ; % factor to convert points to Euros
-pDistr = 0.5                                                              ; % probability that a distractor might occur
+pDistr = 0.5                                                                ; % probability that a distractor might occur
 
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
@@ -74,28 +74,36 @@ overallTrials = 4                                                           ;
 pfpTrials = 2                                                               ; 
 
 % selection whether blue or red stimulus will represent the reward;
-% colors_1 is red, colors_2 is blue. The selection is depending on subject
-% ID --> if it's even, reward is blue, else if it's odd, reward is red
-% put the rewards into a 3D matrix to choose from
-% reward(:,:,2) will be the win, reward(:,:,1) will be the loss
+% colors_1 is red, colors_2 is blue. The selection is on the entries into
+% the gui at the startup of the experiment. These entries should be based
+% on a randomization scheme. 
+% In general, reward(:,:,2) will be the win, reward(:,:,1) will be the loss
 %
-% Furthermore set order of conditions according to ID: for even, start with
-% SP active, then SP passive, then PFP active, finally PFP passive. For
-% odd, go with PFP active, PFP passive, SP active, SP passive.
-%
+% Furthermore the order of conditions is set according to the gui entries
+% as well.
 % Conditions are:
 % 1 = active PFP
 % 2 = passive PFP (replay of active PFP)
 % 3 = active SP
 % 4 = passive SP (replay of active SP)
 
-if ~mod(subjId,2)                                                       
-    reward = cat(3, colors1, colors2, colors3)                              ; % even ID ... put red as loss ... put blue as win ... start with SP. colors3 is the distractor condition
-    condiOrder = [3, 4, 1, 2]                                               ; % use this variable later for a 'switch' procedure
+
+% define winning stimulus
+if strcmp(winStim, 'blue')
+    reward = cat(3, colors1, colors2, colors3)                              ; % blue is win Stim ... red as loss. colors3(green) is the distractor condition
+    
 else 
-    reward = cat(3, colors2, colors1, colors3)                              ; % odd ID ... put blue as loss ... put red as win ... start with PFP. colors3 is the distractor condition
-    condiOrder = [1, 2, 3, 4]                                               ; % use this variable later for a 'switch' procedure
+    reward = cat(3, colors2, colors1, colors3)                              ; % red is win Stim ... blue as loss. colors3(green) is the distractor condition
 end
+
+
+% Define starting condition
+if strcmp(startCond, 'pfp')
+    condiOrder = [1, 2, 3, 4]                                               ; % use this variable later for a 'switch' procedure
+else
+    condiOrder = [3, 4, 1, 2]                                               ; 
+end
+
 
 % Here we will save the reaction times to the distractors
 distractorMat = []                                                          ; % the recognize_distractor function will update this variable

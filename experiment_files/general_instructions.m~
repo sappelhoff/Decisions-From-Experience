@@ -19,7 +19,7 @@ function general_instructions(window, white, reward, maskTexture, rectLocs, mask
 %
 %% Function start
 welcome = sprintf('Welcome to the experiment.\n\n\nPress any key to proceed\n\nthroughout the general instructions.');
-fingers = sprintf('Place your right index finger on [left].\n\nPlace your right ring finger on [right].\n\nPlace your left index finger on [space].');
+fingers = sprintf('Place your right index finger on [left] and your right ring finger on [right]. Place ');
 instruct1 = sprintf('The following tasks will require\n\nyou to make choices between\n\ntwo different lotteries:\n\n[left] or [right]');
 instruct2 = sprintf('The lotteries [left] and [right]\n\neach contain two possible outcomes,\n\nnamely "win" or "lose"');
 instruct3 = sprintf('Some lotteries have a higher chance\n\nto yield a "win" outcome\n\nother lotteries will yield\n\na "lose" outcome more often.\n\n\nAll lotteries will remain stable for one task.\n\nOnce they are shuffled, you are being told.');
