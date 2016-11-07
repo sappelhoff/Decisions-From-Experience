@@ -1,22 +1,48 @@
-\documentclass[12pt, oneside]{scrartcl} 
-
-\usepackage{geometry}                		% See geometry.pdf to 
-\geometry{a4paper}
-\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
-								% TeX will automatically convert eps --> pdf in pdflatex		
-\usepackage{amssymb}
+\documentclass[
+	12pt,
+	oneside,
+	bibliography=totocnumbered]{scrartcl}
 
 
-\title{Termination of Self-directed Information Search}
-\subtitle{Experimental Outline and Design}
+% For figures
+\usepackage{graphicx}
+\graphicspath{{./figures/}} % specify relative path with extra {}
+
+
+% For references
+\usepackage[
+	backend=biber, % troubleshooting: http://tex.stackexchange.com/questions/154751/biblatex-with-biber-configuring-my-editor-to-avoid-undefined-citations
+	style=numeric-comp]{biblatex}
+
+\addbibresource{DFE_refs.bib}
+
+
+% For hyperlinks in table of contents, and references
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black}
+
+
+% General document info
+\title{Terminating Information Search}
 \author{Stefan Appelhoff}
-%\date{}							% Activate to display a given date or no date
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 \begin{document}
 \maketitle
-\section{Introduction}
+\tableofcontents
 
+
+
+\section{Introduction}
 
 Selective Sampling
 
@@ -44,31 +70,62 @@ In the trial to trial decisions participants make, the question of interest to t
 
 
 
-\section{Research Questions}
 
+
+\section{Research Questions}
 - How are sampling efforts sequentially allocated to the different options?
 
 - How do we arrive at a decision to terminate the information search?
 
 - What is the quantitative link between neural signals obtained by EEG with the behavioral data of participants performing the experimental paradigm. 
 
-\section{The Experimental Paradigma}
 
+
+
+
+
+\section{The Experimental Paradigma}
 In general, the experiment will be based on two different tasks that have been described in the literature previously. 
 
 **name them**
 
-\subsection{Bandit Paradigm}
 
+
+
+
+\subsection{Bandit Paradigm}
 for Hertwig (2009) also known as Partial-Feedback-Paradigm
 
-\subsection{Sampling Paradigm}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.3]{pfp.jpg}
+	\caption{Bandit Paradigm.}
+	\label{fig:pfp}
+\end{figure}
 
+Figure \ref{fig:pfp} is adapted from XXX.
+
+
+
+
+\subsection{Sampling Paradigm}
 yep, pretty nice.
 
 
-\section{Computerized implementation of the Paradigma}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.3]{sp.jpg}
+	\caption{Sampling Paradigm.}
+	\label{fig:sp}
+\end{figure}
 
+Figure \ref{fig:sp} is adapted from \cite{hertwig2009}.
+
+
+\section{Computerized implementation of the Paradigma}
 describe the computer code here
 
-\end{document}  
+
+\printbibliography
+
+\end{document}
