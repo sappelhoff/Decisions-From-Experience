@@ -23,12 +23,12 @@ euroFactor = 0.25                                                           ; % 
 pDistr = 0.5                                                                ; % probability that a distractor might occur
 
 % timings in seconds
-tShuffled = 2                                                               ; % the time after the participants are being told that lotteries have been shuffled
-tTrialCount = 2                                                             ; % time that the trial counter is shown
+tShuffled = 1                                                               ; % the time after the participants are being told that lotteries have been shuffled
+tTrialCount = 1                                                             ; % time that the trial counter is shown
 tOutcomePresent = 1                                                         ; % time after a choice before outcome is presented
-tFeedback = 2                                                               ; % time that the feedback is displayed
-tShowPayoff = 2                                                             ; % time that the payoff is shown
-tChosenOpt = 2                                                              ; % in SP, the time that the chosen option is "shown"
+tFeedback = 1                                                               ; % time that the feedback is displayed
+tShowPayoff = 1                                                             ; % time that the payoff is shown
+tChosenOpt = .7                                                             ; % in SP, the time that the chosen option is "shown"
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
 %-------------------------------------------------------------------------%
