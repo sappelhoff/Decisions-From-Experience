@@ -67,6 +67,7 @@
 \begin{document}
 \maketitle
 \tableofcontents
+\listoffigures
 
 
 
@@ -109,12 +110,14 @@ The proposed experiment will be based on a combination  of two different paradig
 \item The Sampling Paradigm
 \end{enumerate}
 
-In the following, these two paradigms will be descibed in detail. Figure \ref{fig:paradigms} provides an overview of the paradigms.
+In the following, these two paradigms will be descibed in detail. Figure \ref{fig:paradigms} provides an overview of the paradigms. Afterwards, the combination of both paradigms for the present experiment will be outlined.
 
 
 % Start the paradigm figure
 % -------------------------------------------------
 % -------------------------------------------------
+
+
 % we want random values
 \pgfmathsetseed{9999}
 \pgfmathdeclarerandomlist{badLottery}{{0}{0}{0}{0}{0}{0}{0}{1}{1}{1}}
@@ -209,8 +212,6 @@ In the following, these two paradigms will be descibed in detail. Figure \ref{fi
 
 }
 
-
-
 %--------------------------------------------------%
 %	      Now the Sampling Paradigm 			      %
 %--------------------------------------------------%
@@ -271,23 +272,24 @@ In the following, these two paradigms will be descibed in detail. Figure \ref{fi
 } % closing bracket from scaling
 
 \captionsetup{width=.9\linewidth, format=plain}
-\caption[Experimental Paradigms]{\textbf{A)} Depiction of a two-armed Bandit. Note that the number of options in the environment can be extended arbitrarily to form an n-armed Bandit. Each Option contains its own probability mass function (pmf) of outcomes. These pmfs are unknown to a subject performing the Bandit task. \textbf{B)} A typical run of trials in a Bandit task. A subject sequentially chooses among options and is provided with feedback. Each trial represents a exploration-exploitation problem.  \textbf{C)} A typical run of trials in the Sampling Paradigm. A subject is allowed to sample the available options without an impact of the outcomes on the final payoff. At some point, the subject can decide to terminate sampling and choose one of the options, which will impact the final payoff.}
+\caption[Experimental Paradigms]{\textbf{A)} Depiction of a two-armed bandit. Note that the number of options in the environment can be extended arbitrarily to form an n-armed bandit. Each option contains its own probability mass function (pmf) of outcomes. These pmfs are unknown to a subject performing the bandit task. \textbf{B)} A typical run of trials in a bandit task. A subject sequentially chooses among options and is provided with feedback. Each trial represents a exploration-exploitation problem.  \textbf{C)} A typical run of trials in the sampling paradigm. A subject is allowed to sample the available options without an impact of the outcomes on the final payoff. At some point, the subject can decide to terminate sampling and choose one of the options, which will impact the final payoff. In the sampling paradigm, exploration and exploitation are thus distinct.}
 \label{fig:paradigms}
 \end{center}
 \end{figure}
-
+% -------------------------------------------------
+% -------------------------------------------------
 
 \subsection{The n-armed Bandit Paradigm}
-From Hertwig also known as Partial-Feedback-Paradigm \cite{hertwig2009}.
 
+The n-armed bandit paradigm was first formalized by Robbins in 1952 \cite{robbins1952}. It has since been the subject of interest in a variety of fields, see \cite{berry1985} for a review. Generally, participants are presented with n action that represent initially unknown outcome distributions with a set number of outcomes. Upon selection of an action, an outcome is yielded from the distribution and presented to the participant as a feedback. With this gained knowledge, the participant may continue with selecting the same or a different action. \\
 
-
+The bandit paradigm offers a concise framework to study the exploration exploitation tradeoff common to the field of reinforcement learning. Here, exploration represents the goal to gather information about actions and their associated outcomes, while exploitation represents the goal to make use of the acquired information. A player who only explores will never exploit upon the accumulated knowledge, while a player who only exploits will most likely select suboptimal actions based on the inadequate knowledge about all actions. Hertwig \& Erev label the bandit paradigm as Partial-Feedback-Paradigm \cite{hertwig2009}.
 
 
 
 \subsection{The Sampling Paradigm}
-yep, pretty nice.
 
+The sampling paradigm is similar to the bandit paradigm. The main difference is that exploration and exploitation are separated. This is achieved through permitting a participant to sample all actions without consequences for as long as the participant wishes. This stage represents purely the exploration, because the outcomes do not count towards a payoff. Once the participant decides to terminate the sampling process, there is one last opportunity to select any action. For this last choice, the outcome will affect the payoff and thus, this stage represents purely the exploitation. For more information, see \cite{hertwig2011, erev2014, hertwig2009}
 
 
 
@@ -296,12 +298,36 @@ yep, pretty nice.
 
 Need a figure here for the 2x2 design
 
-\begin{figure}[h]
+% 2x2 design figure
+
+\begin{figure}[t]
 \begin{center}
-\includegraphics[scale=.5]{2x2_dummy}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}
+
+
+\draw (0,0) rectangle (2,2) node[scale=0.5,midway] {Passive Sampling};
+\draw (2,0) rectangle (4,2) node[scale=0.5,midway] {Passive Bandit};
+\draw (0,2) rectangle (2,4) node[scale=0.5,midway] {Active Sampling};
+\draw (2,2) rectangle (4,4) node[scale=0.5,midway] {Active Bandit};
+
+\node at (2,5) [scale=0.7,below] {Paradigm Condition};
+\node at (1,4) [scale=0.5,above] {Sampling Paradigm};
+\node at (3,4) [scale=0.5,above] {Bandit Paradigm};
+
+\node at (-1,2) [scale=0.7,rotate=90,anchor=north, below] {Interaction Condition};
+\node at (0,3) [scale=0.5,rotate=90,anchor=north,above] {Active};
+\node at (0,1) [scale=0.5,rotate=90,anchor=north, above] {Passive};
+
+
+\end{tikzpicture}
+} % closing bracket from scaling
+
+\captionsetup{width=.9\linewidth, format=plain}
+\caption[Experimental Design]{The 2x2 factorial design of the experiment.}
+\label{fig:design}
 \end{center}
 \end{figure}
-
 
 
 
@@ -312,6 +338,57 @@ describe the computer code here
 need a figure for the flow ???
 
 
+
+
+
+The stimuli used can be seen in Figure \ref{fig:stimuli}
+
+% Stimuli figure
+\begin{figure}[t]
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}[even odd rule]
+
+
+% Checkerboard for Stim 1: Red
+\foreach \x in {0,...,7} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "red" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+
+% Checkerboard for Stim2: Blue
+\foreach \x in {11,...,19} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "blue" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+
+% Checkerboard for Distractor Stim: Green
+\foreach \x in {22,...,30} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "green" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+% Putting a mask with circle-holes around it: Gray
+\fill[fill=gray] (-1,-1) rectangle ++ (32,10) (4,4) circle (4cm) (15,4) circle (4cm) (26,4) circle (4cm);
+
+\end{tikzpicture}
+} % closing bracket from scaling
+
+\captionsetup{width=.9\linewidth, format=plain}
+\caption[Experimental Stimuli]{Three stimuli against a background as used in the experiment . The red and blue stimuli represent either a win or lose outcome. The green stimulus represents a distractor stimulus.}
+\label{fig:stimuli}
+\end{center}
+\end{figure}
+
+\clearpage
 \printbibliography
 
 \end{document}
