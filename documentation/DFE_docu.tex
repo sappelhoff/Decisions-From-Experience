@@ -72,53 +72,44 @@
 
 \section{Introduction}
 
-Selective Sampling
+As agents in different environments, humans often find themselves in situations that require decisions based on limited knowledge about the available choice options. The topic of the present project is the process, how humans selectively sample choice options to arrive at a more refined knowledge about the properties of the options. Specifically, the interest lies in self-directed information search in sequential decision making problems. A short example illustrates the topic further: 
 
-in that: Self-directed information search
+\begin{quotation}
+Imagine that your laptop is broken and you want to acquire a new one. In the process, you may sequentially sample several available models and their respective properties such as prices, specifications, and reviews. To avoid indefinite browsing, you will need to terminate your search at some point and select a new laptop - most likely without having obtained full certainty about the best option.
+\end{quotation} 
 
-best illustrated with an example ... laptop?
+For the project described here, the aforementioned example will be transformed into an experimental paradigm that allows for the examination of behavioral and neural aspects of choice in a controled manner. Similar to the real life example, the experimental paradigm exhibits the following characteristics:
 
-for the project described here, the aforementioned example will be transformed into an experimental paradigma that allows us to examine behavioral and neural aspects of choice in a controled manner.
+\begin{itemize}
+\item There is an environment in which several options exist that will yield outcomes upon selection.
+\item There exists limited knowledge about the options and the frequencies of their associated outcomes.
+\item There will be the opportunity to obtain information about the options through a sampling of the options.
+\item The overall goal is to maximize the positive outcomes obtained from the options in the long run.
+\end{itemize}
 
-Similar to the real life example, the experimental paradigms are characterized by:
-- several options which can yield outcomes
-- limited knowledge about the options and the frequencies of their associated outcomes
-- opportunity to obtain information about the options via sampling
-- the goal to maximize the positive outcomes obtained from the options
-
-Through a structure of repeated sampling of the options and being provided with a feedback, the experimental paradigma describe sequential decision making problems.
-
-In the trial to trial decisions participants make, the question of interest to this project lies in how participants set their stopping criteria. I.e., when do participants decide to terminate the information search in one option and switch to another option ... or stop sampling altogether. 
-
-- See a concise formulation of the research questions in the *next section*.
-
-- Afterwards, the details of the experimental paradigm will be outlined.
-
-- Finally, the implementation of the experimental paradigm in terms of Matlab Code and Psychtoolbox will be described.
-
-
-
+In the paradigm, participants will make sequential decisions about which option to sample. In these trial to trial decisions, the question of interest to this project lies in how participants set their termination criteria. I.e., when do participants decide to terminate the information search in one option and switch to search another option? When do participants decide to stop sampling altogether and decide for one final option to be optimal based on current knowledge? The remainder of this document will be a concise formulation of the research questions followed by an outline of the experimental paradigm. Finally, the implementation of the experimental paradigm on a computer program will be described.
 
 
 \section{Research Questions}
-- How are sampling efforts sequentially allocated to the different options?
 
-- How do we arrive at a decision to terminate the information search?
-
-- What is the quantitative link between neural signals obtained by EEG with the behavioral data of participants performing the experimental paradigm. 
-
-
-
-
+% Listing the research questions
+\begin{enumerate}
+\item How are sampling efforts sequentially allocated to the different options?
+\item How do we arrive at a decision to terminate the information search?
+\item What is the quantitative link between neural signals obtained by EEG with the behavioral data of participants performing the experimental paradigm.
+\end{enumerate}
 
 
-\section{The Experimental Paradigma}
-In general, the experiment will be based on two different tasks that have been described in the literature previously. 
 
-**name them**
+\section{The Experimental Paradigm}
+The proposed experiment will be based on a combination  of two different paradigms that are well known in the literature.
 
+\begin{enumerate}
+\item The n-armed Bandit Paradigm
+\item The Sampling Paradigm
+\end{enumerate}
 
-See Figure \ref{fig:paradigms} for an overview.
+In the following, these two paradigms will be descibed in detail. Figure \ref{fig:paradigms} provides an overview of the paradigms.
 
 
 % Start the paradigm figure
@@ -280,27 +271,45 @@ See Figure \ref{fig:paradigms} for an overview.
 } % closing bracket from scaling
 
 \captionsetup{width=.9\linewidth, format=plain}
-\caption[Experimental Paradigms]{\textbf{A)}this is my description of a\textbf{B)}here i describe b\textbf{C)}finally i describe c}
+\caption[Experimental Paradigms]{\textbf{A)} Depiction of a two-armed Bandit. Note that the number of options in the environment can be extended arbitrarily to form an n-armed Bandit. Each Option contains its own probability mass function (pmf) of outcomes. These pmfs are unknown to a subject performing the Bandit task. \textbf{B)} A typical run of trials in a Bandit task. A subject sequentially chooses among options and is provided with feedback. Each trial represents a exploration-exploitation problem.  \textbf{C)} A typical run of trials in the Sampling Paradigm. A subject is allowed to sample the available options without an impact of the outcomes on the final payoff. At some point, the subject can decide to terminate sampling and choose one of the options, which will impact the final payoff.}
 \label{fig:paradigms}
 \end{center}
 \end{figure}
 
 
-\subsection{Bandit Paradigm}
-for Hertwig (2009) \cite{hertwig2009} also known as Partial-Feedback-Paradigm
+\subsection{The n-armed Bandit Paradigm}
+From Hertwig also known as Partial-Feedback-Paradigm \cite{hertwig2009}.
 
 
 
 
 
 
-\subsection{Sampling Paradigm}
+\subsection{The Sampling Paradigm}
 yep, pretty nice.
 
 
 
-\section{Computerized implementation of the Paradigma}
+
+
+\subsection{Combination of the Two Paradigms}
+
+Need a figure here for the 2x2 design
+
+\begin{figure}[h]
+\begin{center}
+\includegraphics[scale=.5]{2x2_dummy}
+\end{center}
+\end{figure}
+
+
+
+
+
+\section{Computerized Implementation of the Experiment}
 describe the computer code here
+
+need a figure for the flow ???
 
 
 \printbibliography
