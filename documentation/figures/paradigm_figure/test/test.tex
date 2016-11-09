@@ -1,0 +1,24 @@
+\documentclass[tikz]{standalone}
+\usetikzlibrary{positioning}
+
+
+\begin{document}
+  \begin{tikzpicture}
+  
+
+  
+    \node[draw] (a) {a};
+    \node[right=1cm of a] (b) {B};
+    \node[right=1cm of b] (c) {C};
+    \node[right=1cm of c] (d) {D};
+    \node[right=1cm of d] (e) {E};
+    \node[right=1cm of e] (f) {F};
+    \draw [dashed] (a) to[bend left] node {} (f);
+    \draw [red,dashed] (a) -- ++(0,5mm) -| node {} (f);
+  
+  
+  
+  
+  
+  \end{tikzpicture}
+\end{document}
