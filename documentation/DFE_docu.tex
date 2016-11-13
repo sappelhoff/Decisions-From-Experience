@@ -312,7 +312,7 @@ The interaction condition is goverened by active or passive interaction respecti
 To make sure that participants pay attention even during the passive conditions, we introduce an orthogonal task to the 2x2 experimental design. Here, participants will have to react to a stimulus of a different color by a quick button press. If the reaction times are too slow, we can assume that the participants did not pay sufficient attention.
 
 % 2x2 design figure
-\begin{figure}[t]
+\begin{figure}[ht]
 \begin{center}
 \resizebox{.9\linewidth}{!}{%
 \begin{tikzpicture}
@@ -345,15 +345,91 @@ To make sure that participants pay attention even during the passive conditions,
 
 
 \section{Computerized Implementation of the Experiment}
-describe the computer code here
 
-need a figure for the flow ???
+\begin{enumerate}
+
+\item \textbf{The GUI} \\
+At the beginning of the experiment, a graphical user interface will pop up, inquiring about the following information:
+\begin{itemize}
+\item Subject ID
+\begin{itemize}
+\item The subject ID will have at least three digits so that participant one will be '001', participant 2 will be '002' and so on.
+\end{itemize}
+\item Stimulus color
+\begin{itemize}
+\item The stimulus color can be set to either 'blue' or 'red', this entry determines, which color the winning stimulus will be. The losing stimulus will be set to the opposite color (e.g., 'blue', if the selection was 'red').
+\end{itemize}
+\item Starting condition
+\begin{itemize}
+\item  Finally, the starting condition can be set to either 'sp', which stands for sampling paradigm, or 'pfp', which stands for partial feedback paradigm (i.e., bandit). The selected option will be the initial condition of the experiment starting with 'active' as the second factor. This will be followed by a replay of the selected option (i.e., passive condition), before the move goes to the remaining condition, again in the order active - passive.
+\end{itemize}
+\end{itemize}
+
+
+\item \textbf{Instructions} \\
+Right after the initial GUI, there will be a set of initial instructions. I.e., the outline of the overall paradigm. Furthermore there will be more instructions before each upcoming condition.
+
+
+\item \textbf{Active PFP Conditions} \\ 
+If we have 100 trials for this condition, there will be about 4 'games' with 25 trials each. For each game, the lottery locations will be shuffled, so each game presents a new learning situation.
+\begin{itemize}
+\item 'The lotteries have been shuffled' screen  [1 sec.]
+\item Trial counter current\_trial / overall\_trials [1 sec.]
+\item Fixation cross 
+\item Reaction by participant [left] or [right] key to mimic selection of left or right lottery
+\item Fixation cross screen: delay before outcome of choice is presented [1 sec.]
+\item Feedback displayed in form of stimulus (see figure \ref{fig:stimuli}) [1 sec.]
+\item Continue with next trial counter until current\_trial == overal\_trials
+\item Show the payoff for the currently finished game [1 sec.]
+\item Ask the participant which lottery was deemed more profitable.
+\item Then, next game of PFP. Start with 'lotteries shuffled' screen
+\end{itemize}
+
+
+\item \textbf{Passive PFP Condition} \\
+\begin{itemize}
+\item Replay of the Active PFP Condition
+\item Take all timings as they were recorded before, and only interfere, when the timings are inadequately high or low. In these cases, we select a timing at random from the interval [0, 1] as implemented in matlab by: rand+rand.
+\item Skip the question which lottery was deemed more profitable
+\end{itemize} 
+
+
+\item \textbf{Active SP Condition} \\
+As opposed to the active PFP condition, we do not separate our overall 100 trials into distinct games. Instead, we will shuffle the lotteries after each 'choice' stage. Thus, there can be potentially many or few novel learning situations, depending on how often a participants picks 'choice' over 'continue to sample'.
+\begin{itemize}
+\item 'The lotteries have been shuffled' screen  [1 sec.]
+\item Trial counter current\_trial [1 sec.]
+\item Fixation cross 
+\item Reaction by participant [left] or [right] key to mimic selection of left or right lottery
+\item Fixation cross screen: delay before outcome of choice is presented [1 sec.]
+\item Feedback displayed in form of stimulus (see figure \ref{fig:stimuli}) [1 sec.]
+\item Question whether participant would like to: 
+\begin{itemize}
+\item Make a choice
+\item Continue to sample
+\end{itemize}
+\item display choosen answer [0.7 sec.]
+\item If 'continue to sample' was selected, continue with next trial counter else, present a choice screen.
+\item Show the payoff for the currently finished game [1 sec.]
+\item Then, continue with SP. Start with 'lotteries shuffled' screen
+\end{itemize}
+\item \textbf{Passive SP Condition} \\\item
+\begin{itemize}
+\item Replay of active SP condition
+\item Timings are taken from active SP condition, unless they are inadequate (see also passive PFP condition)
+\end{itemize}
+
+
+\item \textbf{Orthogonal Task} \\
+Throughout all four possible conditions, there will be a set chance (5%) that instead of a blue or red stimulus, a green stimulus (\ref{fig:stimuli}) will occur. As soon as that stimulus is shown, participants ought to press the [space] key.
+\end{enumerate} 
 
 
 
 
 
-The stimuli used can be seen in Figure \ref{fig:stimuli}
+
+
 
 % Stimuli figure
 \begin{figure}[t]
