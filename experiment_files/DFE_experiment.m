@@ -39,7 +39,7 @@ PsychDefaultSetup(2)                                                        ; % 
 
 % Screen Management
 screens = Screen('Screens')                                                 ; % get all available screens ordered from 0 (native screen of laptop) to i
-screenNumber = max(screens)                                                 ; % take max of screens to draw to external screen.
+screenNumber = min(screens)                                                 ; % take max of screens to draw to external screen.
 
 % Define white/black/grey
 white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
@@ -178,7 +178,7 @@ KbStrokeWait                                                                ;
     % starting a new PFP
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShuffled)                                                     ;
+    WaitSecs(tShuffled + rand/2)                                            ;
         
         
 
@@ -194,7 +194,7 @@ KbStrokeWait                                                                ;
         Screen('DrawLines', window, fixCoords,...
             fixWidth, white, [xCenter yCenter], 2)                          ;
 
-        WaitSecs(tTrialCount)                                               ; % show trial counter for n seconds
+        WaitSecs(tTrialCount + rand/2)                                      ; % show trial counter for n seconds
         Screen('Flip', window)                                              ; % then show fixcross
 
         % start decision process
@@ -223,14 +223,17 @@ KbStrokeWait                                                                ;
         aPFPmat(4,pfpIdx,pfpRun) = rewardBool                               ; % boolean whether is was rewarded or not
 
 
-        WaitSecs(tOutcomePresent)                                           ; % after choice, wait before displaying result
+        WaitSecs(tOutcomePresent+rand/2)                                    ; % after choice, wait before displaying result
         Screen('Flip', window)                                              ;
         
         if rewardBool == 2
             distractorMat = recognize_distractor(distractorMat)             ; % if this trial was a distractor, measure the RT to it 
+        else
+            WaitSecs(tFeedback+rand/2)                                      ; % feedback briefly displayed
         end
         
-        WaitSecs(tFeedback)                                                 ; % feedback briefly displayed
+        
+        
 
         
         
@@ -246,7 +249,7 @@ KbStrokeWait                                                                ;
     
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShowPayoff)                                                   ; % show payoff for 2 secs
+    WaitSecs(tShowPayoff+rand/2)                                            ; % show payoff for 2 secs
     totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
     
     
@@ -296,7 +299,9 @@ KbStrokeWait                                                                ;
 
 % Show the replay!
 distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, ...
-    maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)              ;
+    maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, ...
+    tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff, ...
+    fixWidth, xCenter, yCenter)                                             ;
 
 
 if condi_idx ~= 4
@@ -361,7 +366,7 @@ while spIdxMax >= 1                                                         ; % 
     % starting a new SP by shuffling the lotteries
     DrawFormattedText(window, texts('shuffled'), 'center', 'center', white) ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShuffled)                                                     ;
+    WaitSecs(tShuffled+rand/2)                                                     ;
         
         
 
@@ -396,13 +401,13 @@ while spIdxMax >= 1                                                         ; % 
                 DrawFormattedText(window, 'draw another sample', ...
                     'center', 'center', white, [], [], [], [], [],textwin1) ;
                 Screen('Flip', window)                                      ;
-                WaitSecs(tChosenOpt)                                        ; % briefly show chosen option
+                WaitSecs(tChosenOpt+rand/2)                                 ; % briefly show chosen option
 
             elseif pickedLoc == 2
                 DrawFormattedText(window, 'make a choice', ...
                     'center', 'center', white, [], [], [], [], [],textwin2) ;
                 Screen('Flip', window)                                      ;
-                WaitSecs(tChosenOpt)                                        ; % briefly show chosen option
+                WaitSecs(tChosenOpt+rand/2)                                 ; % briefly show chosen option
             end
         
         else
@@ -426,7 +431,7 @@ while spIdxMax >= 1                                                         ; % 
                 % drawing the fixcross
                 Screen('DrawLines', window, fixCoords,...
                     fixWidth, white, [xCenter yCenter], 2)                  ;
-                WaitSecs(tTrialCount)                                       ; % briefly show trial counter
+                WaitSecs(tTrialCount+rand/2)                                ; % briefly show trial counter
                 Screen('Flip', window)                                      ; % then show fixcross
 
 
@@ -456,14 +461,16 @@ while spIdxMax >= 1                                                         ; % 
                 aSPmat(4,datIdxCount) = (goodLotteryLoc == pickedLoc)       ; % boolean whether good or bad lottery was chosen
 
                 datIdxCount = datIdxCount + 1                               ; % update our data index counter
-                WaitSecs(tOutcomePresent)                                   ; % after choice, wait before displaying result
+                WaitSecs(tOutcomePresent+rand/2)                            ; % after choice, wait before displaying result
                 Screen('Flip', window)                                      ;
                                     
                 if rewardBool == 2
                     distractorMat = recognize_distractor(distractorMat)     ; % if this trial was a distractor, measure the RT to it 
+                else
+                    WaitSecs(tFeedback+rand/2)                              ; % feedback briefly displayed
                 end  
                 
-                WaitSecs(tFeedback)                                          ; % feedback briefly displayed
+                
 
                 
                 
@@ -501,6 +508,12 @@ while spIdxMax >= 1                                                         ; % 
     Screen('Flip', window)                                                  ;
     
     
+    
+
+    % draw fixcross
+    Screen('DrawLines', window, fixCoords,...
+        fixWidth, white, [xCenter yCenter], 2)                              ; 
+    
     % drawing the checkerboard stim at the chosen location. The reward_bool
     % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
     Screen('FillRect', window, reward(:,:,rewardBool+1),...
@@ -509,6 +522,8 @@ while spIdxMax >= 1                                                         ; % 
     Screen('DrawTextures', window, maskTexture, [],...
         maskLocs(:,:,pickedLoc))                                            ;
 
+    
+    
     
     
     % Measure timing and whether preferred lottery was correct
@@ -524,9 +539,9 @@ while spIdxMax >= 1                                                         ; % 
     spChoiceCount = spChoiceCount + 1                                       ; % update the counter of the preferred lottery data matrix
 
    
-    WaitSecs(tOutcomePresent)                                               ; % wait for one second before displaying feedback
+    WaitSecs(tOutcomePresent+rand/2)                                        ; % wait for a bit before displaying feedback
     Screen('Flip', window)                                                  ;
-    WaitSecs(tFeedback)                                                     ; % briefly show feedback 
+    WaitSecs(tFeedback+rand/2)                                              ; % briefly show feedback 
     
     
     % Tell the subject how much she has earned 

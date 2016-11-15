@@ -1,4 +1,4 @@
-function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff)
+function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff, fixWidth, xCenter, yCenter)
 
 % This function executes a replay
 %
@@ -19,11 +19,14 @@ function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, 
 % - tOutcomePresent: time after a choice before outcome is presented
 % - tFeedback: time that the feedback is displayed
 % - tShowPayoff: time that the payoff is shown
+% - fixWidth: for drawing the fixcross
+% - xCenter: center of the screen x axis
+% - yCenter: center of the screen y axis
 %
 %
 % Returns
 % ----------
-% - distractorMat: an updated distractor mat
+% -    distractorMat: an updated distractor mat
 
 %% Function start
 
@@ -36,7 +39,7 @@ for replayRun = 1:pfpRuns
     % Pretend something has been shuffled
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShuffled)                                                     ;
+    WaitSecs(tShuffled+rand/2)                                              ;
         
     
     for replayTrial = 1:pfpTrials
@@ -50,7 +53,7 @@ for replayRun = 1:pfpRuns
     % drawing the fixcross
     Screen('DrawLines', window, fixCoords,...
         fixWidth, white, [xCenter yCenter], 2)                              ;
-    WaitSecs(tTrialCount)                                                   ; % briefly show trial counter 
+    WaitSecs(tTrialCount+rand/2)                                            ; % briefly show trial counter 
     Screen('Flip', window)                                                  ; % then show fixcross
 
     
@@ -83,19 +86,25 @@ for replayRun = 1:pfpRuns
     maskLocs(:,:,pickedLoc))                                                ;
 
 
-    WaitSecs(tOutcomePresent)                                               ; % after choice, wait briefly before displaying result
+    WaitSecs(tOutcomePresent+rand/2)                                        ; % after choice, wait briefly before displaying result
     Screen('Flip', window)                                                  ;
 
-    WaitSecs(tFeedback)                                                     ; % briefly display feedback 
+    if rewardBool == 2
+        distractorMat = recognize_distractor(distractorMat)                 ; % if this trial was a distractor, measure the RT to it 
+    else
+        WaitSecs(tFeedback+rand/2)                                          ; % briefly display feedback 
+    end
+    
+    
     
     end
     
     % Tell the subject how much was earned
-    payoff = sum(aPFPmat(4,:,pfp_run))                                      ; % the overall payoff
+    payoff = sum(aPFPmat(4,:,replayRun))                                    ; % the overall payoff
     payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShowPayoff)                                                   ; % briefly display payoff
+    WaitSecs(tShowPayoff+rand/2)                                            ; % briefly display payoff
     
     
  

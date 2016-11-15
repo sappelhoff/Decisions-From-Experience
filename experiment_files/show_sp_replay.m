@@ -48,7 +48,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
     % Pretend the lotteries have been shuffled
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)  ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShuffled)                                                     ;
+    WaitSecs(tShuffled+rand/2)                                              ;
     
     for samples = 1:prevSamples(choiceRun) % the number of samples can be obtained here by indexing with the choice of interest
    
@@ -94,7 +94,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
         end  
 
         
-        WaitSecs(tFeedback)                                                 ; % briefly show feedback
+        WaitSecs(tFeedback+rand/2)                                          ; % briefly show feedback
             
         
 
@@ -120,7 +120,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             DrawFormattedText(window, 'draw another sample', ...
                 'center', 'center', white, [], [], [], [], [], textwin1)    ;
             Screen('Flip', window)                                          ;
-            WaitSecs(tChosenOpt)                                            ; % Briefly show the chosen option
+            WaitSecs(tChosenOpt+rand/2)                                     ; % Briefly show the chosen option
 
             % now start from "samples" loop again
             
@@ -129,7 +129,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             DrawFormattedText(window, 'make a choice', ...
                 'center', 'center', white, [], [], [], [], [], textwin2)    ;
             Screen('Flip', window)                                          ;
-            WaitSecs(tChosenOpt)                                            ; % Briefly show the chosen option
+            WaitSecs(tChosenOpt+rand/2)                                     ; % Briefly show the chosen option
             
             % get the historical values from our data
             pickedLoc = aSPprefLotMat(1, choiceRun)                         ;
@@ -139,7 +139,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             
             % Replay decision process originally, as long as it is [1,3]sec
             if rt < 1 ||  rt > 3
-                rt = randi(2,1,1)+rand                                      ; % if actual RT differs, create a conforming random RT
+                rt = rand+rand                                              ; % if actual RT differs, create a conforming random RT
             end
      
             
@@ -155,6 +155,12 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
                 fixWidth, white, [xCenter yCenter], 2)                      ; 
             Screen('Flip', window)                                          ;
     
+            
+
+            % draw fixcross
+            Screen('DrawLines', window, fixCoords,...
+                fixWidth, white, [xCenter yCenter], 2)                      ; 
+            
             % drawing the checkerboard stim at the chosen location. The
             % reward_bool tells us win(1) or loss(0) ... we add 1 so we get
             % win=2, loss=1
@@ -164,7 +170,7 @@ for choiceRun = 1:allChoices % before each choice, there is a number of samples 
             Screen('DrawTextures', window, maskTexture, [],...
                 maskLocs(:,:,pickedLoc))                                    ;            
             Screen('Flip', window)                                          ;
-            WaitSecs(tFeedback)                                             ; % briefly show feedback
+            WaitSecs(tFeedback+rand/2)                                      ; % briefly show feedback
             
             % Now shuffle lotteries (i.e., advance in outer loop)
             
