@@ -8,7 +8,7 @@ function DFE_experiment
 % - level 1: Partial Feedback Paradigm (PFP) 
 % - level 2: Sampling Paradigm (SP) 
 %
-% Factor 2 describes two different ways how the tasks are being performed:
+% Factor 2 describes two different ways how the tasks are being performed :
 % - level 1: Active selection of lotteries through button presses
 % - level 2: Passive, i.e., watching a replay of previous decisions
 
@@ -20,15 +20,16 @@ expStart = datestr(now)                                                     ; % 
 [subjId, winStim, startCond] = inquire_user                                 ; % Get user info and experiment environment specs
 totalEarnings = 0                                                           ; % total earnings of user
 euroFactor = 0.25                                                           ; % factor to convert points to Euros
-pDistr = 0.5                                                                ; % probability that a distractor might occur
+pDistr = 0.05                                                               ; % probability that a distractor might occur
 
 % timings in seconds
 tShuffled = 1                                                               ; % the time after the participants are being told that lotteries have been shuffled
 tTrialCount = 1                                                             ; % time that the trial counter is shown
-tOutcomePresent = 1                                                         ; % time after a choice before outcome is presented
+tDelayFeedback = 1                                                          ; % time after a choice before outcome is presented
 tFeedback = 1                                                               ; % time that the feedback is displayed
 tShowPayoff = 1                                                             ; % time that the payoff is shown
 tChosenOpt = .75                                                            ; % in SP, the time that the chosen option is "shown"
+
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
 %-------------------------------------------------------------------------%
@@ -98,7 +99,6 @@ pfpTrials = 2                                                               ;
 % define winning stimulus
 if strcmp(winStim, 'blue')
     reward = cat(3, colors1, colors2, colors3)                              ; % blue is win Stim ... red as loss. colors3(green) is the distractor condition
-    
 else 
     reward = cat(3, colors2, colors1, colors3)                              ; % red is win Stim ... blue as loss. colors3(green) is the distractor condition
 end
@@ -223,7 +223,7 @@ KbStrokeWait                                                                ;
         aPFPmat(4,pfpIdx,pfpRun) = rewardBool                               ; % boolean whether is was rewarded or not
 
 
-        WaitSecs(tOutcomePresent+rand/2)                                    ; % after choice, wait before displaying result
+        WaitSecs(tDelayFeedback+rand/2)                                    ; % after choice, wait before displaying result
         Screen('Flip', window)                                              ;
         
         if rewardBool == 2
@@ -249,7 +249,7 @@ KbStrokeWait                                                                ;
     
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShowPayoff+rand/2)                                            ; % show payoff for 2 secs
+    WaitSecs(tShowPayoff+rand/2)                                            ; % show payoff for some time
     totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
     
     
@@ -300,7 +300,7 @@ KbStrokeWait                                                                ;
 % Show the replay!
 distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, ...
     maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, ...
-    tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff, ...
+    tShuffled, tTrialCount, tDelayFeedback, tFeedback, tShowPayoff, ...
     fixWidth, xCenter, yCenter)                                             ;
 
 
@@ -461,7 +461,7 @@ while spIdxMax >= 1                                                         ; % 
                 aSPmat(4,datIdxCount) = (goodLotteryLoc == pickedLoc)       ; % boolean whether good or bad lottery was chosen
 
                 datIdxCount = datIdxCount + 1                               ; % update our data index counter
-                WaitSecs(tOutcomePresent+rand/2)                            ; % after choice, wait before displaying result
+                WaitSecs(tDelayFeedback+rand/2)                            ; % after choice, wait before displaying result
                 Screen('Flip', window)                                      ;
                                     
                 if rewardBool == 2
@@ -492,7 +492,7 @@ while spIdxMax >= 1                                                         ; % 
     spRunCount = spRunCount + 1                                             ;     
     
     % if this is the last trial, tell the subject so
-    if spIdxMax <= 1                                                        % spIdxMax will be 0 if participant came here through sampling ... and will be 1 if participant selected "choice" on the last trial
+    if spIdxMax < 1                                                         
         DrawFormattedText(window, texts('aSPfinal'), 'center', ...
             'center', white)                                                ;
         Screen('Flip', window)                                              ;
@@ -503,18 +503,18 @@ while spIdxMax >= 1                                                         ; % 
     DrawFormattedText(window, texts('aSPchoice'), 'center', ...
         'center', white)                                                    ;
     Screen('Flip', window)                                                  ;
-    KbStrokeWait                                                            ;
     
     % start decision process
     [pickedLoc, rewardBool, ...
         rt] = require_response(leftLottery, rightLottery)                   ; % during the choice procedure of the SP, getting a distractor is impossible
 
+    % Once decision is done, prepare the screen for feedback but do not yet
+    % present it ...
     % draw fixcross
     Screen('DrawLines', window, fixCoords,...
-        fixWidth, white, [xCenter yCenter], 2)                              ; 
+        fixWidth, white, [xCenter yCenter], 2)                              ;     
     Screen('Flip', window)                                                  ;
-    
-    
+    WaitSecs(tDelayFeedback+rand/2)                                         ; % wait for a bit before displaying feedback
     
 
     % draw fixcross
@@ -546,7 +546,7 @@ while spIdxMax >= 1                                                         ; % 
     spChoiceCount = spChoiceCount + 1                                       ; % update the counter of the preferred lottery data matrix
 
    
-    WaitSecs(tOutcomePresent+rand/2)                                        ; % wait for a bit before displaying feedback
+    
     Screen('Flip', window)                                                  ;
     WaitSecs(tFeedback+rand/2)                                              ; % briefly show feedback 
     
@@ -557,7 +557,7 @@ while spIdxMax >= 1                                                         ; % 
     payoffStr = strcat(texts('payoff'), sprintf(' %d', payoff))             ;
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
-    KbStrokeWait                                                            ;
+    WaitSecs(tShowPayoff+rand/2)                                            ; % show payoff for some time
     totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
  	
 
@@ -595,8 +595,11 @@ KbStrokeWait                                                                ;
 
 
 % Show the replay!
-distractorMat = show_sp_replay(aPFPmat, texts, reward, window, white, ...
-    maskTexture, maskLocs, rectLocs, distractorMat, fixCoords)              ;
+distractorMat = show_sp_replay(aSPmat, aSPprefLotMat, texts, reward, ...
+    window, white, maskTexture, maskLocs, rectLocs, screenXpixels, ...
+    screenYpixels, distractorMat, fixCoords, fixWidth, xCenter, ...
+    yCenter, tShuffled, tTrialCount, tDelayFeedback, tFeedback, ...
+    tShowPayoff, tChosenOpt)                                                ; 
 
 
 if condi_idx ~= 4
@@ -641,4 +644,7 @@ sca                                                                         ; % 
 save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, ...
     aPFPprefLotMat, aSPmat, aSPprefLotMat, distactor_mat)                   ; % data located in /data ... sibling dir of /experiment_files
 
+% print out the earnings in ? to the console
+money = sprintf('The subject has earned %2.f ?.', totalEarnings*euroFactor) ; 
+disp(money)                                                                 ;
 end % function end

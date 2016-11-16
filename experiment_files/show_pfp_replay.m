@@ -1,4 +1,4 @@
-function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, tShuffled, tTrialCount, tOutcomePresent, tFeedback, tShowPayoff, fixWidth, xCenter, yCenter)
+function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, maskTexture, maskLocs, rectLocs, distractorMat, fixCoords, tShuffled, tTrialCount, tDelayFeedback, tFeedback, tShowPayoff, fixWidth, xCenter, yCenter)
 
 % This function executes a replay
 %
@@ -16,7 +16,7 @@ function distractorMat = show_pfp_replay(aPFPmat, texts, reward, window, white, 
 % - fixCoords: for the fixcross
 % - tShuffled: the time after the participants are being told that lotteries have been shuffled
 % - tTrialCount: time that the trial counter is shown
-% - tOutcomePresent: time after a choice before outcome is presented
+% - tDelayFeedback: time after a choice before outcome is presented
 % - tFeedback: time that the feedback is displayed
 % - tShowPayoff: time that the payoff is shown
 % - fixWidth: for drawing the fixcross
@@ -68,7 +68,7 @@ for replayRun = 1:pfpRuns
     if rt <= 3
         WaitSecs(rt)                                                        ; % RTs below 3 seconds are reasonable
     else
-        WaitSecs(rand+rand)                                                 ; % if actual RT differs, create a conforming random RT
+        WaitSecs(1+rand/2)                                                  ; % if actual RT differs, create a conforming random RT
     end
     
     
@@ -86,7 +86,7 @@ for replayRun = 1:pfpRuns
     maskLocs(:,:,pickedLoc))                                                ;
 
 
-    WaitSecs(tOutcomePresent+rand/2)                                        ; % after choice, wait briefly before displaying result
+    WaitSecs(tDelayFeedback+rand/2)                                        ; % after choice, wait briefly before displaying result
     Screen('Flip', window)                                                  ;
 
     if rewardBool == 2
@@ -101,7 +101,7 @@ for replayRun = 1:pfpRuns
     
     % Tell the subject how much was earned
     payoff = sum(aPFPmat(4,:,replayRun))                                    ; % the overall payoff
-    payoffStr = strcat(texts('payoff'), sprintf(' %d', num2str(payoff)))    ;
+    payoffStr = strcat(texts('payoff'), sprintf(' %d', payoff))             ;
     DrawFormattedText(window, payoffStr, 'center', 'center', white)         ;
     Screen('Flip', window)                                                  ;
     WaitSecs(tShowPayoff+rand/2)                                            ; % briefly display payoff

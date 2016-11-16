@@ -44,7 +44,7 @@ texts('aPFP_intro2') = sprintf('Try to maximize your "win" outcomes.\n\nYou need
 
 % Active SP specific texts
 texts('aSPchoice') = sprintf('From which lottery do\nyou want to draw your payoff?\nPress [left] or [right]');
-texts('aSPfinal') = sprintf('You have reached the final\ntrial. You are granted one\nlast choice towards your payoff.');
+texts('aSPfinal') = sprintf('You have reached the final\ntrial. You are granted one\nlast choice towards your payoff.\nPress any key.');
 
 texts('aSPintro1') = sprintf('Whenever you see the + sign,\n\nuse [left] and [right] to choose a lottery.');
 texts('aSPintro2') = sprintf('However, the outcomes you see\n\n reflect "samples".\n\nYou do not receive\n\npoints for these samples.');
