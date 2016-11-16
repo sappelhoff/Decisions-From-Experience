@@ -28,7 +28,7 @@ tTrialCount = 1                                                             ; % 
 tOutcomePresent = 1                                                         ; % time after a choice before outcome is presented
 tFeedback = 1                                                               ; % time that the feedback is displayed
 tShowPayoff = 1                                                             ; % time that the payoff is shown
-tChosenOpt = .7                                                             ; % in SP, the time that the chosen option is "shown"
+tChosenOpt = .75                                                            ; % in SP, the time that the chosen option is "shown"
 %-------------------------------------------------------------------------%
 %                   Setting Defaults for the Experiment                   %
 %-------------------------------------------------------------------------%
@@ -366,7 +366,7 @@ while spIdxMax >= 1                                                         ; % 
     % starting a new SP by shuffling the lotteries
     DrawFormattedText(window, texts('shuffled'), 'center', 'center', white) ;
     Screen('Flip', window)                                                  ;
-    WaitSecs(tShuffled+rand/2)                                                     ;
+    WaitSecs(tShuffled+rand/2)                                              ;
         
         
 
@@ -484,8 +484,15 @@ while spIdxMax >= 1                                                         ; % 
  
     % If 'right' (=2) was selected or there are no trials left, start the
     % choice procedure
+
+    % After the following choice, the subject has completed one SP run.
+    % We calculate, how many trials remain to start a new trial or go on
+    % to the next task.
+    spIdxMax = spIdxMax - spIdx                                             ;
+    spRunCount = spRunCount + 1                                             ;     
     
-    if spIdxMax == 1 % if this is the last trial, tell the subject so
+    % if this is the last trial, tell the subject so
+    if spIdxMax <= 1                                                        % spIdxMax will be 0 if participant came here through sampling ... and will be 1 if participant selected "choice" on the last trial
         DrawFormattedText(window, texts('aSPfinal'), 'center', ...
             'center', white)                                                ;
         Screen('Flip', window)                                              ;
@@ -554,10 +561,7 @@ while spIdxMax >= 1                                                         ; % 
     totalEarnings = totalEarnings + payoff                                  ; % increment the total earnings of the participant
  	
 
-    % Now the subject has completed one SP run. We calculate, how many
-    % trials remain to start a new trial or go on to the next task.
-    spIdxMax = spIdxMax - spIdx                                             ;
-    spRunCount = spRunCount + 1                                             ; 
+
     
 end % end of while loop implmenting all possible SP runs
 

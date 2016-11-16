@@ -17,7 +17,9 @@
 \usetikzlibrary{positioning} % arrows between nodes and relative positions
 \usetikzlibrary{arrows}
 
-
+% For drawing the frames of the images
+\fboxsep=0.5mm%padding thickness
+\fboxrule=0.5mm%border thickness
 
 % for drawing from different lotteries (left/right)
 \usepackage{xifthen}
@@ -395,22 +397,22 @@ If we have 100 trials for this condition, there will be about 4 'games' with 25 
 
 % Insert all the pictures
 \node[inner sep=0pt] (lotShuffle) at (0,0)
-    {\includegraphics[width=\imgSize]{lotShuffle.jpg}};
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{lotShuffle.jpg}}};
 
 \node[inner sep=0pt] (trialCount) at (0,-4)
-    {\includegraphics[width=\imgSize]{spCounter.jpg}};    
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{pfpCounter.jpg}}};    
 
 \node[inner sep=0pt] (fixcross) at (0,-8)
-    {\includegraphics[width=\imgSize]{fixcross.jpg}};
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{fixcross.jpg}}};
     
 \node[inner sep=0pt] (outcome) at (0,-12)
-    {\includegraphics[width=\imgSize]{outBlueRight.jpg}};
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{outBlueRight.jpg}}};
  
 \node[inner sep=0pt] (earn) at (0,-16)
-    {\includegraphics[width=\imgSize]{earnZero.jpg}}; 
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{earnZero.jpg}}}; 
    
 \node[inner sep=0pt] (prefLot) at (0,-20)
-    {\includegraphics[width=\imgSize]{prefLot.jpg}};
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{prefLot.jpg}}};
 
 
 
@@ -433,17 +435,17 @@ If we have 100 trials for this condition, there will be about 4 'games' with 25 
 
 % Inserting describing text next to pictures
 
-\node at (4,0) [text width=\descrTextWidth, align=left, right] {The options [left] and [right] are shuffled once for each game.};
+\node at (4,0) [text width=\descrTextWidth, align=left, right] {Options [left] and [right] are shuffled};
 
-\node at (4,-4) [text width=\descrTextWidth, align=left, right] {Each trial starts with a counter indicating the current trial of all trials in the present game.};
+\node at (4,-4) [text width=\descrTextWidth, align=left, right] {Trial counter: Current trial of all trials in present game};
 
-\node at (4,-8) [text width=\descrTextWidth, align=left, right] {Once a fixation cross is shown, participants can select an option by clicking [left] or [right on the keyboard.]};
+\node at (4,-8) [text width=\descrTextWidth, align=left, right] {Fixation cross: Participants select an option by clicking [left] or [right]};
 
-\node at (4,-12) [text width=\descrTextWidth, align=left, right] {Participants are provided with the outcome of their choice. Could also be a distractor trial, where participants need to press [space] as quickly as possible.};
+\node at (4,-12) [text width=\descrTextWidth, align=left, right] {Outcome, or distractor, where participants need to press [space] as quickly as possible};
 
-\node at (4,-16) [text width=\descrTextWidth, align=left, right] {Once all trials of the present game have been finished, the overall earnings are displayed.};
+\node at (4,-16) [text width=\descrTextWidth, align=left, right] {Overall earnings are displayed};
 
-\node at (4,-20) [text width=\descrTextWidth, align=left, right] {Lastly, participants are asked, which option they deemed more profitable.};
+\node at (4,-20) [text width=\descrTextWidth, align=left, right] {Participants are asked, which option they deemed more profitable};
 
 
 % Drawing the bent arrows 
@@ -456,7 +458,7 @@ If we have 100 trials for this condition, there will be about 4 'games' with 25 
 \end{tikzpicture}
 } % close the resize box
 \captionsetup{width=.9\linewidth, format=plain}
-\caption[Flow Bandit Paradigm]{Experimental flow of the bandit paradigm. Note: RT=Reaction time, ms=miliseconds, t=time}
+\caption[Flow Bandit Paradigm]{Experimental flow of the bandit paradigm. Red colors indicate the loop where participants explore and exploit there options. Once all trials have been spent within the red loop, a transition to the blue loop occurs, resetting the environment for a new game and leading to the red loop again, until all games are exhausted. Note: RT=Reaction time, ms=miliseconds, t=time}
 \label{fig:banditFlow}
 \end{center}
 
@@ -491,6 +493,132 @@ As opposed to the active PFP condition, we do not separate our overall 100 trial
 \item Show the payoff for the currently finished game [1 sec.]
 \item Then, continue with SP. Start with 'lotteries shuffled' screen
 \end{itemize}
+
+
+\begin{figure}[ht]
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}
+
+
+% Insert all the pictures
+\node[inner sep=0pt] (lotShuffle) at (0,0)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{lotShuffle.jpg}}};
+
+\node[inner sep=0pt] (trialCount) at (0,-3)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spCounter.jpg}}};    
+
+\node[inner sep=0pt] (fixcross) at (0,-6)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{fixcross.jpg}}};
+    
+\node[inner sep=0pt] (outcome) at (0,-9)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{outRedLeft.jpg}}};
+ 
+\node[inner sep=0pt] (question) at (0,-12)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestion.jpg}}}; 
+   
+\node[inner sep=0pt] (spQuestionSample) at (-4,-15)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestionSample.jpg}}};
+
+\node[inner sep=0pt] (spQuestionChoice) at (4,-15)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{spQuestionChoice.jpg}}};
+
+\node[inner sep=0pt] (noTrials) at (8,-15)
+    {\fcolorbox{green}{green}{\includegraphics[width=\imgSize]{spNoTrials.jpg}}}; 
+
+\node[inner sep=0pt] (spChoice) at (4,-18)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{spChoice.jpg}}};
+
+\node[inner sep=0pt] (outcomeChoice) at (4,-21)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{outBlueRight.jpg}}};
+    
+\node[inner sep=0pt] (earn) at (4,-24)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{earnZero.jpg}}};
+
+
+
+
+
+
+% Drawing all nodes between pictures
+\draw[->,thick] (lotShuffle) -- (trialCount)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (trialCount) -- (fixcross)
+    node [midway,fill=white] {$1250\pm250$ ms};
+    
+\draw[->,thick] (fixcross) -- (outcome)
+    node [midway,fill=white] {t depends on RT};
+    
+\draw[->,thick] (outcome) -- (question)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (spQuestionChoice) -- (spChoice)
+    node [midway,fill=white] {$750\pm250$ ms};
+    
+\draw[->,thick] (spChoice) -- (outcomeChoice)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (outcomeChoice) -- (earn)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+
+
+% Inserting describing text next to pictures
+
+\node at (14,0) [text width=\descrTextWidth, align=left] {Options [left] and [right] are shuffled};
+
+\node at (14,-3) [text width=\descrTextWidth, align=left] {Trial counter: Current trial only (no indication of maximum trials)};
+
+\node at (14,-6) [text width=\descrTextWidth, align=left] {Fixation cross: Participants select an option by clicking [left] or [right]};
+
+\node at (14,-9) [text width=\descrTextWidth, align=left] {Outcome of sampling, or distractor};
+
+\node at (14,-12) [text width=\descrTextWidth, align=left] {Question whether to proceed with sampling (exploration) or make a choice (exploitation)};
+
+\node at (14,-15) [text width=\descrTextWidth, align=left] {Quick show of selection};
+
+\node at (14,-18) [text width=\descrTextWidth, align=left] {Which option to choose for exploitation};
+
+\node at (14,-21) [text width=\descrTextWidth, align=left] {Outcome of choice};
+
+\node at (14,-24) [text width=\descrTextWidth, align=left] {Earnings are displayed};
+
+
+
+
+
+% describing text for double bent arrow
+\node at (0,-15.2) [text width=\descrTextWidth, align=center] {t depends on RT};
+
+
+% Drawing the bent arrows 
+
+\draw[->,thick] (outcome.east) to [out=0, in=90] node [text width=0.2\textwidth, midway,fill=white] {If trial counter is at max, there is one last choice.} (noTrials.north);
+
+\draw[->,thick] (noTrials.south) to [out=270, in=360] node [near start,fill=white] {t depends on RT} (spChoice.east);
+
+\draw[->,thick] (question.south) to [out=270, in=180] node []{} (spQuestionChoice.west);    
+
+\draw[->,thick] (question.south) to [out=270, in=0] node []{} (spQuestionSample.east);
+
+\draw[->,thick] (spQuestionSample.north) to [out=90,in=180] node[text width=0.2\textwidth, midway, fill=white, align=center]{$750\pm250$ ms \\ Increment trial counter} (trialCount.west) ;
+
+\draw[->,thick] (earn.east) to [out=0,in=0] node[text width=0.2\textwidth, near end, fill=white, align=center] {t depends on RT \\ Trial counter is not incremented. If trial counter at max, paradigm is stopped.} (lotShuffle.east);
+
+
+\end{tikzpicture}
+} % closing bracket from scaling
+
+\captionsetup{width=.9\linewidth, format=plain}
+\caption[Flow Sampling Paradigm]{Experimental flow of the sampling paradigm. Red colors indicate the sampling loop, from which one can transition to the blue choice loop, leading back to the sampling loop. Once the maximum of trials has been reached, a transition to the green loop for a last choice occurs. Note: RT=Reaction time, ms=miliseconds, t=time. }
+\label{fig:spFlow}
+\end{center}
+\end{figure}
+
+
+
+
 \item \textbf{Passive SP Condition} \\\item
 \begin{itemize}
 \item Replay of active SP condition
