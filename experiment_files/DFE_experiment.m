@@ -40,7 +40,7 @@ PsychDefaultSetup(2)                                                        ; % 
 
 % Screen Management
 screens = Screen('Screens')                                                 ; % get all available screens ordered from 0 (native screen of laptop) to i
-screenNumber = min(screens)                                                 ; % take max of screens to draw to external screen.
+screenNumber = max(screens)                                                 ; % take max of screens to draw to external screen.
 
 % Define white/black/grey
 white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
@@ -642,7 +642,7 @@ sca                                                                         ; % 
 % neatly together with a readme in form of a matlab cell.
 
 save_data(expStart, expEnd, totalEarnings, subjId, aPFPmat, ...
-    aPFPprefLotMat, aSPmat, aSPprefLotMat, distactor_mat)                   ; % data located in /data ... sibling dir of /experiment_files
+    aPFPprefLotMat, aSPmat, aSPprefLotMat, distractor_mat)                  ; % data located in /data ... sibling dir of /experiment_files
 
 % print out the earnings in ? to the console
 money = sprintf('The subject has earned %2.f ?.', totalEarnings*euroFactor) ; 
