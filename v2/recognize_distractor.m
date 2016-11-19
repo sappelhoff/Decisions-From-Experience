@@ -1,25 +1,27 @@
 function distrMat = recognize_distractor(distrMat)
 
 % Inquires about the space key pressed and the associated timing. Remains
-% in a while loop until space is pressed. 
+% in a while loop until space is pressed. Then appends the RT to a vector
+% given as input.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 %
-% Parameters
-% ----------
+% distrMat = recognize_distractor(distrMat)
+%
+% IN
 % - distrMat: Here we save RTs for detecting the distractors
 %
-% Returns
-% ----------
+% OUT
 % - distrMat: An updated distrMat with RTs for current distractor appended
 %
-%
+%% Function start
+
 %-------------------------------------------------------------------------%
 %                      Keyboard information                               %
 %-------------------------------------------------------------------------%
 spaceKey = KbName('space')                                                  ; % detect distractor
 
-%% Function start
+%% 
 
 tStart = GetSecs                                                            ; % get time of start
 respToBeMade = true                                                         ; % condition for while loop

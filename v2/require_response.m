@@ -1,29 +1,34 @@
-function [pickedLoc, rewardBool, rt] = require_response(leftLottery, rightLottery, pDistr)
-% a function to inquire about key pressed and their timings
+function [pickedLoc, rewardBool, rt] = require_response(leftLottery, rightLottery)
+
+% Function remains in a while loop until either [left] or [right] are
+% pressed. Then, measures the associated RT, and samples the lottery either
+% left or right.
 %
-% Parameters
-% ----------
+% Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
+%
+% [pickedLoc, rewardBool, rt] = require_response(leftLottery, rightLottery)
+%
+% IN:
 % - leftLottery: the lottery connected to button [left]
 % - rightLottery: the lottery connected to button [right]
-% - pDistr(optional argument): probability of a distractor occuring 
 %
-% Returns
-% ----------
+% OUT:
 % - pickedLoc: either 1(=left) or 2(=right) for the picked location
 % - rewardBool: either 0 or 1 depending on whether the choice was rewarded
 % ... can also be 2 in 5% of all cases, to present a distractor
 % - rt: reaction time in ms to respond
 %
-%
-%-------------------------------------------------------------------------%
-%                      Keyboard information                              %
-%-------------------------------------------------------------------------%
 
+%% Function start
+
+%-------------------------------------------------------------------------%
+%                      Keyboard information                               %
+%-------------------------------------------------------------------------%
 
 leftKey = KbName('LeftArrow')                                               ; % choose left lottery
 rightKey = KbName('RightArrow')                                             ; % choose right lottery
 
-%% Function start
+%% 
 
 tStart = GetSecs                                                            ; % get time of start
 respToBeMade = true                                                         ; % condition for while loop
@@ -42,9 +47,5 @@ while respToBeMade
         end
 end
 
-if nargin == 3
-    if rand <= pDistr
-        rewardBool = 2                                                      ; % in p_distractor of all trials, present a distractor instead of the reward
-    end
-end
+%% Function end
 end
