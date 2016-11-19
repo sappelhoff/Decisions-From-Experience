@@ -1,4 +1,4 @@
-function BdistrsMat = bandit_replay(choiceMat, winStim, ID)
+function [BdistrsMat, BdistrsInsertMat] = bandit_replay(choiceMat, winStim, ID)
 
 % Implements a replay of a bandit paradigm performed earlier as described in
 % the documentation.
@@ -15,6 +15,8 @@ function BdistrsMat = bandit_replay(choiceMat, winStim, ID)
 %
 % OUT:
 % - BdistrsMat: RTs to the distractor trials that happened during the replay
+% - BdistrsInsertMat: a trialsXgames matrix of zeros. 1s, where distr was
+% inserted
 
 %% function start
 
@@ -83,7 +85,8 @@ tShowPayoff = 1                                                             ; % 
 [~, nTrials, nGames] = size(choiceMat);
 
 % Matrix for saving the data
-BdistrsMat = [];
+BdistrsMat = []                                                             ;
+BdistrsInsertMat = zeros(nTrials,nGames)                                     ; % A 1 will be put, where a distractor was used
 
 %% Doing the experimental flow
 
@@ -140,6 +143,7 @@ Screen('Flip', window)                                                      ; % 
 
 if rewardBool == 2
     BdistrsMat = recognize_distractor(BdistrsMat)                           ; % If a distractor occurred, measure the RT to it
+    BdistrsInsertMat(trial, game) = 1                                       ; % Note, where exactly a distractor was applied 
 else
     WaitSecs(tShowFeedback+rand/2)                                          ; % Else, just display the feedback for a bit
 end
@@ -164,7 +168,7 @@ data_dir = fullfile(pwd)                                                    ; % 
 cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
 fname = fullfile(data_dir,strcat('banditReplay_subj_', ...
     sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'BdistrsMat')                                                   ; % save it!
+save(fname, 'BdistrsMat', 'BdistrsInsertMat')                               ; % save it!
 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger

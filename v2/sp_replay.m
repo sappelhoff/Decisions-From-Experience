@@ -1,11 +1,11 @@
-function SPdistrsMat = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
+function [SPdistrsMat, SPdistrsInsertMat] = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
 
 % Implements a replay of a sampling paradigm performed earlier as descibed
 % in the documentation.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 % 
-% SPdistrsMat = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
+% [SPdistrsMat, SPdistrsInsertMat] = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
 %
 % IN:
 % - sampleMat: Data for how to behave during sampling
@@ -16,6 +16,8 @@ function SPdistrsMat = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
 %
 % OUT:
 % - SPdistrsMat: RTs to the distractor trials that happened during the replay
+% - SPdistrInsertMat: a 1Xtrials matrix of zeros. 1s, where distr was
+% inserted
 
 %% Function start
 
@@ -100,7 +102,7 @@ ques_idx = 1;
 
 % For saving the RTs to distractors
 SPdistrsMat = []                                                            ;
-
+SPdistrsInsertMat = zeros(1,nTrials)                                        ; % A 1 will be put, where a distractor was inserted
 %% Do the experimental flow
 
 
@@ -155,6 +157,7 @@ Screen('Flip', window)                                                      ; % 
 
 if rewardBool == 2
     SPdistrsMat = recognize_distractor(SPdistrsMat)                         ; % If a distractor occurred, measure the RT to it
+    SPdistrsInsertMat(1,trial) = 1                                          ; % insert trial, where a distractor occurred
 else
     WaitSecs(tShowFeedback+rand/2)                                          ; % Else, just display the feedback for a bit
 end
@@ -273,7 +276,7 @@ data_dir = fullfile(pwd)                                                    ; % 
 cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
 fname = fullfile(data_dir,strcat('spReplay_subj_', ...
     sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'SPdistrsMat')                                                   ; % save it!
+save(fname, 'SPdistrsMat', 'SPdistrsInsertMat')                             ; % save it!
 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
