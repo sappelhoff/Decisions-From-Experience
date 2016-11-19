@@ -33,7 +33,7 @@ while respToBeMade
         end
 end
 
-distrMat = [distrMat, rt] ;
+distrMat = [distrMat, rt]                                                   ;
 
 %% Function end
 end

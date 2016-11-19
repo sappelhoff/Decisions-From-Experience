@@ -1,6 +1,6 @@
 function BdistrsMat = bandit_replay(choiceMat, winStim, ID)
 
-% Implements a replay of a bandit paradigm performed earlier as descibed in
+% Implements a replay of a bandit paradigm performed earlier as described in
 % the documentation.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
@@ -14,7 +14,7 @@ function BdistrsMat = bandit_replay(choiceMat, winStim, ID)
 % - ID: the ID of the subject. A three digit number.
 %
 % OUT:
-% - distrsMat: RTs to the distractor trials that happened during the replay
+% - BdistrsMat: RTs to the distractor trials that happened during the replay
 
 %% function start
 
@@ -142,7 +142,6 @@ if rewardBool == 2
     BdistrsMat = recognize_distractor(BdistrsMat)                           ; % If a distractor occurred, measure the RT to it
 else
     WaitSecs(tShowFeedback+rand/2)                                          ; % Else, just display the feedback for a bit
-
 end
 
 end % End of trial loop

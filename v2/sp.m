@@ -94,7 +94,7 @@ samp_idx = 1                                                                ; % 
 choi_idx = 1                                                                ; % Assign data a place within choiceMat
 ques_idx = 1;
 
-% Matrices for saving the data. One for sampling loop, the other for choice
+% Matrices for saving the data. For sampling loop, choice loop, questions
 sampleMat = nan(4,nTrials)                                                  ; % So far just a placeholder. For the meaning of each row, column, ans sheet, see below.
 choiceMat = nan(4,nTrials)                                                  ; % Cannot preallocate choices exactly, so drop unnecessary NANs later.
 questionMat = nan(2,nTrials-1)                                              ; % Save the decision in the questions. For last trial, there won't be a question, CHOICE will be forced. Thus nTrails-1 as dim.
