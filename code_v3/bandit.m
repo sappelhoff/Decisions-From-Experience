@@ -45,9 +45,6 @@ Screen('TextSize',window,25)                                                ;
 Screen('TextStyle',window,0)                                                ; %0=normal,1=bold,2=italic,4=underline
 
 
-% Measure the vertical refresh rate of the monitor
-ifi = Screen('GetFlipInterval', window)                                     ; % Inter-frame-interval
-
 % Retreive the maximum priority number
 topPriorityLevel = MaxPriority(window)                                      ;
 Priority(topPriorityLevel)                                                  ; % Set priority level once for the whole script
@@ -55,7 +52,7 @@ Priority(topPriorityLevel)                                                  ; % 
 % Set Verbosity level to very low.
 % Screen('Preference', 'Verbosity', 0)                                      ; % makes only sense, once this code is thoroughly tested
 
-%HideCursor                                                                  ; % Hide the cursor
+HideCursor                                                                  ; % Hide the cursor
 
 %-------------------------------------------------------------------------%
 %           Preparing all Stimuli and Experimental Information            %
@@ -89,9 +86,6 @@ tDelayFeedback = 1                                                          ; % 
 tShowFeedback = 1                                                           ; % time that the feedback is displayed
 tShowPayoff = 1                                                             ; % time that the payoff is shown
 
-% Timings in frames
-waitframes = 1;
-
 % Shuffle the random number generator
 rng('shuffle')                                                              ;
 
@@ -111,9 +105,8 @@ for game=1:nGames
 
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
-vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                                                      ; % Show that lotteries have been shuffled
+vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                        ; % Show that lotteries have been shuffled
 Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
-%WaitSecs(tShowShuffled+rand/2)                                              ; % ... Show it as long as we want to
 
 
 for trial=1:nTrials
@@ -123,7 +116,6 @@ trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % 
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
 vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                         ; % draw it on an otherwise grey screen ... waiting for fixcross
 
-%WaitSecs(tShowTrialCount+rand/2)                                            ; % Show it for our intended time period
 
 
 % Fixation cross & choice selection
@@ -134,23 +126,21 @@ Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % 
 [pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery,...
     stimOnset)  ; % Inquire response ... this is a while loop
 
-choiceMat(1,trial,game) = pickedLoc                                         ; % which location was picked: 1, left - 2, right
-choiceMat(2,trial,game) = rt                                                ; % how quickly was it picked in s
-choiceMat(3,trial,game) = (goodLotteryLoc == pickedLoc)                     ; % boolean was the good lottery chosen? 0=no, 1=yes
-choiceMat(4,trial,game) = rewardBool                                        ; % boolean whether is was rewarded or not
-
-
-%WaitSecs(tDelayFeedback+rand/2)                                             ; % Delay the feedback by a bit
-
 
 % Feedback
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;                                
-vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2)                     ; % Show feedback
+Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
+Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
 
-%WaitSecs(tShowFeedback+rand/2)                                              ;
+choiceMat(1,trial,game) = pickedLoc                                         ; % which location was picked: 1, left - 2, right
+choiceMat(2,trial,game) = rt                                                ; % how quickly was it picked in s
+choiceMat(3,trial,game) = (goodLotteryLoc == pickedLoc)                     ; % boolean was the good lottery chosen? 0=no, 1=yes
+choiceMat(4,trial,game) = rewardBool                                        ; % boolean whether is was rewarded or not
+
+vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt)                  ; % Show feedback
+
 
 end % End of trial loop
 
@@ -161,7 +151,6 @@ payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff))                  ; % 
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window, payoffStr, 'center', 'center', white)             ; % Printing it out to the screen
 vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2)                                                      ;
-%WaitSecs(tShowPayoff+rand/2)                                                ; % show payoff for some time
 
 
 % Ask about preferred lottery
@@ -194,9 +183,10 @@ save(fname, 'choiceMat', 'prefMat')                                         ; % 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('end'),'center','center',white)              ; % Some nice words
-Screen('Flip',window,vbl+rt*2)                                                       ;
+Screen('Flip',window,vbl+rt)                                                ;
 KbStrokeWait                                                                ;
 Priority(0)                                                                 ; % Reset priority level to 0
+ShowCursor                                                                  ;
 sca                                                                         ;
 
 %% function end

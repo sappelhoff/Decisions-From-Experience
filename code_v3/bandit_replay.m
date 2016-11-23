@@ -48,7 +48,15 @@ Screen('TextFont',window,'Verdana')                                         ; % 
 Screen('TextSize',window,25)                                                ;
 Screen('TextStyle',window,0)                                                ; %0=normal,1=bold,2=italic,4=underline
 
-%HideCursor                                                                  ; % Hide the cursor
+% Retreive the maximum priority number
+topPriorityLevel = MaxPriority(window)                                      ;
+Priority(topPriorityLevel)                                                  ; % Set priority level once for the whole script
+
+% Set Verbosity level to very low.
+% Screen('Preference', 'Verbosity', 0)                                      ; % makes only sense, once this code is thoroughly tested
+
+
+HideCursor                                                                  ; % Hide the cursor
 
 %-------------------------------------------------------------------------%
 %           Preparing all Stimuli and Experimental Information            %
@@ -84,11 +92,16 @@ tShowPayoff = 1                                                             ; % 
 % Get the nTrials and nGames from dataMat
 [~, nTrials, nGames] = size(choiceMat);
 
+% Shuffle the random number generator
+rng('shuffle')                                                              ;
+
 % Matrix for saving the data
 BdistrsMat = []                                                             ;
-BdistrsInsertMat = zeros(nTrials,nGames)                                     ; % A 1 will be put, where a distractor was used
+BdistrsInsertMat = zeros(nTrials,nGames)                                    ; % A 1 will be put, where a distractor was used
 
 %% Doing the experimental flow
+
+vbl = Screen('Flip', window)                                                ; % Get initial system time
 
 for game=1:nGames
     
@@ -96,41 +109,35 @@ for game=1:nGames
 % just replay.
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
-Screen('Flip', window)                                                      ; % Show that lotteries have been shuffled
+vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2)                          ; % Show that lotteries have been shuffled
 Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
-WaitSecs(tShowShuffled+rand/2)                                              ; % ... Show it as long as we want to
-    
+
 
 for trial=1:nTrials
 
 % drawing trialcounter
 trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % Current trial out of all trials
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
-Screen('Flip', window)                                                      ; % draw it on an otherwise grey screen ... waiting for fixcross
-
-WaitSecs(tShowTrialCount+rand/2)                                            ; % Show it for our intended time period
+vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % draw it on an otherwise grey screen ... waiting for fixcross
 
 
 % Fixation cross & recall of previous choice
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
-Screen('Flip',window)                                                       ; % Show fixcross
+vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
 
 pickedLoc   = choiceMat(1,trial,game)                                       ; % which location was picked: 1, left - 2, right
 rt          = choiceMat(2,trial,game)                                       ; % how quickly was it picked in s
 rewardBool  = choiceMat(4,trial,game)                                       ; % boolean whether is was rewarded or not
 
 if rt < 3
-    WaitSecs(rt)                                                            ; % Wait for actual RT, as long as it's not over 3 seconds
+    tWait = rt                                                              ; % Wait for actual RT, as long as it's not over 3 seconds
 else
-    WaitSecs(1+rand/2)                                                      ; % If RT was over 3 seconds, create a more adequate one
+    tWait = 1+rand/2                                                        ; % If RT was over 3 seconds, create a more adequate one
 end
-
-WaitSecs(tDelayFeedback+rand/2)                                             ; % Delay the feedback by a bit
 
 
 % Feedback & possibly distractor
-
 if rand <= pDistr
    rewardBool = 2                                                           ; % On pDistr of all trials, replace the reward with a distractor
 end
@@ -138,14 +145,15 @@ end
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;                                
-Screen('Flip', window)                                                      ; % Show feedback
+Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
+[vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2) 	; % Show feedback
 
 if rewardBool == 2
-    BdistrsMat = recognize_distractor(BdistrsMat)                           ; % If a distractor occurred, measure the RT to it
+    BdistrsMat = recognize_distractor(BdistrsMat,stimOnset)                 ; % If a distractor occurred, measure the RT to it
     BdistrsInsertMat(trial, game) = 1                                       ; % Note, where exactly a distractor was applied 
+    tWait = BdistrsMat(end) + rand/2                                        ; % add some time to RT
 else
-    WaitSecs(tShowFeedback+rand/2)                                          ; % Else, just display the feedback for a bit
+    tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end
 
 end % End of trial loop
@@ -154,10 +162,11 @@ end % End of trial loop
 summa = sum(choiceMat,2)                                                    ; % Computing the sum over trials
 payoff = summa(4,:,game)                                                    ; % Extracting the sum of the rewardBools of the current game
 payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff))                  ; % Making a string out of the payoff
+Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window, payoffStr, 'center', 'center', white)             ; % Printing it out to the screen
-Screen('Flip', window)                                                      ;
-WaitSecs(tShowPayoff+rand/2)                                                ; % show payoff for some time    
-    
+vbl = Screen('Flip',window,vbl+tWait)                                                      ;
+Screen('TextSize',window,25)                                                ; % Reset font size
+
 
 % We do not ask about the preferred lottery, this is a replay.
 
@@ -173,8 +182,10 @@ save(fname, 'BdistrsMat', 'BdistrsInsertMat')                               ; % 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('end'),'center','center',white)              ; % Some nice words
-Screen('Flip',window)                                                       ;
+Screen('Flip',window,vbl+tShowPayoff+rand/2)                                                       ;
 KbStrokeWait                                                                ;
+Priority(0)                                                                 ; % Reset priority level to 0
+ShowCursor                                                                  ;
 sca                                                                         ;
 
 %% function end

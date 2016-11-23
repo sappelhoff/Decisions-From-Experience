@@ -45,7 +45,14 @@ Screen('TextFont',window,'Verdana')                                         ; % 
 Screen('TextSize',window,25)                                                ;
 Screen('TextStyle',window,0)                                                ; %0=normal,1=bold,2=italic,4=underline
 
-%HideCursor                                                                  ; % Hide the cursor
+% Retreive the maximum priority number
+topPriorityLevel = MaxPriority(window)                                      ;
+Priority(topPriorityLevel)                                                  ; % Set priority level once for the whole script
+
+% Set Verbosity level to very low.
+% Screen('Preference', 'Verbosity', 0)                                      ; % makes only sense, once this code is thoroughly tested
+
+HideCursor                                                                  ; % Hide the cursor
 
 %-------------------------------------------------------------------------%
 %           Preparing all Stimuli and Experimental Information            %
@@ -94,6 +101,9 @@ samp_idx = 1                                                                ; % 
 choi_idx = 1                                                                ; % Assign data a place within choiceMat
 ques_idx = 1;
 
+% Shuffle the random number generator
+rng('shuffle')                                                              ;
+
 % Matrices for saving the data. For sampling loop, choice loop, questions
 sampleMat = nan(4,nTrials)                                                  ; % So far just a placeholder. For the meaning of each row, column, ans sheet, see below.
 choiceMat = nan(4,nTrials)                                                  ; % Cannot preallocate choices exactly, so drop unnecessary NANs later.
@@ -101,6 +111,7 @@ questionMat = nan(2,nTrials-1)                                              ; % 
 
 %% Do the experimental flow
 
+vbl = Screen('Flip', window)                                                ; % Get initial system time
 
 while trlCount > 0
 
@@ -111,9 +122,10 @@ while trlCount > 0
 
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
-Screen('Flip', window)                                                      ; % Show that lotteries have been shuffled
+vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2)                          ; % Show that lotteries have been shuffled
 Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
-WaitSecs(tShowShuffled+rand/2)                                              ; % ... Show it as long as we want to
+
+
 
 
 for trial=1:trlCount
@@ -121,35 +133,38 @@ for trial=1:trlCount
 % Drawing trial counter
 trialCounter = sprintf('%d', samp_idx)                                      ; % Current trial 
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
-Screen('Flip', window)                                                      ; % draw it on an otherwise grey screen ... waiting for fixcross
-
-WaitSecs(tShowTrialCount+rand/2)                                            ; % Show it for our intended time period
+if trial==1
+    vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                    ; % draw it on an otherwise grey screen ... waiting for fixcross
+else
+    vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2)                   ; % draw it on an otherwise grey screen ... waiting for fixcross
+end
 
 
 % Fixation cross & choice selection
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
-Screen('Flip',window)                                                       ; % Show fixcross
+[vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
 
-[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery)      ; % Inquire response ... this is a while loop
-
-sampleMat(1,samp_idx) = pickedLoc                                           ; % which location was picked: 1, left - 2, right
-sampleMat(2,samp_idx) = rt                                                  ; % how quickly was it picked in s
-sampleMat(3,samp_idx) = (goodLotteryLoc == pickedLoc)                       ; % boolean was the good lottery chosen? 0=no, 1=yes
-sampleMat(4,samp_idx) = rewardBool                                          ; % boolean whether is was rewarded or not
-samp_idx = samp_idx+1                                                       ; % increment index for sampleMat for next round of sampling
-
-WaitSecs(tDelayFeedback+rand/2)                                             ; % Delay the feedback by a bit
+[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery, ...
+    stimOnset)                                                              ; % Inquire response ... this is a while loop
 
 
 % Feedback
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;                                
-Screen('Flip', window)                                                      ; % Show feedback
+Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
+Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
 
-WaitSecs(tShowFeedback+rand/2)                                              ;
+sampleMat(1,samp_idx) = pickedLoc                                           ;
+sampleMat(2,samp_idx) = rt                                                  ;
+sampleMat(3,samp_idx) = (pickedLoc==goodLotteryLoc)                         ;
+sampleMat(4,samp_idx) = rewardBool                                          ;
+samp_idx              = samp_idx+1                                          ;
+
+
+vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2+rt)                    ; % Show feedback
+
 
 % Check, whether there are more trials remaining. If not, no need to ask
 % whether to continue to sample or make a choice. Then it will be only
@@ -158,7 +173,7 @@ if samp_idx > nTrials
     Screen('TextSize',window,50)                                            ; % If we draw text, make font a bit bigger
     DrawFormattedText(window, texts('aSPfinal'), 'center', ...
         'center',white)                                                     ; % If the last trial has been reached, tell the subject so
-        Screen('Flip',window)                                               ;
+    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                    ;
     KbStrokeWait                                                            ;
     break                                                                   ; % no more trials available ... the same as choosing "choice" 
 else    
@@ -171,9 +186,9 @@ else
         [], [], [], [], [], textwin1)                                       ;
     DrawFormattedText(window,'make a choice','center','center', ...
         white,[], [], [], [], [], textwin2)                                 ;
-    Screen('Flip', window)                                                  ;    
+    [vbl, stimOnset] = Screen('Flip',window,vbl+tShowFeedback+rand/2)                                                  ;    
 
-    [pickedLoc,~,rt] = require_response(leftLottery, rightLottery)          ; % We are only interested in location and rt
+    [pickedLoc,~,rt] = require_response(leftLottery,rightLottery,stimOnset) ; % We are only interested in location and rt
     
     questionMat(1,ques_idx) = rt                                            ; % How quickly did the participant choose whether to sample or make a choice.
     questionMat(2,ques_idx) = pickedLoc                                     ; % What did the participant choose?
@@ -183,14 +198,14 @@ else
     if pickedLoc == 1
         DrawFormattedText(window,'draw another sample','center', ...
             'center',white, [], [], [], [], [],textwin1)                    ; % Pick sampling
-        Screen('Flip', window)                                              ;
-        WaitSecs(tShowChosenOpt+rand/2)                                     ; % Briefly show chosen option
+        vbl = Screen('Flip',window,vbl+rt*1.1)                              ;
         Screen('TextSize',window,25)                                        ; % Reset font size
+        
+ 
     elseif pickedLoc == 2
         DrawFormattedText(window,'make a choice','center','center', ...
             white,[], [], [], [], [],textwin2)                              ; % Pick choice
-        Screen('Flip', window)                                              ;
-        WaitSecs(tShowChosenOpt+rand/2)                                     ; % Briefly show chosen option
+        vbl = Screen('Flip',window,vbl+rt*1.1)                              ;    
         break                                                               ; % The subject selected "choice", so we break the sampling loop and enter the choice loop
     end
 end
@@ -203,10 +218,11 @@ trlCount = trlCount - trial                                                 ; % 
 
 % Let the participant make a choice
 DrawFormattedText(window,texts('aSPchoice'),'center','center',white)        ; % Prompt for making a choice [left] or [right]
-Screen('Flip',window)                                                       ; % Print it to the screen
+[vbl, stimOnset] = Screen('Flip',window,vbl+tShowChosenOpt+rand/2)          ; % Print it to the screen
 Screen('TextSize',window,25)                                                ; % After a lot of text, don't forget to reset font size
 
-[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery)      ; % We want the picked location, the outcome, and the rt!
+[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery, ...
+    stimOnset)                                                              ; % We want the picked location, the outcome, and the rt!
 
 choiceMat(1,choi_idx) = pickedLoc                                           ; % Which location was picked: 1, left - 2, right
 choiceMat(2,choi_idx) = rt                                                  ; % How quickly was it picked in s
@@ -215,16 +231,18 @@ choiceMat(4,choi_idx) = rewardBool                                          ; % 
 choi_idx = choi_idx+1                                                       ; % Increment choice index for next round of choice
 
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % After pick, show fixation cross    
-Screen('Flip',window)                                                       ;
-WaitSecs(tDelayFeedback+rand/2)                                             ; % Wait for a bit before displaying feedback
+vbl = Screen('Flip',window,vbl+rt*1.1)                                      ;
+
+
 
 
 % Feedback
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Drawing the checkerboard stim at the chosen location. The reward_bool % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
-Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;
-Screen('Flip',window)                                                       ;
-WaitSecs(tShowFeedback+rand/2)                                              ; % Briefly show feedback 
+Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;
+
+vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2)                                                       ;
+
 
         
 % Tell the subject how much she has earned 
@@ -232,10 +250,10 @@ Screen('TextSize',window,50)                                                ; % 
 payoff = rewardBool                                                         ; % The subject earned as much as the reward bool of the choice outcome indicated
 payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff))                  ;
 DrawFormattedText(window,payoffStr,'center','center',white)                 ;
-Screen('Flip',window)                                                       ;
+vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                        ;
+
 Screen('TextSize',window,25)                                                ; % Reset font size
 
-WaitSecs(tShowPayoff+rand/2)                                                ; % show payoff for some time
 
 
    
@@ -253,8 +271,10 @@ save(fname, 'sampleMat', 'choiceMat', 'questionMat')                        ; % 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('end'),'center','center',white)              ; % Some nice words
-Screen('Flip',window)                                                       ;
+Screen('Flip',window,vbl+tShowPayoff+rand/2)                                ;
 KbStrokeWait                                                                ;
+Priority(0)                                                                 ; % Reset priority level to 0
+ShowCursor                                                                  ;
 sca                                                                         ;
 
 %% Function end

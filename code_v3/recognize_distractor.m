@@ -1,4 +1,4 @@
-function distrMat = recognize_distractor(distrMat)
+function distrMat = recognize_distractor(distrMat, tStart)
 
 % Inquires about the space key pressed and the associated timing. Remains
 % in a while loop until space is pressed. Then appends the RT to a vector
@@ -10,6 +10,9 @@ function distrMat = recognize_distractor(distrMat)
 %
 % IN
 % - distrMat: Here we save RTs for detecting the distractors
+% - tStart: the time, when the RT test was triggered. E.g., a vbl from the
+% last screen flip. Alternatively, a GetSecs; right before the function
+% call
 %
 % OUT
 % - distrMat: An updated distrMat with RTs for current distractor appended
@@ -23,7 +26,6 @@ spaceKey = KbName('space')                                                  ; % 
 
 %% 
 
-tStart = GetSecs                                                            ; % get time of start
 respToBeMade = true                                                         ; % condition for while loop
 while respToBeMade            
     [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
