@@ -1,4 +1,4 @@
-function [BdistrsMat, BdistrsInsertMat] = bandit_replay(choiceMat, winStim, ID)
+function [BdistrMat, BdistrInsertMat] = bandit_replay(choiceMat, winStim, ID)
 
 % Implements a replay of a bandit paradigm performed earlier as described in
 % the documentation.
@@ -96,8 +96,9 @@ tShowPayoff = 1                                                             ; % 
 rng('shuffle')                                                              ;
 
 % Matrix for saving the data
-BdistrsMat = []                                                             ;
-BdistrsInsertMat = zeros(nTrials,nGames)                                    ; % A 1 will be put, where a distractor was used
+BdistrMat = nan(1,nTrials*nGames)                                           ; % Preallocate generously and drop the places we didn't fill later on
+distrIdx = 1                                                                ; % Running index to put distractor data (RTs) into BdistrsMat
+BdistrInsertMat = zeros(nTrials,nGames)                                     ; % A 1 will be put, where a distractor was used
 
 %% Doing the experimental flow
 
@@ -149,9 +150,10 @@ Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;
 [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2) 	; % Show feedback
 
 if rewardBool == 2
-    BdistrsMat = recognize_distractor(BdistrsMat,stimOnset)                 ; % If a distractor occurred, measure the RT to it
-    BdistrsInsertMat(trial, game) = 1                                       ; % Note, where exactly a distractor was applied 
-    tWait = BdistrsMat(end) + rand/2                                        ; % add some time to RT
+    BdistrMat = recognize_distractor(BdistrMat,distrIdx,stimOnset)          ; % If a distractor occurred, measure the RT to it
+    BdistrInsertMat(trial, game) = 1                                        ; % Note, where exactly a distractor was applied 
+    distrIdx = distrIdx + 1                                                 ; % Increment our distractor counter
+    tWait = BdistrMat(end) + rand/2                                         ; % add some time to RT
 else
     tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end
@@ -173,6 +175,7 @@ Screen('TextSize',window,25)                                                ; % 
 end % End of game loop
 
 % Save the RT data to the distractors
+BdistrMat(isnan(BdistrMat)) = []                                            ; % Drop those preallocated spaces we didn't fill
 data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
 cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
 fname = fullfile(data_dir,strcat('banditReplay_subj_', ...

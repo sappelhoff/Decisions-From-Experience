@@ -117,8 +117,14 @@ while trlCount > 0
 
 
 % Shuffle the lotteries & inform about it
-[leftLottery,rightLottery,goodLotteryLoc] = ...
-    determine_lottery_loc(lotteryOption1,lotteryOption2)                    ; % Place good and bad lottery randomly either left or right
+goodLotteryLoc = randi(2,1)                                                 ; % determine whether good lottery will be left(1) or right(2)
+if goodLotteryLoc == 1
+    leftLottery = lotteryOption1                                            ; % Note: lotteryOption1 is always the better one
+    rightLottery = lotteryOption2                                           ; % Note2: lotteryOption2 is always the worse one
+else
+    leftLottery = lotteryOption2                                            ;
+    rightLottery = lotteryOption1                                           ;
+end
 
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning

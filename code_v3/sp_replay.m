@@ -1,4 +1,4 @@
-function [SPdistrsMat, SPdistrsInsertMat] = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
+function [SPdistrMat, SPdistrInsertMat] = sp_replay(sampleMat, choiceMat, questionMat, winStim, ID)
 
 % Implements a replay of a sampling paradigm performed earlier as descibed
 % in the documentation.
@@ -111,8 +111,9 @@ ques_idx = 1;
 rng('shuffle')                                                              ;
 
 % For saving the RTs to distractors
-SPdistrsMat = []                                                            ;
-SPdistrsInsertMat = zeros(1,nTrials)                                        ; % A 1 will be put, where a distractor was inserted
+SPdistrMat = nan(1,nTrials)                                                 ;
+distrIdx = 1                                                                ; % Running index to put RTs into SPdistrMat
+SPdistrInsertMat = zeros(1,nTrials)                                         ; % A 1 will be put, where a distractor was inserted
 %% Do the experimental flow
 
 vbl = Screen('Flip', window)                                                ; % Get initial system time
@@ -170,9 +171,10 @@ Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;
 [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2)    ; % Show feedback
 
 if rewardBool == 2
-    SPdistrsMat = recognize_distractor(SPdistrsMat, stimOnset)              ; % If a distractor occurred, measure the RT to it
-    SPdistrsInsertMat(1,trial) = 1                                          ; % insert trial, where a distractor occurred
-    tWait = SPdistrsMat(end) + rand/2                                       ;
+    SPdistrMat = recognize_distractor(SPdistrMat,distrIdx,stimOnset)        ; % If a distractor occurred, measure the RT to it
+    SPdistrInsertMat(1,trial) = 1                                           ; % insert trial, where a distractor occurred
+    distrIdx = distrIdx + 1                                                 ;
+    tWait = SPdistrMat(end) + rand/2                                        ;
 else
     tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end
@@ -279,6 +281,7 @@ end % end of choice loop (while loop)
 
 
 % Save the RT data to the distractors
+SPdistrMat(isnan(SPdistrMat)) = []                                          ; % Drop those preallocated spaces we didn't fill
 data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
 cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
 fname = fullfile(data_dir,strcat('spReplay_subj_', ...
