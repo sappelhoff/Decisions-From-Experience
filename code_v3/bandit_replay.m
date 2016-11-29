@@ -152,8 +152,8 @@ Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;
 if rewardBool == 2
     BdistrMat = recognize_distractor(BdistrMat,distrIdx,stimOnset)          ; % If a distractor occurred, measure the RT to it
     BdistrInsertMat(trial, game) = 1                                        ; % Note, where exactly a distractor was applied 
+    tWait = BdistrMat(1,distrIdx) + rand/2                                  ; % add some time to RT
     distrIdx = distrIdx + 1                                                 ; % Increment our distractor counter
-    tWait = BdistrMat(end) + rand/2                                         ; % add some time to RT
 else
     tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end

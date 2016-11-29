@@ -18,6 +18,7 @@ function [fixWidth, fixCoords, colors1, colors2, colors3, rectLocs, maskLocs, ma
 % - fixCoords: the coordinates for the fixation cross
 % - colors1: red for checkerboard
 % - colors2: blue for checkerboard
+% - colors3: green for checkerboard
 % - rectLocs: checkerboard locs to choose from
 % - maskLocs: the locations where a mask will be displayed. 
 % - maskTexture: a texture that makes our square checkerboard circular

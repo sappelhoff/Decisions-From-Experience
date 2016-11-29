@@ -121,17 +121,17 @@ for trial=1:nTrials
 % Drawing trial counter
 trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % Current trial out of all trials
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
-vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                         ; % draw it on an otherwise grey screen ... waiting for fixcross
+vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % draw it on an otherwise grey screen ... waiting for fixcross
 
 
 
 % Fixation cross & choice selection
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
-[vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
+[vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
 
 [pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery,...
-    stimOnset)  ; % Inquire response ... this is a while loop
+    stimOnset)                                                              ; % Inquire response ... this is a while loop
 
 
 % Feedback
@@ -140,6 +140,7 @@ Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % 
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
 Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
 Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
+
 
 choiceMat(1,trial,game) = pickedLoc                                         ; % which location was picked: 1, left - 2, right
 choiceMat(2,trial,game) = rt                                                ; % how quickly was it picked in s
@@ -166,9 +167,11 @@ DrawFormattedText(window,texts('aPFP_PrefLot'),'center','center',white)     ; % 
 
 [pickedLoc,~,rt] = require_response(leftLottery,rightLottery,stimOnset)     ; % Inquiring about the answer. "~" instead of rewardBool, because there will be no outcome.
 
-prefMat(1,game) = pickedLoc                                                 ; % Which lottery was preferred? 1=left, 2=right, note that this is saved for all trials of the game (":"), because it is valid for the whole game
-prefMat(2,game) = rt                                                        ; % Rt to select preferred lottery
-prefMat(3,game) = pickedLoc == goodLotteryLoc                               ; % Boolean whether correct lottery was preferred
+
+%A(i,j) --> A(i + (j-1)*M)
+prefMat(1+(game-1)*nGames) = pickedLoc                                      ; % Which lottery was preferred? 1=left, 2=right, note that this is saved for all trials of the game (":"), because it is valid for the whole game
+prefMat(2+(game-1)*nGames) = rt                                             ; % Rt to select preferred lottery
+prefMat(3+(game-1)*nGames) = pickedLoc == goodLotteryLoc                    ; % Boolean whether correct lottery was preferred
 
 
 Screen('TextSize',window,25)                                                ; % Reset the text size

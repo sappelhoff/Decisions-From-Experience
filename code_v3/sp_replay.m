@@ -173,8 +173,8 @@ Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc))        ;
 if rewardBool == 2
     SPdistrMat = recognize_distractor(SPdistrMat,distrIdx,stimOnset)        ; % If a distractor occurred, measure the RT to it
     SPdistrInsertMat(1,trial) = 1                                           ; % insert trial, where a distractor occurred
+    tWait = SPdistrMat(1,distrIdx) + rand/2                                 ;
     distrIdx = distrIdx + 1                                                 ;
-    tWait = SPdistrMat(end) + rand/2                                        ;
 else
     tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end
