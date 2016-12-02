@@ -82,6 +82,9 @@ end
 % Probability of a distractor replacing a previous outcome
 pDistr = 0.2                                                                ;
 
+% Keyboard information
+spaceKey = KbName('space')                                                  ; % detect distractor
+
 % Timings in seconds
 tShowShuffled = 1                                                           ; % the time after the participants are being told that lotteries have been shuffled
 tShowTrialCount = 0                                                         ; % time that the trial counter is shown
@@ -118,12 +121,12 @@ for trial=1:nTrials
 
 % drawing trialcounter
 trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % Current trial out of all trials
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Trial counter is presented at the top of the screen
 vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % draw it on an otherwise grey screen ... waiting for fixcross
 
 
 % Fixation cross & recall of previous choice
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
 vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
 
@@ -143,17 +146,28 @@ if rand <= pDistr
    rewardBool = 2                                                           ; % On pDistr of all trials, replace the reward with a distractor
 end
 
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
 Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
 [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2) 	; % Show feedback
 
 if rewardBool == 2
-    BdistrMat = recognize_distractor(BdistrMat,distrIdx,stimOnset)          ; % If a distractor occurred, measure the RT to it
+    
+    % If a distractor occurred, measure the RT to it
+    respToBeMade = true                                                     ; % condition for while loop
+    while respToBeMade            
+    [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+        if keyCode(spaceKey)
+            rt = tEnd - stimOnset                                           ; % Measure timing
+            respToBeMade = false                                            ; % stop checking
+        end
+    end
+    BdistrMat(distrIdx) = rt                                                ;
     BdistrInsertMat(trial, game) = 1                                        ; % Note, where exactly a distractor was applied 
-    tWait = BdistrMat(1,distrIdx) + rand/2                                  ; % add some time to RT
+    tWait = BdistrMat(distrIdx) + rand/2                                    ; % add some time to RT
     distrIdx = distrIdx + 1                                                 ; % Increment our distractor counter
+
 else
     tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
 end
@@ -180,7 +194,7 @@ data_dir = fullfile(pwd)                                                    ; % 
 cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
 fname = fullfile(data_dir,strcat('banditReplay_subj_', ...
     sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'BdistrsMat', 'BdistrsInsertMat')                               ; % save it!
+save(fname, 'BdistrMat', 'BdistrInsertMat')                                 ; % save it!
 
 % Time for a break :-)
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger

@@ -87,6 +87,10 @@ end
 lotteryOption1 = [ones(1,7), zeros(1,3)]                                    ; % p(win)=.7 --> good lottery
 lotteryOption2 = [ones(1,3), zeros(1,7)]                                    ; % p(win)=.3 --> bad lottery
 
+% Keyboard information
+leftKey = KbName('LeftArrow')                                               ; % choose left lottery
+rightKey = KbName('RightArrow')                                             ; % choose right lottery
+
 % Timings in seconds
 tShowShuffled = 1                                                           ; % the time after the participants are being told that lotteries have been shuffled
 tShowTrialCount = 0                                                         ; % time that the trial counter is shown
@@ -138,7 +142,7 @@ for trial=1:trlCount
 
 % Drawing trial counter
 trialCounter = sprintf('%d', samp_idx)                                      ; % Current trial 
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Trial counter is presented at the top of the screen
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Trial counter is presented at the top of the screen
 if trial==1
     vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                    ; % draw it on an otherwise grey screen ... waiting for fixcross
 else
@@ -147,16 +151,38 @@ end
 
 
 % Fixation cross & choice selection
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
 [vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
 
-[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery, ...
-    stimOnset)                                                              ; % Inquire response ... this is a while loop
+
+
+% Inquire response
+respToBeMade = true                                                         ; % condition for while loop
+while respToBeMade            
+    [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+        if keyCode(leftKey)
+            rt = tEnd - stimOnset                                           ; % Measure timing
+            rewardBool = Sample(leftLottery)                                ; % drawing either a 0(loss) or a 1(win)
+            pickedLoc = 1                                                   ; % 1 for left
+            respToBeMade = false                                            ; % stop checking now
+        elseif keyCode(rightKey)
+            rt = tEnd - stimOnset                                           ; % Measure timing
+            rewardBool = Sample(rightLottery)                               ; 
+            pickedLoc = 2                                                   ; % 2 for right
+            respToBeMade = false                                            ;            
+        end
+end
+
+
+
+
+
+
 
 
 % Feedback
-DrawFormattedText(window, trialCounter, 'center', screenYpixels*.1, white)  ; % Redraw trial counter
+DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
 Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
 Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
@@ -194,7 +220,22 @@ else
         white,[], [], [], [], [], textwin2)                                 ;
     [vbl, stimOnset] = Screen('Flip',window,vbl+tShowFeedback+rand/2)                                                  ;    
 
-    [pickedLoc,~,rt] = require_response(leftLottery,rightLottery,stimOnset) ; % We are only interested in location and rt
+
+    % Inquire about the answer
+    respToBeMade = true                                                         ; % condition for while loop
+    while respToBeMade            
+        [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+            if keyCode(leftKey)
+                rt = tEnd - stimOnset                                           ; % Measure timing
+                pickedLoc = 1                                                   ; % 1 for left
+                respToBeMade = false                                            ; % stop checking now
+            elseif keyCode(rightKey)
+                rt = tEnd - stimOnset                                           ; % Measure timing
+                pickedLoc = 2                                                   ; % 2 for right
+                respToBeMade = false                                            ;            
+            end
+    end
+
     
     questionMat(1,ques_idx) = rt                                            ; % How quickly did the participant choose whether to sample or make a choice.
     questionMat(2,ques_idx) = pickedLoc                                     ; % What did the participant choose?
@@ -227,9 +268,28 @@ DrawFormattedText(window,texts('aSPchoice'),'center','center',white)        ; % 
 [vbl, stimOnset] = Screen('Flip',window,vbl+tShowChosenOpt+rand/2)          ; % Print it to the screen
 Screen('TextSize',window,25)                                                ; % After a lot of text, don't forget to reset font size
 
-[pickedLoc,rewardBool,rt] = require_response(leftLottery,rightLottery, ...
-    stimOnset)                                                              ; % We want the picked location, the outcome, and the rt!
-
+ 
+% Inquire response
+respToBeMade = true                                                         ; % condition for while loop
+while respToBeMade            
+    [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+        if keyCode(leftKey)
+            rt = tEnd - stimOnset                                           ; % Measure timing
+            rewardBool = Sample(leftLottery)                                ; % drawing either a 0(loss) or a 1(win)
+            pickedLoc = 1                                                   ; % 1 for left
+            respToBeMade = false                                            ; % stop checking now
+        elseif keyCode(rightKey)
+            rt = tEnd - stimOnset                                           ; % Measure timing
+            rewardBool = Sample(rightLottery)                               ; 
+            pickedLoc = 2                                                   ; % 2 for right
+            respToBeMade = false                                            ;            
+        end
+end
+ 
+ 
+ 
+ 
+ 
 choiceMat(1,choi_idx) = pickedLoc                                           ; % Which location was picked: 1, left - 2, right
 choiceMat(2,choi_idx) = rt                                                  ; % How quickly was it picked in s
 choiceMat(3,choi_idx) = (goodLotteryLoc == pickedLoc)                       ; % Boolean was the good lottery chosen? 0=no, 1=yes
