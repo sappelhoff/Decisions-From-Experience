@@ -62,8 +62,6 @@ HideCursor                                                                  ; % 
 [fixWidth, fixCoords, colors1, colors2, colors3, rectLocs, maskLocs, ...
     maskTexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
-% All presentation texts
-texts = produce_texts                                                       ; % separate function which outputs a "container.Map" with texts
 
 % define winning stimulus
 if strcmp(winStim, 'blue')
@@ -71,7 +69,7 @@ if strcmp(winStim, 'blue')
 elseif strcmp(winStim, 'red') 
     reward = cat(3, colors2, colors1, colors3)                              ; % red is win Stim ... blue as loss. colors3(green) is the distractor condition
 else
-    sca;
+    sca                                                                     ;
     error('check the function inputs!')
 end
 
@@ -96,6 +94,27 @@ rng('shuffle')                                                              ;
 % Matrix for saving the data
 choiceMat = nan(4, nTrials, nGames)                                         ; % So far just a placeholder. For the meaning of each row, column, ans sheet, see below.
 prefMat = nan(3,nGames)                                                     ; % saving the data from asking about the preferred lottery at end of each game
+
+% Texts
+texts = containers.Map                                                      ; 
+
+texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\', ...
+    'nPress a key to close.'])                                              ; % General texts
+
+texts('shuffled') = sprintf('The lotteries have been shuffled.')            ; % General texts
+
+texts('payoff') = sprintf('You earned: ')                                   ; % General texts
+
+texts('aPFP_PrefLot') = sprintf(['Which lottery do you think was more', ...
+    'profitable?\nPress [left] or [right].'])                               ; % Active PFP specific texts
+
+texts('aPFP_intro1') = sprintf(['Whenever you see the + sign,\n\nuse', ...
+    '[left] and [right] to choose a lottery.'])                             ; % Active PFP specific texts
+
+texts('aPFP_intro2') = sprintf(['Try to maximize your "win" outcomes.', ...
+    '\n\nYou need to balance exploration\n\nand exploitation of your', ...
+    'options.'])                                                            ; % Active PFP specific texts
+
 
 %% Doing the experimental flow
 
@@ -235,6 +254,8 @@ KbStrokeWait                                                                ;
 Priority(0)                                                                 ; % Reset priority level to 0
 ShowCursor                                                                  ;
 sca                                                                         ;
+
+
 
 %% function end
 end

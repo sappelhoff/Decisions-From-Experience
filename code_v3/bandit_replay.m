@@ -67,7 +67,12 @@ HideCursor                                                                  ; % 
     maskTexture] = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 % All presentation texts
-texts = produce_texts                                                       ; % separate function which outputs a "container.Map" with texts
+texts = containers.Map                                                      ;
+texts('shuffled') = sprintf('The lotteries have been shuffled.')            ;
+texts('payoff') = sprintf('You earned: ')                                   ;
+texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\n',...
+    'Press a key to close.'])                                               ;
+
 
 % define winning stimulus
 if strcmp(winStim, 'blue')

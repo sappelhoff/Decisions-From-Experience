@@ -71,7 +71,17 @@ textwin2 = [screenXpixels*.6,screenYpixels*.5,screenXpixels*.9, ...
 
 
 % All presentation texts
-texts = produce_texts                                                       ; % separate function which outputs a "container.Map" with texts
+texts = containers.Map                                                      ;
+texts('shuffled') = sprintf('The lotteries have been shuffled.')            ;
+texts('payoff') = sprintf('You earned: ')                                   ;
+texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\n',...
+    'Press a key to close.'])                                               ;
+texts('aSPchoice') = sprintf(['From which lottery do\nyou want to draw',...
+    'your payoff?\nPress [left] or [right]'])                               ;
+texts('aSPfinal') = sprintf(['You have reached the final\ntrial. You', ...
+    'are granted one\nlast choice towards your payoff.\nPress any key.'])   ;
+
+
 
 % define winning stimulus
 if strcmp(winStim, 'blue')
