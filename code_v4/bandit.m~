@@ -114,6 +114,23 @@ texts('aPFP_intro2') = sprintf(['Try to maximize your "win" outcomes.', ...
     'options.'])                                                            ; % Active PFP specific texts
 
 
+
+% EEG markers
+mrkShuffle  = 1                                                             ;
+mrkFixOnset = 2                                                             ;
+mrkChoice   = 3                                                             ;
+mrkFeedback = 4                                                             ;
+mrkPayoff   = 5                                                             ;
+mrkPrefLot  = 6                                                             ;
+
+% set up the parallel port
+config_io                                                                   ;
+
+% Parallel port address
+ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function
+outp(ppAddress, 0)                                                          ; % call outp so that there will be no "first-call-delay" during the flow later
+
+
 %% Doing the experimental flow
 
 vbl = Screen('Flip', window)                                                ; % Get initial system time and assign to "vbl"
@@ -136,6 +153,10 @@ DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % 
 vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                        ; % Show that lotteries have been shuffled ... here, timing of tShowFeedback makes only sense after first iteration
 Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
 
+% Write EEG Marker --> lotteries have been shuffled
+outp(ppAddress,mrkShuffle); WaitSecs(0.010)                                 ;
+outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
+
 
 for trial = 1:nTrials
 
@@ -151,17 +172,26 @@ DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % 
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
 [vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
 
+% Write EEG Marker --> Fixation cross onset, expect a response
+outp(ppAddress,mrkFixOnset); WaitSecs(0.010)                                ;
+outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
 
 % Inquire response
 respToBeMade = true                                                         ; % condition for while loop
 while respToBeMade            
     [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
         if keyCode(leftKey)
+            % Write EEG Marker --> button press, a choice has been made
+            outp(ppAddress,mrkChoice); WaitSecs(0.010)                      ;
+            outp(ppAddress,0)        ; WaitSecs(0.001)                      ;
             rt = tEnd - stimOnset                                           ; % Measure timing
             rewardBool = Sample(leftLottery)                                ; % drawing either a 0(loss) or a 1(win)
             pickedLoc = 1                                                   ; % 1 for left
             respToBeMade = false                                            ; % stop checking now
         elseif keyCode(rightKey)
+            % Write EEG Marker --> button press, a choice has been made
+            outp(ppAddress,mrkChoice); WaitSecs(0.010)                      ;
+            outp(ppAddress,0)        ; WaitSecs(0.001)                      ;            
             rt = tEnd - stimOnset                                           ; % Measure timing
             rewardBool = Sample(rightLottery)                               ; 
             pickedLoc = 2                                                   ; % 2 for right
@@ -190,6 +220,9 @@ choiceMat(4,trial,game) = rewardBool                                        ; % 
 
 vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt)                  ; % Show feedback
 
+% Write EEG Marker --> the feedback is presented
+outp(ppAddress,mrkFeedback); WaitSecs(0.010)                                ;
+outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
 
 end % End of trial loop
 
@@ -201,10 +234,17 @@ Screen('TextSize',window,50)                                                ; % 
 DrawFormattedText(window, payoffStr, 'center', 'center', white)             ; % Printing it out to the screen
 vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2)                      ;
 
+% Write EEG Marker --> the payoff is shown
+outp(ppAddress,mrkPayoff); WaitSecs(0.010)                                  ;
+outp(ppAddress,0)        ; WaitSecs(0.001)                                  ;
 
 % Ask about preferred lottery
 DrawFormattedText(window,texts('aPFP_PrefLot'),'center','center',white)     ; % Asking the question
 [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2)             ;
+
+% Write EEG Marker --> the preferred lottery is being inquired
+outp(ppAddress,mrkPrefLot); WaitSecs(0.010)                                 ;
+outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
 
 
 % Inquire about the answer
