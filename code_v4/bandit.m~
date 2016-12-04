@@ -129,18 +129,10 @@ config_io                                                                   ; % 
 
 % Parallel port address
 ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function
+outp(ppAddress, 0)                                                          ; % call outp so that there will be no "first-call-delay" during the flow later
 
-% "Warming up" (i.e., loading into memory) before timing becomes crucial
-outp(ppAddress, 0)                                                          ; 
-Sample(1)                                                                   ;
-randi(1)                                                                    ;
-KbCheck                                                                     ; 
-num2str(1)                                                                  ; 
-WaitSecs(0)                                                                 ;
-strcat('warm', 'up')                                                        ;
-rand                                                                        ;
-sum(1)                                                                      ;
-sprintf('warm up')                                                          ; 
+% Load functions into memory
+Sample
 
 %% Doing the experimental flow
 
