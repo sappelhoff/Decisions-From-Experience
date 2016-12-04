@@ -118,14 +118,14 @@ texts('aPFP_intro2') = sprintf(['Try to maximize your "win" outcomes.', ...
 % EEG markers
 mrkShuffle  = 1                                                             ; % Onset of lotteries have been shuffled screen at the beginning of one game
 mrkFixOnset = 2                                                             ; % Onset of fixation cross during new trial
-mrkChoice   = 3                                                             ; % Button press upon chice of a lottery
+mrkChoice   = 3                                                             ; % Button press upon choice of a lottery
 mrkFeedback = 4                                                             ; % Onset of feedback presentation
 mrkPayoff   = 5                                                             ; % Onset of payoff presentation at the end of one game
 mrkPrefLot  = 6                                                             ; % Onset of the question, which lottery was preferred
 mrkSelect   = 7                                                             ; % Button press upon selection of the preferred lottery
 
 % set up the parallel port
-config_io                                                                   ;
+config_io                                                                   ; % The io64 module, see documentation
 
 % Parallel port address
 ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function

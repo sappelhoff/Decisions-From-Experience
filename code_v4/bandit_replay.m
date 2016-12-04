@@ -106,6 +106,22 @@ BdistrMat = nan(1,nTrials*nGames)                                           ; % 
 distrIdx = 1                                                                ; % Running index to put distractor data (RTs) into BdistrsMat
 BdistrInsertMat = zeros(nTrials,nGames)                                     ; % A 1 will be put, where a distractor was used
 
+
+% EEG markers
+mrkShuffle  = 1                                                             ; % Onset of lotteries have been shuffled screen at the beginning of one game
+mrkFixOnset = 2                                                             ; % Onset of fixation cross during new trial
+mrkDistr    = 3                                                             ; % Button press upon choice of a lottery
+mrkFeedback = 4                                                             ; % Onset of feedback presentation
+mrkPayoff   = 5                                                             ; % Onset of payoff presentation at the end of one game
+
+
+% set up the parallel port
+config_io                                                                   ; % The io64 module, see documentation
+
+% Parallel port address
+ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function
+outp(ppAddress, 0)                                                          ; % call outp so that there will be no "first-call-delay" during the flow later
+
 %% Doing the experimental flow
 
 vbl = Screen('Flip', window)                                                ; % Get initial system time
@@ -118,6 +134,10 @@ Screen('TextSize',window,50)                                                ; % 
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
 vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2)                          ; % Show that lotteries have been shuffled
 Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
+
+% Write EEG Marker --> lotteries have been shuffled
+outp(ppAddress,mrkShuffle); WaitSecs(0.010)                                 ;
+outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
 
 
 for trial=1:nTrials
@@ -132,6 +152,10 @@ vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % 
 DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
 Screen('DrawLines',window,fixCoords,fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
 vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
+
+% Write EEG Marker --> Fixation cross onset, expect a response
+outp(ppAddress,mrkFixOnset); WaitSecs(0.010)                                ;
+outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
 
 pickedLoc   = choiceMat(1,trial,game)                                       ; % which location was picked: 1, left - 2, right
 rt          = choiceMat(2,trial,game)                                       ; % how quickly was it picked in s
@@ -155,6 +179,11 @@ Screen('FillRect',window,reward(:,:,rewardBool+1),rectLocs(:,:,pickedLoc))  ; % 
 Screen('DrawTextures',window,maskTexture,[],maskLocs(:,:,pickedLoc),[],0)   ;                                
 [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2) 	; % Show feedback
 
+% Write EEG Marker --> the feedback is presented
+outp(ppAddress,mrkFeedback); WaitSecs(0.010)                                ;
+outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
+
+
 if rewardBool == 2
     
     % If a distractor occurred, measure the RT to it
@@ -162,6 +191,9 @@ if rewardBool == 2
     while respToBeMade            
     [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
         if keyCode(spaceKey)
+            % Write EEG Marker --> button press, a distractor was seen
+            outp(ppAddress,mrkDistr); WaitSecs(0.010)                       ;
+            outp(ppAddress,0)       ; WaitSecs(0.001)                       ;            
             rt = tEnd - stimOnset                                           ; % Measure timing
             respToBeMade = false                                            ; % stop checking
         end
@@ -186,6 +218,9 @@ DrawFormattedText(window, payoffStr, 'center', 'center', white)             ; % 
 vbl = Screen('Flip',window,vbl+tWait)                                       ;
 Screen('TextSize',window,25)                                                ; % Reset font size
 
+% Write EEG Marker --> the payoff is shown
+outp(ppAddress,mrkPayoff); WaitSecs(0.010)                                  ;
+outp(ppAddress,0)        ; WaitSecs(0.001)                                  ;
 
 % We do not ask about the preferred lottery, this is a replay.
 

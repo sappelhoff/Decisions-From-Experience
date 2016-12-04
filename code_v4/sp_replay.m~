@@ -151,16 +151,15 @@ vbl = Screen('Flip', window)                                                ; % 
 
 while trlCount > 0
 
-% Inform about shuffled lotteries. But no need to actually shuffle anything
+% Inform about shuffled lotteries. But no need t actually shuffle anything
 Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
 DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
 vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2)                          ; % Show that lotteries have been shuffled
+Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
 
 % Write EEG Marker --> lotteries have been shuffled
 outp(ppAddress,mrkShuffle); WaitSecs(0.010)                                 ;
 outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
-
-Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
 
 
 for trial=1:trlCount
@@ -275,10 +274,10 @@ else
         DrawFormattedText(window,'draw another sample','center', ...
             'center',white, [], [], [], [], [],textwin1)                    ; % Pick sampling
         vbl = Screen('Flip',window,vbl+tWait*1.1)                           ;
+        Screen('TextSize',window,25)                                        ; % Reset font size
         % Write EEG Marker --> Selection screen of answer to question
         outp(ppAddress,mrkAnswer); WaitSecs(0.010)                          ;
         outp(ppAddress,0)        ; WaitSecs(0.001)                          ;       
-        Screen('TextSize',window,25)                                        ; % Reset font size
         
     elseif pickedLoc == 2
         DrawFormattedText(window,'make a choice','center','center', ...
