@@ -367,8 +367,6 @@ end % end of choice loop (while loop)
 
 
 
-
-
 % Save the RT data to the distractors
 SPdistrMat(isnan(SPdistrMat)) = []                                          ; % Drop those preallocated spaces we didn't fill
 data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
