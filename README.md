@@ -6,6 +6,8 @@ Matlab code relying on [Psychtoolbox 3](http://psychtoolbox.org) to execute an e
 - code_v2 --> separate scripts, more tidy
 - code_v2 --> same as v2 but with improved timing
 - code_v4 --> same as v3 but with EEG markers
+- code_v5 --> same as v4 functionally ... but in a different style. Also, requires Statistics Toolbox (for binornd function)
+
 
 For more information, [read the documentation!](documentation/DFE_docu.pdf)
 
