@@ -406,7 +406,7 @@ while trlCount > 0
     Screen('FillRect',window,reward(:,:,rewardBool+1), ...
         Stims.rectLocs(:,:,pickedLoc));
     Screen('DrawTextures',window,Stims.maskTexture,[], ...
-        Stims.maskLocs(:,:,pickedLoc),[],0);
+        Stims.maskLocs(:,:,pickedLoc),[],0)   ;
 
     vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
 
@@ -451,5 +451,5 @@ Priority(0);
 ShowCursor;
 sca;
 
-
-end % Function end
+%% Function end
+end

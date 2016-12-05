@@ -100,7 +100,7 @@ tShowPayoff     = 1;
 rng('shuffle');
 
 % Matrices for saving the data (choiceMat). We save trial data in 2nd dim 
-% abd separate games using the 3rd dim. The 1st dim describes
+% and separate games using the 3rd dim. The 1st dim describes
 % the choice per se, the RT, whether it was a good choice, and how it was
 % rewarded. We also have a matrix to save the preferred lottery for each
 % game (prefMat).
@@ -155,11 +155,11 @@ for game = 1:nGames
     Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
-    Screen('TextSize',window,25);
 
     % Write EEG Marker --> lotteries have been shuffled
     outp(ppAddress,mrkShuffle); WaitSecs(0.010);
     outp(ppAddress,0)         ; WaitSecs(0.001);
+    Screen('TextSize',window,25);
 
 
     for trial = 1:nTrials
