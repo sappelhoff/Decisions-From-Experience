@@ -1,7 +1,7 @@
 function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat, winStim, ID)
 
-% Implements a replay of a bandit paradigm performed earlier as described
-% in the documentation.
+% Implements a replay of a bandit paradigm performed earlier as described in
+% the documentation.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 % 
@@ -14,9 +14,8 @@ function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat, winStim, ID)
 % - ID: the ID of the subject. A three digit number.
 %
 % OUT:
-% - BdistrsMat: RTs to the distractor trials that happened during the
-% replay
-% - BdistrsInsertMat: a trialsXgames matrix of zeros. Ones, where distr was
+% - BdistrsMat: RTs to the distractor trials that happened during the replay
+% - BdistrsInsertMat: a trialsXgames matrix of zeros. 1s, where distr was
 % inserted
 
 %% function start
@@ -108,7 +107,7 @@ rng('shuffle');
 % was used.
 BdistrMat = nan(1,nTrials*nGames);
 distrIdx = 1; 
-BdistrInsertMat = zeros(nTrials,nGames);
+BdistrInsertMat = zeros(nTrials,nGames); % A 1 will be put, where a distractor was used
 
 % All presentation texts
 texts             = containers.Map;

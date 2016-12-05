@@ -24,37 +24,43 @@ function [SPdistrMat, SPdistrInsertMat] = spReplay(sampleMat, choiceMat, questio
 
 if nargin ~= 5, error('Check the function inputs!'), end
 
-PsychDefaultSetup(2)                                                        ; % default settings for Psychtoolbox
+% Default settings for Psychtoolbox
+PsychDefaultSetup(2); 
 
+% Screen management: Get all available screens ordered from 0 to i. Take
+% the max of screens to draw to external screen.
+screens = Screen('Screens');
+screenNumber = max(screens);
 
-% Screen Management
-screens = Screen('Screens')                                                 ; % get all available screens ordered from 0 (native screen of laptop) to i
-screenNumber = max(screens)                                                 ; % take max of screens to draw to external screen.
+% Define white as an RGB tuple.
+white = WhiteIndex(screenNumber);
 
-% Define white/black/grey
-white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
+% Open an on screen window and get its size and center in pixels. Set the
+% standard background to white/2, which is grey.
+[window, windowRect] = PsychImaging('OpenWindow',screenNumber,white/2);
+[~,screenYpixels] = Screen('WindowSize',window);
+[xCenter,yCenter] = RectCenter(windowRect);
 
-% Open an on screen window and get its size and center
-[window, windowRect] = PsychImaging('OpenWindow',screenNumber,white/2)      ; % our standard background will be grey
-[screenXpixels,screenYpixels] = Screen('WindowSize',window)                 ; % getting the dimensions of the screen in pixels
-[xCenter,yCenter] = RectCenter(windowRect)                                  ; % getting the center of the screen
+% Make transparency possible with RGBA tuples and for textures. A=0 means
+% transparent, A=1 means opaque .
+Screen('BlendFunction',window,'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); 
 
-% for making transparency possible in RGBA tuples and for textures
-Screen('BlendFunction',window,'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA')      ; % transparency is determined in RGBA tuples with each value [0,1], where A=0 means transparent, A=1 means opaque 
+% Defaults for drawing text on the screen. Pick a font that's available
+% everywhere. For style, note that 0=normal,1=bold,2=italic,4=underline.
+Screen('TextFont',window,'Verdana');
+Screen('TextSize',window,25);
+Screen('TextStyle',window,0);
 
-% Defaults for drawing text on the screen
-Screen('TextFont',window,'Verdana')                                         ; % Pick a font that's available everywhere ...
-Screen('TextSize',window,25)                                                ;
-Screen('TextStyle',window,0)                                                ; %0=normal,1=bold,2=italic,4=underline
+% Retreive the maximum priority number and set priority level once for the
+% whole script.
+topPriorityLevel = MaxPriority(window);
+Priority(topPriorityLevel);
 
-% Retreive the maximum priority number
-topPriorityLevel = MaxPriority(window)                                      ;
-Priority(topPriorityLevel)                                                  ; % Set priority level once for the whole script
+% Set Verbosity level to very low to speed up PTB. This makes only sense
+% once the code has been thoroughly tested.
+% Screen('Preference', 'Verbosity', 0);
 
-% Set Verbosity level to very low.
-% Screen('Preference', 'Verbosity', 0)                                      ; % makes only sense, once this code is thoroughly tested
-
-HideCursor                                                                  ; % Hide the cursor
+HideCursor;
 
 %-------------------------------------------------------------------------%
 %           Preparing all Stimuli and Experimental Information            %

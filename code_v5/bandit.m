@@ -305,7 +305,7 @@ end % End of game loop
 
 
 % Save all the data to same directory of the function. Use a file name
-% consisting of subj_id and datetime to avoid overwriting files
+% consisting of subj_id and datetime to avoid overwriting files.
 dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('bandit_subj_', ...
@@ -325,5 +325,5 @@ sca;
 
 
 
-%% function end
-end
+
+end % function end
