@@ -1,11 +1,11 @@
-function [BdistrMat, BdistrInsertMat] = bandit_replay(choiceMat, winStim, ID)
+function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat, winStim, ID)
 
 % Implements a replay of a bandit paradigm performed earlier as described in
 % the documentation.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 % 
-% distrsMat = bandit_replay(dataMat, winStim, ID)
+% [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat, winStim, ID)
 %
 % IN:
 % - choiceMat: The data provided by an earlier bandit paradigm about
@@ -61,7 +61,7 @@ HideCursor                                                                  ; % 
 %-------------------------------------------------------------------------%
 
 % All Psychtoolbox stimuli
-stims = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
+Stims = ptbStims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 % All presentation texts
 texts = containers.Map                                                      ;
@@ -73,9 +73,9 @@ texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\n',...
 
 % define winning stimulus
 if strcmp(winStim, 'blue')
-    reward = cat(3, stims.colors1, stims.colors2, stims.colors3)                              ; % blue is win Stim ... red as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors1, Stims.colors2, Stims.colors3)                              ; % blue is win Stim ... red as loss. Stims.colors3(green) is the distractor condition
 elseif strcmp(winStim, 'red') 
-    reward = cat(3, stims.colors2, stims.colors1, stims.colors3)                              ; % red is win Stim ... blue as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors2, Stims.colors1, Stims.colors3)                              ; % red is win Stim ... blue as loss. Stims.colors3(green) is the distractor condition
 else
     sca;
     error('check the function inputs!')
@@ -142,13 +142,13 @@ for game=1:nGames
 
         % drawing trialcounter
         trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % Current trial out of all trials
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Trial counter is presented at the top of the screen
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white)  ; % Trial counter is presented at the top of the screen
         vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % draw it on an otherwise grey screen ... waiting for fixcross
 
 
         % Fixation cross & recall of previous choice
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white)  ; % Redraw trial counter
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
         vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
 
         % Write EEG Marker --> Fixation cross onset, expect a response
@@ -171,10 +171,10 @@ for game=1:nGames
            rewardBool = 2                                                           ; % On pDistr of all trials, replace the reward with a distractor
         end
 
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white)  ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-        Screen('FillRect',window,reward(:,:,rewardBool+1),stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-        Screen('DrawTextures',window,stims.maskTexture,[],stims.maskLocs(:,:,pickedLoc),[],0)   ;                                
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white)  ; % Redraw trial counter
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
+        Screen('FillRect',window,reward(:,:,rewardBool+1),Stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
+        Screen('DrawTextures',window,Stims.maskTexture,[],Stims.maskLocs(:,:,pickedLoc),[],0)   ;                                
         [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2) 	; % Show feedback
 
         % Write EEG Marker --> the feedback is presented
@@ -226,10 +226,10 @@ end % End of game loop
 
 % Save the RT data to the distractors
 BdistrMat(isnan(BdistrMat)) = []                                            ; % Drop those preallocated spaces we didn't fill
-data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
-cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
-fname = fullfile(data_dir,strcat('banditReplay_subj_', ...
-    sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
+dataDir = fullfile(pwd)                                                    ; % Puts the data where the script is
+curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
+fname = fullfile(dataDir,strcat('banditReplay_subj_', ...
+    sprintf('%03d_',ID),curTime))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
 save(fname, 'BdistrMat', 'BdistrInsertMat')                                 ; % save it!
 
 % Time for a break :-)

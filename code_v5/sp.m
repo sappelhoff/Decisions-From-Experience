@@ -57,14 +57,14 @@ HideCursor                                                                  ; % 
 %-------------------------------------------------------------------------%
 
 % All Psychtoolbox stimuli
-stims = produce_stims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
+Stims = ptbStims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
 
 
 % Drawing the text options for sample vs choice decision      
-textwin1 = [screenXpixels*.1,screenYpixels*.5,screenXpixels*.4, ...
-    screenYpixels*.5]                                                       ; % windows to center the formatted text in
-textwin2 = [screenXpixels*.6,screenYpixels*.5,screenXpixels*.9, ...
-    screenYpixels*.5]                                                       ; % arguments are: left top right bottom
+textwin1 = [screenXpixels*0.1,screenYpixels*0.5,screenXpixels*0.4, ...
+    screenYpixels*0.5]                                                       ; % windows to center the formatted text in
+textwin2 = [screenXpixels*0.6,screenYpixels*0.5,screenXpixels*0.9, ...
+    screenYpixels*0.5]                                                       ; % arguments are: left top right bottom
 
 
 % All presentation texts
@@ -82,9 +82,9 @@ texts('aSPfinal') = sprintf(['You have reached the final\ntrial. You', ...
 
 % define winning stimulus
 if strcmp(winStim, 'blue')
-    reward = cat(3, stims.colors1, stims.colors2, stims.colors3)                              ; % blue is win Stim ... red as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors1, Stims.colors2, Stims.colors3)                              ; % blue is win Stim ... red as loss. Stims.colors3(green) is the distractor condition
 elseif strcmp(winStim, 'red') 
-    reward = cat(3, stims.colors2, stims.colors1, stims.colors3)                              ; % red is win Stim ... blue as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors2, Stims.colors1, Stims.colors3)                              ; % red is win Stim ... blue as loss. Stims.colors3(green) is the distractor condition
 else
     sca                                                                     ;
     error('check the function inputs!')
@@ -108,9 +108,9 @@ tShowChosenOpt = 0.75                                                       ; % 
 
 % Indices for the loops and assigning data to their places within matrices
 trlCount = nTrials                                                          ; % A trial counter that will be counted down during the while loop
-samp_idx = 1                                                                ; % Assign data a place within sampleMat
-choi_idx = 1                                                                ; % Assign data a place within choiceMat
-ques_idx = 1                                                                ;
+sampIdx = 1                                                                ; % Assign data a place within sampleMat
+choiIdx = 1                                                                ; % Assign data a place within choiceMat
+quesIdx = 1                                                                ;
 
 % Shuffle the random number generator
 rng('shuffle')                                                              ;
@@ -171,8 +171,8 @@ while trlCount > 0
     for trial = 1:trlCount
 
         % Drawing trial counter
-        trialCounter = sprintf('%d', samp_idx)                                      ; % Current trial 
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Trial counter is presented at the top of the screen
+        trialCounter = sprintf('%d', sampIdx)                                      ; % Current trial 
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Trial counter is presented at the top of the screen
         if trial == 1
             vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                    ; % draw it on an otherwise grey screen ... waiting for fixcross
         else
@@ -181,8 +181,8 @@ while trlCount > 0
 
 
         % Fixation cross & choice selection
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Redraw trial counter
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
         [vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
 
         % Write EEG Marker --> Fixation cross onset, expect a response
@@ -218,17 +218,17 @@ while trlCount > 0
         end
 
         % Feedback
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-        Screen('FillRect',window,reward(:,:,rewardBool+1),stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-        Screen('DrawTextures',window,stims.maskTexture,[],stims.maskLocs(:,:,pickedLoc),[],0)   ;                                
+        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Redraw trial counter
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
+        Screen('FillRect',window,reward(:,:,rewardBool+1),Stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
+        Screen('DrawTextures',window,Stims.maskTexture,[],Stims.maskLocs(:,:,pickedLoc),[],0)   ;                                
         Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
 
-        sampleMat(1,samp_idx) = pickedLoc                                           ;
-        sampleMat(2,samp_idx) = rt                                                  ;
-        sampleMat(3,samp_idx) = (pickedLoc==goodLotteryLoc)                         ;
-        sampleMat(4,samp_idx) = rewardBool                                          ;
-        samp_idx              = samp_idx+1                                          ;
+        sampleMat(1,sampIdx) = pickedLoc                                           ;
+        sampleMat(2,sampIdx) = rt                                                  ;
+        sampleMat(3,sampIdx) = (pickedLoc==goodLotteryLoc)                         ;
+        sampleMat(4,sampIdx) = rewardBool                                          ;
+        sampIdx              = sampIdx+1                                          ;
 
 
         vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2+rt)                    ; % Show feedback
@@ -240,7 +240,7 @@ while trlCount > 0
         % Check, whether there are more trials remaining. If not, no need to ask
         % whether to continue to sample or make a choice. Then it will be only
         % choice.
-        if samp_idx > nTrials
+        if sampIdx > nTrials
             Screen('TextSize',window,50)                                            ; % If we draw text, make font a bit bigger
             DrawFormattedText(window, texts('aSPfinal'), 'center', ...
                 'center',white)                                                     ; % If the last trial has been reached, tell the subject so
@@ -280,9 +280,9 @@ while trlCount > 0
             end
 
 
-            questionMat(1,ques_idx) = rt                                            ; % How quickly did the participant choose whether to sample or make a choice.
-            questionMat(2,ques_idx) = pickedLoc                                     ; % What did the participant choose?
-            ques_idx = ques_idx+1                                                   ; % Increment question index to be ready for next question    
+            questionMat(1,quesIdx) = rt                                            ; % How quickly did the participant choose whether to sample or make a choice.
+            questionMat(2,quesIdx) = pickedLoc                                     ; % What did the participant choose?
+            quesIdx = quesIdx+1                                                   ; % Increment question index to be ready for next question    
 
 
             if pickedLoc == 1
@@ -349,22 +349,22 @@ while trlCount > 0
 
 
 
-    choiceMat(1,choi_idx) = pickedLoc                                           ; % Which location was picked: 1, left - 2, right
-    choiceMat(2,choi_idx) = rt                                                  ; % How quickly was it picked in s
-    choiceMat(3,choi_idx) = (goodLotteryLoc == pickedLoc)                       ; % Boolean was the good lottery chosen? 0=no, 1=yes
-    choiceMat(4,choi_idx) = rewardBool                                          ; % Boolean whether is was rewarded or not
-    choi_idx = choi_idx+1                                                       ; % Increment choice index for next round of choice
+    choiceMat(1,choiIdx) = pickedLoc                                           ; % Which location was picked: 1, left - 2, right
+    choiceMat(2,choiIdx) = rt                                                  ; % How quickly was it picked in s
+    choiceMat(3,choiIdx) = (goodLotteryLoc == pickedLoc)                       ; % Boolean was the good lottery chosen? 0=no, 1=yes
+    choiceMat(4,choiIdx) = rewardBool                                          ; % Boolean whether is was rewarded or not
+    choiIdx = choiIdx+1                                                       ; % Increment choice index for next round of choice
 
-    Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % After pick, show fixation cross    
+    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % After pick, show fixation cross    
     vbl = Screen('Flip',window,vbl+rt*1.1)                                      ;
 
 
 
 
     % Feedback
-    Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-    Screen('FillRect',window,reward(:,:,rewardBool+1),stims.rectLocs(:,:,pickedLoc))  ; % Drawing the checkerboard stim at the chosen location. The reward_bool % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
-    Screen('DrawTextures',window,stims.maskTexture,[],stims.maskLocs(:,:,pickedLoc),[],0)   ;
+    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
+    Screen('FillRect',window,reward(:,:,rewardBool+1),Stims.rectLocs(:,:,pickedLoc))  ; % Drawing the checkerboard stim at the chosen location. The reward_bool % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
+    Screen('DrawTextures',window,Stims.maskTexture,[],Stims.maskLocs(:,:,pickedLoc),[],0)   ;
 
     vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2)                                                       ;
 
@@ -391,10 +391,10 @@ end % end of choice loop (while loop)
 
 
 % Save all the data
-data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
-cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
-fname = fullfile(data_dir,strcat('sp_subj_', ...
-    sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
+dataDir = fullfile(pwd)                                                    ; % Puts the data where the script is
+curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
+fname = fullfile(dataDir,strcat('sp_subj_', ...
+    sprintf('%03d_',ID),curTime))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
 save(fname, 'sampleMat', 'choiceMat', 'questionMat')                        ; % save it!
 
 

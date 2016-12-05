@@ -1,9 +1,10 @@
 function [choiceMat, prefMat] = bandit(nGames, nTrials, winStim, ID)
 
 % Implements the bandit paradigm as descibed in the documentation.
+%
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 % 
-% dataMat = bandit(nGames, nTrials, winStim, ID)
+% [choiceMat, prefMat] = bandit(nGames, nTrials, winStim, ID)
 %
 % IN:
 % - nGames: Number of bandit games.
@@ -19,285 +20,308 @@ function [choiceMat, prefMat] = bandit(nGames, nTrials, winStim, ID)
 
 if nargin ~= 4, error('Check the function inputs!'), end
 
-PsychDefaultSetup(2)                                                        ; % default settings for Psychtoolbox
+% Default settings for Psychtoolbox
+PsychDefaultSetup(2); 
 
+% Screen management: Get all available screens ordered from 0 to i. Take
+% the max of screens to draw to external screen.
+screens = Screen('Screens');
+screenNumber = max(screens);
 
-% Screen Management
-screens = Screen('Screens')                                                 ; % get all available screens ordered from 0 (native screen of laptop) to i
-screenNumber = max(screens)                                                 ; % take max of screens to draw to external screen.
+% Define white as an RGB tuple.
+white = WhiteIndex(screenNumber);
 
-% Define white/black/grey
-white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
+% Open an on screen window and get its size and center in pixels. Set the
+% standard background to white/2, which is grey.
+[window, windowRect] = PsychImaging('OpenWindow',screenNumber,white/2);
+[~,screenYpixels] = Screen('WindowSize',window);
+[xCenter,yCenter] = RectCenter(windowRect);
 
-% Open an on screen window and get its size and center
-[window, windowRect] = PsychImaging('OpenWindow',screenNumber,white/2)      ; % our standard background will be grey
-[~,screenYpixels] = Screen('WindowSize',window)                             ; % getting the dimensions of the screen in pixels
-[xCenter,yCenter] = RectCenter(windowRect)                                  ; % getting the center of the screen
+% Make transparency possible with RGBA tuples and for textures. A=0 means
+% transparent, A=1 means opaque .
+Screen('BlendFunction',window,'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA'); 
 
-% for making transparency possible in RGBA tuples and for textures
-Screen('BlendFunction',window,'GL_SRC_ALPHA','GL_ONE_MINUS_SRC_ALPHA')      ; % transparency is determined in RGBA tuples with each value [0,1], where A=0 means transparent, A=1 means opaque 
+% Defaults for drawing text on the screen. Pick a font that's available
+% everywhere. For style, note that 0=normal,1=bold,2=italic,4=underline.
+Screen('TextFont',window,'Verdana');
+Screen('TextSize',window,25);
+Screen('TextStyle',window,0);
 
-% Defaults for drawing text on the screen
-Screen('TextFont',window,'Verdana')                                         ; % Pick a font that's available everywhere ...
-Screen('TextSize',window,25)                                                ;
-Screen('TextStyle',window,0)                                                ; %0=normal,1=bold,2=italic,4=underline
+% Retreive the maximum priority number and set priority level once for the
+% whole script.
+topPriorityLevel = MaxPriority(window);
+Priority(topPriorityLevel);
 
+% Set Verbosity level to very low to speed up PTB. This makes only sense
+% once the code has been thoroughly tested.
+% Screen('Preference', 'Verbosity', 0);
 
-% Retreive the maximum priority number
-topPriorityLevel = MaxPriority(window)                                      ;
-Priority(topPriorityLevel)                                                  ; % Set priority level once for the whole script
+HideCursor;
 
-% Set Verbosity level to very low.
-% Screen('Preference', 'Verbosity', 0)                                      ; % makes only sense, once this code is thoroughly tested
+%--------------------------------------------------------------------------
+%           Preparing all Stimuli and Experimental Information            
+%--------------------------------------------------------------------------
 
-HideCursor                                                                  ; % Hide the cursor
+% All Psychtoolbox stimuli are created with a separate function. We can
+% access the stimuli from the structure Stims.
+Stims = ptbStims(window, windowRect, screenNumber);
 
-%-------------------------------------------------------------------------%
-%           Preparing all Stimuli and Experimental Information            %
-%-------------------------------------------------------------------------%
-
-% All Psychtoolbox stimuli
-stims = produce_stims(window, windowRect, screenNumber)                     ; % separate function for the stim creation to avoid clutter
-
-% define winning stimulus
+% Define the winning stimulus based on the input to the present function.
+% The winning stimulus is defined by a color (red or blue). The losing
+% stimulus gets the remaining color. The distractor stimulus is always
+% green.
 if strcmp(winStim, 'blue')
-    reward = cat(3, stims.colors1, stims.colors2, stims.colors3)                              ; % blue is win Stim ... red as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors1, Stims.colors2, Stims.colors3); 
 elseif strcmp(winStim, 'red') 
-    reward = cat(3, stims.colors2, stims.colors1, stims.colors3)                              ; % red is win Stim ... blue as loss. stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors2, Stims.colors1, Stims.colors3); 
 else
-    sca                                                                     ;
+    sca;
     error('check the function inputs!')
-end
+end % end defining winning stimulus
 
-% Create some lotteries - these are stable and hardcoded across the study
-lotteryOption1 = 0.7                                                        ; % p(win)=.7 --> good lottery
-lotteryOption2 = 1-lotteryOption1                                           ; % p(win)=.3 --> bad lottery
+% Create some lotteries - these are stable and hardcoded across the study.
+% We generally have a good lottery at p(win)=0.7 and a bad lottery at
+% p(win)=0.3
+lotteryOption1 = 0.7;
+lotteryOption2 = 1-lotteryOption1;
 
 % Keyboard information
-leftKey = KbName('LeftArrow')                                               ; % choose left lottery
-rightKey = KbName('RightArrow')                                             ; % choose right lottery
+leftKey  = KbName('LeftArrow'); % choose left lottery
+rightKey = KbName('RightArrow'); % choose right lottery
 
 % Timings in seconds
-tShowShuffled = 1                                                           ; % the time after the participants are being told that lotteries have been shuffled
-tShowTrialCount = 0                                                         ; % time that the trial counter is shown
-tDelayFeedback = 1                                                          ; % time after a choice before outcome is presented
-tShowFeedback = 1                                                           ; % time that the feedback is displayed
-tShowPayoff = 1                                                             ; % time that the payoff is shown
+tShowShuffled   = 1;
+tShowTrialCount = 0; 
+tDelayFeedback  = 1; 
+tShowFeedback   = 1; 
+tShowPayoff     = 1; 
 
 % Shuffle the random number generator
-rng('shuffle')                                                              ;
+rng('shuffle');
 
-% Matrix for saving the data
-choiceMat = nan(4, nTrials, nGames)                                         ; % So far just a placeholder. For the meaning of each row, column, ans sheet, see below.
-prefMat = nan(3,nGames)                                                     ; % saving the data from asking about the preferred lottery at end of each game
+% Matrices for saving the data (choiceMat). We save trial data in 2nd dim 
+% abd separate games using the 3rd dim. The 1st dim describes
+% the choice per se, the RT, whether it was a good choice, and how it was
+% rewarded. We also have a matrix to save the preferred lottery for each
+% game (prefMat).
+choiceMat = nan(4, nTrials, nGames); 
+prefMat   = nan(3,nGames);
 
 % Texts
-texts = containers.Map                                                      ; 
-
-texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\', ...
-    'nPress a key to close.'])                                              ; % General texts
-
-texts('shuffled') = sprintf('The lotteries have been shuffled.')            ; % General texts
-
-texts('payoff') = sprintf('You earned: ')                                   ; % General texts
-
-texts('aPFP_PrefLot') = sprintf(['Which lottery do you think was more', ...
-    'profitable?\nPress [left] or [right].'])                               ; % Active PFP specific texts
-
-texts('aPFP_intro1') = sprintf(['Whenever you see the + sign,\n\nuse', ...
-    '[left] and [right] to choose a lottery.'])                             ; % Active PFP specific texts
-
-texts('aPFP_intro2') = sprintf(['Try to maximize your "win" outcomes.', ...
-    '\n\nYou need to balance exploration\n\nand exploitation of your', ...
-    'options.'])                                                            ; % Active PFP specific texts
+texts             = containers.Map; 
+texts('end')      = sprintf(['This task is done.\n\nThank you so far!',...
+    '\n\n\nPress a key to close.']);
+texts('shuffled') = sprintf('The lotteries have been shuffled.');
+texts('payoff')   = sprintf('You earned: ');
+texts('prefLot')  = sprintf(['Which lottery do you think was more', ...
+    'profitable?\nPress [left] or [right].']); 
 
 % EEG markers
-mrkShuffle  = 1                                                             ; % Onset of lotteries have been shuffled screen at the beginning of one game
-mrkFixOnset = 2                                                             ; % Onset of fixation cross during new trial
-mrkChoice   = 3                                                             ; % Button press upon choice of a lottery
-mrkFeedback = 4                                                             ; % Onset of feedback presentation
-mrkPayoff   = 5                                                             ; % Onset of payoff presentation at the end of one game
-mrkPrefLot  = 6                                                             ; % Onset of the question, which lottery was preferred
-mrkSelect   = 7                                                             ; % Button press upon selection of the preferred lottery
+mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
+mrkFixOnset = 2; % Onset of fixation cross during new trial
+mrkChoice   = 3; % Button press upon choice of a lottery
+mrkFeedback = 4; % Onset of feedback presentation
+mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
+mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
+mrkSelect   = 7; % Button press upon selection of the preferred lottery
 
-% set up the parallel port
-config_io                                                                   ; % The io64 module, see documentation
+% Set up the parallel port using the io64 module.
+config_io; 
 
 % Parallel port address
-ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function
+ppAddress = hex2dec('D050');
 
 
 %% Doing the experimental flow
 
-vbl = Screen('Flip', window)                                                ; % Get initial system time and assign to "vbl"
+% Get initial system time and assign to "vbl". We will keep updating vbl
+% upon each screen flip and use it to time accurately.
+vbl = Screen('Flip', window); 
 
 for game = 1:nGames
 
-    % Shuffle the lotteries & inform about it
-    goodLotteryLoc = randi(2,1)                                                 ; % determine whether good lottery will be left(1) or right(2)
+    % Shuffle the lotteries & inform about it. Good lottery will be left=1
+    % or right=2
+    goodLotteryLoc = randi(2,1); 
     if goodLotteryLoc == 1
-        leftLottery = lotteryOption1                                            ; % Note: lotteryOption1 is always the better one
-        rightLottery = lotteryOption2                                           ; % Note2: lotteryOption2 is always the worse one
+        leftLottery = lotteryOption1; 
+        rightLottery = lotteryOption2;
     else
-        leftLottery = lotteryOption2                                            ;
-        rightLottery = lotteryOption1                                           ;
-    end
+        leftLottery = lotteryOption2;
+        rightLottery = lotteryOption1;
+    end % end shuffling lotteries
 
 
-    Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
-    DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
-    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                        ; % Show that lotteries have been shuffled ... here, timing of tShowFeedback makes only sense after first iteration
-    Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
+    Screen('TextSize',window,50);
+    DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
+    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
+    Screen('TextSize',window,25);
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(0.010)                                 ;
-    outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
+    outp(ppAddress,mrkShuffle); WaitSecs(0.010);
+    outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
     for trial = 1:nTrials
 
-        % Drawing trial counter
-        trialCounter = strcat(num2str(trial),'/',num2str(nTrials))                  ; % Current trial out of all trials
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Trial counter is presented at the top of the screen
-        vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                        ; % draw it on an otherwise grey screen ... waiting for fixcross
+        % Drawing trial counter as current trial out of all trials
+        trialCounter = strcat(num2str(trial),'/',num2str(nTrials));
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
+        vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
-
-
-        % Fixation cross & choice selection
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
-        [vbl, stimOnset] = Screen('Flip',window,vbl+tShowTrialCount+rand/2)         ; % Show fixcross
+        
+        % Fixation cross & choice selection. Redraw the trial counter and
+        % then present a fixation cross, which acts as an inviation to make
+        % a choice.
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
+            white,[xCenter yCenter],2);
+        [vbl, stimOnset] = Screen('Flip',window, ...
+            vbl+tShowTrialCount+rand/2);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(0.010)                                ;
-        outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
+        outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
+        outp(ppAddress,0)          ; WaitSecs(0.001);
 
-        % Inquire response
-        respToBeMade = true                                                         ; % condition for while loop
+        % Inquire the answer with a loop and PTB call to the keyboard.
+        % Stop the loop only, once a keypress has been noticed.
+        respToBeMade = true;
         while respToBeMade            
-            [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+            [~,tEnd,keyCode] = KbCheck; 
                 if keyCode(leftKey)
-                    % Write EEG Marker --> button press, a choice has been made
-                    outp(ppAddress,mrkChoice); WaitSecs(0.010)                      ;
-                    outp(ppAddress,0)        ; WaitSecs(0.001)                      ;
-                    rt = tEnd - stimOnset                                           ; % Measure timing
-                    pickedLoc = 1                                                   ; % 1 for left
-                    respToBeMade = false                                            ; % stop checking now
+                    % Write EEG Marker --> button press, choice done
+                    outp(ppAddress,mrkChoice); WaitSecs(0.010);
+                    outp(ppAddress,0)        ; WaitSecs(0.001);
+                    rt = tEnd - stimOnset;
+                    pickedLoc = 1;
+                    respToBeMade = false;
                 elseif keyCode(rightKey)
-                    % Write EEG Marker --> button press, a choice has been made
-                    outp(ppAddress,mrkChoice); WaitSecs(0.010)                      ;
-                    outp(ppAddress,0)        ; WaitSecs(0.001)                      ;            
-                    rt = tEnd - stimOnset                                           ; % Measure timing   
-                    pickedLoc = 2                                                   ; % 2 for right
-                    respToBeMade = false                                            ;            
-                end
-        end
+                    % Write EEG Marker --> button press, choice done
+                    outp(ppAddress,mrkChoice); WaitSecs(0.010);
+                    outp(ppAddress,0)        ; WaitSecs(0.001);            
+                    rt = tEnd - stimOnset;
+                    pickedLoc = 2;
+                    respToBeMade = false;            
+                end % end checking whether a keypress has been done
+        end % end waiting for keypress
 
-        % Observation
+
+        % Observation. Drawing either a 0=loss or a 1=win.
         if pickedLoc == 1
-            rewardBool = binornd(1,leftLottery)                             ; % drawing either a 0(loss) or a 1(win)
-        else % pickedLoc == 2
-            rewardBool = binornd(1,rightLottery)                            ;     
-        end
+            rewardBool = binornd(1,leftLottery);
+        else 
+            rewardBool = binornd(1,rightLottery);     
+        end % end making an observation
             
 
+        % Prepare feedback: Redraw trialcounter and fixation cross, then
+        % draw the stimulus in adequate color and apply a texture. Calling
+        % 'DrawingFinished' can speed up PTB, when we do other computations
+        % before flipping to the screen.
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
+            white,[xCenter yCenter],2);
+        Screen('FillRect',window,reward(:,:,rewardBool+1), ...
+            Stims.rectLocs(:,:,pickedLoc));
+        Screen('DrawTextures',window,Stims.maskTexture,[], ...
+            Stims.maskLocs(:,:,pickedLoc),[],0);                                
+        Screen('DrawingFinished', window);
 
+        % Save data: Which location was picked? (left=1, right=2), how
+        % quickly was it picked in s? Boolean whether the good location
+        % (lottery) was picked. Boolean whether the outcome was a reward or
+        % not.
+        choiceMat(1,trial,game) = pickedLoc;
+        choiceMat(2,trial,game) = rt; 
+        choiceMat(3,trial,game) = (goodLotteryLoc == pickedLoc); 
+        choiceMat(4,trial,game) = rewardBool; 
 
-
-
-        % Feedback
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,stims.fixCoords,stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-        Screen('FillRect',window,reward(:,:,rewardBool+1),stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-        Screen('DrawTextures',window,stims.maskTexture,[],stims.maskLocs(:,:,pickedLoc),[],0)   ;                                
-        Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
-
-
-        choiceMat(1,trial,game) = pickedLoc                                         ; % which location was picked: 1, left - 2, right
-        choiceMat(2,trial,game) = rt                                                ; % how quickly was it picked in s
-        choiceMat(3,trial,game) = (goodLotteryLoc == pickedLoc)                     ; % boolean was the good lottery chosen? 0=no, 1=yes
-        choiceMat(4,trial,game) = rewardBool                                        ; % boolean whether is was rewarded or not
-
-        vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt)                  ; % Show feedback
+        vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(0.010)                                ;
-        outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
+        outp(ppAddress,mrkFeedback); WaitSecs(0.010);
+        outp(ppAddress,0)          ; WaitSecs(0.001);
 
     end % End of trial loop
 
-    % Present Earnings
-    summa = sum(choiceMat,2)                                                    ; % Computing the sum over trials
-    payoff = summa(4,:,game)                                                    ; % Extracting the sum of the rewardBools of the current game
-    payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff))                  ; % Making a string out of the payoff
-    Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
-    DrawFormattedText(window, payoffStr, 'center', 'center', white)             ; % Printing it out to the screen
-    vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2)                      ;
+    % Present Earnings. First compute the sum over trials for all
+    % variables, then extract the sum of the rewardBools of the current
+    % game. Make a string out of it and present it.
+    summa = sum(choiceMat,2); 
+    payoff = summa(4,:,game); 
+    payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff));
+    Screen('TextSize',window,50); 
+    DrawFormattedText(window, payoffStr, 'center', 'center', white);
+    vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(0.010)                                  ;
-    outp(ppAddress,0)        ; WaitSecs(0.001)                                  ;
+    outp(ppAddress,mrkPayoff); WaitSecs(0.010);
+    outp(ppAddress,0)        ; WaitSecs(0.001);
 
     % Ask about preferred lottery
-    DrawFormattedText(window,texts('aPFP_PrefLot'),'center','center',white)     ; % Asking the question
-    [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2)             ;
+    DrawFormattedText(window,texts('prefLot'),'center','center',white);
+    [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 
     % Write EEG Marker --> the preferred lottery is being inquired
-    outp(ppAddress,mrkPrefLot); WaitSecs(0.010)                                 ;
-    outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
+    outp(ppAddress,mrkPrefLot); WaitSecs(0.010);
+    outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
-    % Inquire about the answer
-    respToBeMade = true                                                         ; % condition for while loop
+    % Inquire about the answer with a loop and PTB call to the keyboard.
+    % Stop the loop only, once a keypress has been noticed.
+    respToBeMade = true;
     while respToBeMade            
-        [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+        [~,tEnd,keyCode] = KbCheck; 
             if keyCode(leftKey)
-                % Write EEG Marker --> button press, a selection has been made
-                outp(ppAddress,mrkSelect); WaitSecs(0.010)                      ;
-                outp(ppAddress,0)        ; WaitSecs(0.001)                      ;            
-                rt = tEnd - stimOnset                                           ; % Measure timing
-                pickedLoc = 1                                                   ; % 1 for left
-                respToBeMade = false                                            ; % stop checking now
+                % Write EEG Marker --> button press, selection done
+                outp(ppAddress,mrkSelect); WaitSecs(0.010);
+                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                rt = tEnd - stimOnset;
+                pickedLoc = 1; % 1 = left
+                respToBeMade = false;
             elseif keyCode(rightKey)
-                % Write EEG Marker --> button press, a selection has been made
-                outp(ppAddress,mrkSelect); WaitSecs(0.010)                      ;
-                outp(ppAddress,0)        ; WaitSecs(0.001)                      ;            
-                rt = tEnd - stimOnset                                           ; % Measure timing
-                pickedLoc = 2                                                   ; % 2 for right
-                respToBeMade = false                                            ;            
-            end
-    end
+                % Write EEG Marker --> button press, selection done
+                outp(ppAddress,mrkSelect); WaitSecs(0.010);
+                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                rt = tEnd - stimOnset;
+                pickedLoc = 2; % 2 = right
+                respToBeMade = false;            
+            end % end checking whether a key has been pressed
+    end % end waiting for a keypress
 
 
-    prefMat(1,game) = pickedLoc                                                 ; % Which lottery was preferred? 1=left, 2=right, note that this is saved for all trials of the game (":"), because it is valid for the whole game
-    prefMat(2,game) = rt                                                        ; % Rt to select preferred lottery
-    prefMat(3,game) = pickedLoc == goodLotteryLoc                               ; % Boolean whether correct lottery was preferred
+    % Save data: Which lottery was preferred? 1=left, 2=right, RT to select
+    % the preferred lottery, Boolean whether the good lottery was preferred
+    prefMat(1,game) = pickedLoc; 
+    prefMat(2,game) = rt;
+    prefMat(3,game) = pickedLoc == goodLotteryLoc;
 
-
-    Screen('TextSize',window,25)                                                ; % Reset the text size
-
-
-
+    Screen('TextSize',window,25);
 
 end % End of game loop
 
 
-% Save all the data
-data_dir = fullfile(pwd)                                                    ; % Puts the data where the script is
-cur_time = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
-fname = fullfile(data_dir,strcat('bandit_subj_', ...
-    sprintf('%03d_',ID),cur_time))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'choiceMat', 'prefMat')                                         ; % save it!
+% Save all the data to same directory of the function. Use a file name
+% consisting of subj_id and datetime to avoid overwriting files
+dataDir = fullfile(pwd);
+curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
+fname   = fullfile(dataDir,strcat('bandit_subj_', ...
+    sprintf('%03d_',ID),curTime));
+save(fname, 'choiceMat', 'prefMat');
 
 
-% Time for a break :-)
-Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
-DrawFormattedText(window,texts('end'),'center','center',white)              ; % Some nice words
-Screen('Flip',window,vbl+rt)                                                ;
-KbStrokeWait                                                                ;
-Priority(0)                                                                 ; % Reset priority level to 0
-ShowCursor                                                                  ;
-sca                                                                         ;
+% Print that it's time for a break, reset priority level, and clean the
+% screen (sca).
+Screen('TextSize',window,50);
+DrawFormattedText(window,texts('end'),'center','center',white);
+Screen('Flip',window,vbl+rt);
+KbStrokeWait;
+Priority(0);
+ShowCursor;
+sca;
 
 
 
