@@ -27,90 +27,110 @@ function Stims = ptbStims(window, windowRect, screenNumber)
 
 %% Function start
 
-[screenXpixels, screenYpixels] = Screen('WindowSize', window)               ; % geting the dimensions of the screen in pixels
-[xCenter, yCenter] = RectCenter(windowRect)                                 ; % getting the center of the screen
+% Getting the dimensions of the screen in pixels and the center of the
+% screen. Also get the color white as an RGB tuple.
+[screenXpixels, screenYpixels] = Screen('WindowSize', window); 
+[xCenter, yCenter] = RectCenter(windowRect); 
+white = WhiteIndex(screenNumber); 
 
-white = WhiteIndex(screenNumber)                                            ; % This function returns an RGB tuble for 'white' = [1 1 1]
-
-
-%-------------------------------------------------------------------------%
-%                      Preparing all Stimuli                              %
-%-------------------------------------------------------------------------%
+%--------------------------------------------------------------------------
+%                      Preparing all Stimuli                              
+%--------------------------------------------------------------------------
 
 %% Fixation cross
 
-fixCrossDimPix      = 20                                                    ; % how large should the fixcross be
-Stims.fixWidth            = 2                                                     ; % how fat should the fixcross lines be
+% how large and fat should the fixcross be
+fixCrossDimPix       = 20; 
+Stims.fixWidth       = 2; 
 
-% we define coordinates for two lines
-fixXcoords          = [-fixCrossDimPix fixCrossDimPix 0 0]                  ; % relative to 0 so that it's centered on the screen
-fixYcoords          = [0 0 -fixCrossDimPix fixCrossDimPix]                  ;
-Stims.fixCoords           = [fixXcoords; fixYcoords]                              ;
+% we define coordinates for two lines ...relative to 0 so that it's 
+% centered on the screen: These are [x1, x2, y1, y2]
+fixXcoords          = [-fixCrossDimPix fixCrossDimPix 0 0]; 
+fixYcoords          = [0 0 -fixCrossDimPix fixCrossDimPix];
+Stims.fixCoords     = [fixXcoords; fixYcoords];
 
 
 
 %% Checkerboard stimuli
-squares             = 10                                                    ; % squares per row in checkerboard: if even, it will later be rounded to next highest odd number
-Stimsize            = 200                                                   ; % how large the checkerboard stimuli should be
-checkerColor1       = [1, 0, 0]                                             ; % color for stim 1: red
-checkerColor2       = [0, 0, 1]                                             ; % color for stim 2: blue
-checkerColor3       = [0, 1, 0]                                             ; % color for stim 3: green ... distraction stim
-checkerBackground   = [1, 1, 1]                                             ; % background for both Stims: white
+
+
+% How many squares do we want in our checkerboard stimuli? How large should
+% the overall checkerboards be? Note, if you want an even number of
+% squares, you have a problem. With this code you will get one square more
+% than you wanted, if you type in an even number. E.g., 10-->11
+squares             = 10;
+stimSize            = 200; 
+
+% Define colors, red=stim1, blue=stim2, green=distractor and
+% white=common background
+checkerColor1       = [1, 0, 0];
+checkerColor2       = [0, 0, 1];
+checkerColor3       = [0, 1, 0];
+checkerBackground   = [1, 1, 1];
 
 % Make the coordinates for our grid of squares
-squares             = floor(squares/2)                                      ; % processing step for meshgrid, to go from -squares to +squares and get dim: squares+1
-[xPos, yPos]        = meshgrid(-squares:1:squares)                          ; % with this code, we can only display boards with an odd number of single rects as the grid crosses 0
+squares             = floor(squares/2); 
+[xPos, yPos]        = meshgrid(-squares:1:squares); 
 
 % Calculate the number of squares and reshape the matrices of coordinates
 % into a vector
-[s1, s2]            = size(xPos)                                            ; % could also take yPos here, they have the same dimensions: it's a square grid after all
-numSquares          = s1 * s2                                               ; % calculate overall number of squares
-xPos                = reshape(xPos, 1, numSquares)                          ; 
-yPos                = reshape(yPos, 1, numSquares)                          ;
+[s1, s2]            = size(xPos); 
+numSquares          = s1 * s2; 
+xPos                = reshape(xPos, 1, numSquares); 
+yPos                = reshape(yPos, 1, numSquares);
 
-% Determine size of the single rects within checkerboards
-dim                 = Stimsize/s1                                           ; % divide overall size by number of rects per row in checkerboard
-baseRect            = [0 0 dim dim]                                         ; % the individual rectangles making up an overall checkerboard have these dimensions
-
-
-% Scale the grid spacing to the size of our squares and centre
-checkerXposLeft     = xPos .* dim + screenXpixels * 0.25                    ; % vertical: stim centered on middle between screen border and fixation cross
-checkerYposLeft     = yPos .* dim + yCenter                                 ; % horizontal: always centered on middle between screen borders
-checkerXposRight    = xPos .* dim + screenXpixels * 0.75                    ;
-checkerYposRight    = yPos .* dim + yCenter                                 ;
-checkerXposCenter   = xPos .* dim + xCenter                                 ; % central checkerboard will be needed for instruction screen
-checkerYposCenter   = yPos .* dim + screenYpixels * 0.75                    ;
-
-% Setting colors of the checkerboards - 1 is red, 2 is blue, 3 is green
-colors1 = repmat([checkerColor1',checkerBackground'],1,numSquares/2-.5)     ; % concatenate a vector where stimcolor and stimbackground change for each rect in the checkerboard
-Stims.colors1 = [colors1, checkerColor1']                                         ; % append one more color, because our checkerboards have odd numbers of rects
-
-colors2 = repmat([checkerColor2',checkerBackground'],1,numSquares/2-.5)     ;
-Stims.colors2 = [colors2, checkerColor2']                                         ;
-
-colors3 = repmat([checkerColor3',checkerBackground'],1,numSquares/2-.5)     ;
-Stims.colors3 = [colors3, checkerColor3']                                         ;
+% Determine size of the single rects within checkerboards. the individual
+% rectangles making up an overall checkerboard have the dimensions of
+% baseRect
+dim                 = stimSize/s1; 
+baseRect            = [0 0 dim dim];
 
 
+% Scale the grid spacing to the size of our squares and centre. Place the
+% stimuli in the middle between central fixation cross and border of the
+% screen. Either on left "middle" or right "middle". Also one central
+% checkerboard.
+checkerXposLeft     = xPos .* dim + screenXpixels * 0.25; 
+checkerYposLeft     = yPos .* dim + yCenter; 
+checkerXposRight    = xPos .* dim + screenXpixels * 0.75;
+checkerYposRight    = yPos .* dim + yCenter;
+checkerXposCenter   = xPos .* dim + xCenter; 
+checkerYposCenter   = yPos .* dim + screenYpixels * 0.75;
+
+% Setting colors of the checkerboards - 1 is red, 2 is blue, 3 is green.
+% For that, concatenate a vector where stimcolor and stimbackground change
+% for each rect in the checkerboard. Lastly, append one more color, because
+% our checkerboards have odd numbers of rects
+colors1 = repmat([checkerColor1',checkerBackground'],1,numSquares/2-.5);
+Stims.colors1 = [colors1, checkerColor1']; 
+
+colors2 = repmat([checkerColor2',checkerBackground'],1,numSquares/2-.5);
+Stims.colors2 = [colors2, checkerColor2'];
+
+colors3 = repmat([checkerColor3',checkerBackground'],1,numSquares/2-.5);
+Stims.colors3 = [colors3, checkerColor3'];
 
 
 
-% Make our rectangle coordinates
-allRectsLeft    = nan(4,numSquares)                                         ; % preallocate for speed ... each column represents 4 'coordinates' of 1 rect
-allRectsRight   = nan(4,numSquares)                                         ;
-allRectsCenter  = nan(4,numSquares)                                         ;
+% Make our rectangle coordinates ... preallocate for speed, each column
+% represents 4 'coordinates' of 1 rect
+allRectsLeft    = nan(4,numSquares);
+allRectsRight   = nan(4,numSquares);
+allRectsCenter  = nan(4,numSquares);
 
+% center the individual rects on the grid we created before
 for i = 1:numSquares
     allRectsLeft(:, i) = CenterRectOnPointd(baseRect,...                
-        checkerXposLeft(i), checkerYposLeft(i))                             ; % center the individual rects on the grid we created before
+        checkerXposLeft(i), checkerYposLeft(i)); 
     allRectsRight(:, i) = CenterRectOnPointd(baseRect,...
-        checkerXposRight(i), checkerYposRight(i))                           ;
+        checkerXposRight(i), checkerYposRight(i));
     allRectsCenter(:, i) = CenterRectOnPointd(baseRect,...                
-        checkerXposCenter(i), checkerYposCenter(i))                         ; 
+        checkerXposCenter(i), checkerYposCenter(i)); 
 end
 
 % Put the board locations into a matrix to choose from during the procedure
-Stims.rectLocs = cat(3, allRectsLeft, allRectsRight, allRectsCenter)              ; %  (:,:,1) will be left, (:,:,2) will be right, (:,:,3) for center
+%  (:,:,1) will be left, (:,:,2) will be right, (:,:,3) for center
+Stims.rectLocs = cat(3, allRectsLeft, allRectsRight, allRectsCenter); 
 
 
 
@@ -118,31 +138,41 @@ Stims.rectLocs = cat(3, allRectsLeft, allRectsRight, allRectsCenter)            
 
 
 % Respective coordinates for the apperture
-maskXleft   = xCenter - screenXpixels * 0.25                                ; % we are not working with a grid here, so it's just a single coordinate point
-maskXright  = xCenter + screenXpixels * 0.25                                ;
-maskYcenter = yCenter + screenYpixels * 0.25                                ;
+maskXleft   = xCenter - screenXpixels * 0.25; 
+maskXright  = xCenter + screenXpixels * 0.25;
+maskYcenter = yCenter + screenYpixels * 0.25;
 
 % the apperture will be centered within a rect, which is centered on our
-% Stims
-maskRect    = [0 0 Stimsize Stimsize]                                       ; % the rect has to be big enough to cover the checkerboard completely, but not bigger
+% Stims. The rect has to be big enough to cover the checkerboard 
+% completely, but not bigger.
+maskRect    = [0 0 stimSize stimSize];
 
-rightMask   = CenterRectOnPointd(maskRect, maskXright, yCenter)             ; % center the 'destination rect' for the mask directly on our checkerboard
-leftMask    = CenterRectOnPointd(maskRect, maskXleft, yCenter)              ;
-centerMask  = CenterRectOnPointd(maskRect, xCenter, maskYcenter)            ; % we also need to mask the checkerboard shown during instructions
+rightMask   = CenterRectOnPointd(maskRect, maskXright, yCenter); 
+leftMask    = CenterRectOnPointd(maskRect, maskXleft, yCenter);
+centerMask  = CenterRectOnPointd(maskRect, xCenter, maskYcenter); 
 
 % put the two locations into one matrix to choose from during the procedure
-Stims.maskLocs    = cat(3, leftMask, rightMask, centerMask)                       ; % (:,:,1) will be left, (:,:,2) will be right, (:,:,3) will be center
+% (:,:,1) will be left, (:,:,2) will be right, (:,:,3) will be center
+Stims.maskLocs = cat(3, leftMask, rightMask, centerMask);
 
 % Our apperture is a texture: basically a circle within a rect, where the
 % interior of the circle is 100% transparent and the rest of the rect looks
-% like the background of the experimental screen
-mask        = Circle(100)                                                   ; % the argument x to Circle(x) determines the 'resolution' of our circle ... if it's too high, it will take too long to compute
-mask(:,:,2) = mask                                                          ; % add a 3rd dimension to the texture to represent alpha levels (transparency)
-mask        = ~mask                                                         ; % make sure that interior of circle=0, exterior=1
-mask        = double(mask) * white/2                                        ; % color the exterior of the circle grey, as the background of experimental screen. interior of the circle i 0, so it is not affected. 
-mask(:,:,2) = mask(:,:,2) * 2                                               ; % exterior of 2nd layer(=alpha levels) is now also set to 'grey'=0.5 --> we want the exterior of the circle to be 1(0% transparency) 
+% like the background of the experimental screen. We proceed as follows:
+% 1) Circle(x) creates an x X x logical matrix. x determines the resolution
+% 2) We add a third dimension representing alpha levels (transparency)
+% 3) We turn interior of circle=0 and exterior=1
+% 4) We turn the exterior of the circle to grey ... interior stays 0
+% 5) We turn transparency levels for "grey" to 1 again ... 0% transparent
+% ... the interior stays 100% transparent
 
-Stims.maskTexture = Screen('MakeTexture', window, mask)                           ; % PTB call to make our matrix 'mask' a texture on the main window 
+mask        = Circle(100);
+mask(:,:,2) = mask; 
+mask        = ~mask;
+mask        = double(mask) * white/2;
+mask(:,:,2) = mask(:,:,2) * 2; 
+
+% PTB call to make our matrix 'mask' a texture on the main window 
+Stims.maskTexture = Screen('MakeTexture', window, mask); 
 
 
 
