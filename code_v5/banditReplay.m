@@ -1,4 +1,4 @@
-function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat, winStim, ID)
+function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat,winStim, ID)
 
 % Implements a replay of a bandit paradigm performed earlier as described
 % in the documentation.
@@ -233,11 +233,9 @@ for game=1:nGames
             BdistrInsertMat(trial, game) = 1; 
             tWait = BdistrMat(distrIdx) + rand/2;
             distrIdx = distrIdx + 1; 
-
         else
             tWait = tShowFeedback+rand/2; 
         end % End of checking whether distractor trial or not
-
     end % End of trial loop
 
     % Present Earnings. First compute the sum over trials for all

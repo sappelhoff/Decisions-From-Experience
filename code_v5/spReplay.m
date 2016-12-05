@@ -1,11 +1,13 @@
-function [SPdistrMat, SPdistrInsertMat] = spReplay(sampleMat, choiceMat, questionMat, winStim, ID)
+function [SPdistrMat,SPdistrInsertMat] = spReplay(sampleMat,choiceMat, ...
+    questionMat,winStim,ID)
 
 % Implements a replay of a sampling paradigm performed earlier as descibed
 % in the documentation.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 % 
-% [SPdistrMat, SPdistrInsertMat] = spReplay(sampleMat, choiceMat, questionMat, winStim, ID)
+% [SPdistrMat,SPdistrInsertMat] = spReplay(sampleMat,choiceMat, ...
+% questionMat,winStim,ID)
 %
 % IN:
 % - sampleMat: Data for how to behave during sampling
@@ -15,7 +17,8 @@ function [SPdistrMat, SPdistrInsertMat] = spReplay(sampleMat, choiceMat, questio
 % - ID: the ID of the subject. A three digit number.
 %
 % OUT:
-% - SPdistrsMat: RTs to the distractor trials that happened during the replay
+% - SPdistrsMat: RTs to the distractor trials that happened during the
+% replay
 % - SPdistrInsertMat: a 1Xtrials matrix of zeros. 1s, where distr was
 % inserted
 
@@ -62,236 +65,272 @@ Priority(topPriorityLevel);
 
 HideCursor;
 
-%-------------------------------------------------------------------------%
-%           Preparing all Stimuli and Experimental Information            %
-%-------------------------------------------------------------------------%
-
-% All Psychtoolbox stimuli
-Stims = ptbStims(window, windowRect, screenNumber)          ; % separate function for the stim creation to avoid clutter
+%--------------------------------------------------------------------------
+%           Preparing all Stimuli and Experimental Information            
+%--------------------------------------------------------------------------
 
 
-% Drawing the text options for sample vs choice decision      
-textwin1 = [screenXpixels*0.1,screenYpixels*0.5,screenXpixels*0.4, ...
-    screenYpixels*0.5]                                                       ; % windows to center the formatted text in
-textwin2 = [screenXpixels*0.6,screenYpixels*0.5,screenXpixels*0.9, ...
-    screenYpixels*0.5]                                                       ; % arguments are: left top right bottom
+% All Psychtoolbox stimuli are created with a separate function. We can
+% access the stimuli from the structure Stims.
+Stims = ptbStims(window, windowRect, screenNumber);
 
 
-% All presentation texts
-texts = containers.Map                                                      ;
-texts('shuffled') = sprintf('The lotteries have been shuffled.')            ;
-texts('payoff') = sprintf('You earned: ')                                   ;
-texts('end') = sprintf(['This task is done.\n\nThank you so far!\n\n\n',...
-    'Press a key to close.'])                                               ;
-texts('aSPchoice') = sprintf(['From which lottery do\nyou want to draw',...
-    'your payoff?\nPress [left] or [right]'])                               ;
-texts('aSPfinal') = sprintf(['You have reached the final\ntrial. You', ...
-    'are granted one\nlast choice towards your payoff.\nPress any key.'])   ;
-
-% define winning stimulus
+% Define the winning stimulus based on the input to the present function.
+% The winning stimulus is defined by a color (red or blue). The losing
+% stimulus gets the remaining color. The distractor stimulus is always
+% green.
 if strcmp(winStim, 'blue')
-    reward = cat(3, Stims.colors1, Stims.colors2, Stims.colors3)                              ; % blue is win Stim ... red as loss. Stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors1, Stims.colors2, Stims.colors3); 
 elseif strcmp(winStim, 'red') 
-    reward = cat(3, Stims.colors2, Stims.colors1, Stims.colors3)                              ; % red is win Stim ... blue as loss. Stims.colors3(green) is the distractor condition
+    reward = cat(3, Stims.colors2, Stims.colors1, Stims.colors3); 
 else
     sca;
     error('check the function inputs!')
-end
+end % end defining winning stimulus
+
+
+% Making windows, for drawing the text options for sample vs choice 
+% decision. Arguments are: left top right bottom.      
+textwin1 = [screenXpixels*0.1,screenYpixels*0.5,screenXpixels*0.4, ...
+    screenYpixels*0.5]; 
+textwin2 = [screenXpixels*0.6,screenYpixels*0.5,screenXpixels*0.9, ...
+    screenYpixels*0.5];
+
 
 % Probability of a distractor replacing a previous outcome
-pDistr = 0.2                                                                ;
+pDistr = 0.2;
 
 % Keyboard information
-spaceKey = KbName('space')                                                  ; % detect distractor
+spaceKey = KbName('space');
 
 % Timings in seconds
-tShowShuffled = 1                                                           ; % the time after the participants are being told that lotteries have been shuffled
-tShowTrialCount = 0                                                         ; % time that the trial counter is shown
-tDelayFeedback = 1                                                          ; % time after a choice before outcome is presented
-tShowFeedback = 1                                                           ; % time that the feedback is displayed
-tShowPayoff = 1                                                             ; % time that the payoff is shown
-tShowChosenOpt = 0.75                                                       ; % time that the chosen option during the question will be shown
+tShowShuffled   = 1;
+tShowTrialCount = 0; 
+tDelayFeedback  = 1; 
+tShowFeedback   = 1; 
+tShowPayoff     = 1; 
+tShowChosenOpt = 0.75;
 
 % Variables we get from our input matrices
-nTrials = size(sampleMat,2)                                                 ;
+nTrials = size(sampleMat,2);
 
 % Indices for the loops and assigning data to their places within matrices
-trlCount = nTrials                                                          ; % A trial counter that will be counted down during the while loop
-sampIdx = 1                                                                ; % Assign data a place within sampleMat
-choiIdx = 1                                                                ; % Assign data a place within choiceMat
+trlCount = nTrials;
+sampIdx = 1;
+choiIdx = 1;
 quesIdx = 1;
 
 % Shuffle the random number generator
-rng('shuffle')                                                              ;
+rng('shuffle');
 
-% For saving the RTs to distractors
-SPdistrMat = nan(1,nTrials)                                                 ;
-distrIdx = 1                                                                ; % Running index to put RTs into SPdistrMat
-SPdistrInsertMat = zeros(1,nTrials)                                         ; % A 1 will be put, where a distractor was inserted
+% Matrices for saving the data. SPdistrMat is preallocated generously ...
+% later on we will drop the NANs. The BdistrInsertMat is initialized as 0
+% for all trials across all games and a one will be put where a distractor
+% was used.
+SPdistrMat = nan(1,nTrials);
+distrIdx = 1;
+SPdistrInsertMat = zeros(1,nTrials);
 
+
+% All presentation texts
+texts              = containers.Map;
+texts('shuffled')  = sprintf('The lotteries have been shuffled.');
+texts('payoff')    = sprintf('You earned: ');
+texts('end')       = sprintf(['This task is done.\n\nThank you so far!',...
+    '\n\n\nPress a key to close.']);
+texts('aSPchoice') = sprintf(['From which lottery do\nyou want to draw',...
+    'your payoff?\nPress [left] or [right]']);
+texts('aSPfinal')  = sprintf(['You have reached the final\ntrial. You', ...
+    'are granted one\nlast choice towards your payoff.\nPress any key.']);
 
 % EEG markers
-mrkShuffle  = 1                                                             ; % Onset of lotteries have been shuffled screen at the beginning of one game
-mrkFixOnset = 2                                                             ; % Onset of fixation cross during new trial
-mrkDistr    = 3                                                             ; % Button press upon detection of a distractor
-mrkFeedback = 4                                                             ; % Onset of feedback presentation
-mrkPayoff   = 5                                                             ; % Onset of payoff presentation at the end of one game
-mrkPrefLot  = 6                                                             ; % Onset of the question, which lottery was preferred
+mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
+mrkFixOnset = 2; % Onset of fixation cross during new trial
+mrkDistr    = 3; % Button press upon detection of a distractor
+mrkFeedback = 4; % Onset of feedback presentation
+mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
+mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
 
-mrkResult   = 8                                                             ; % Feedback on the choice of preferred lottery
-mrkQuestion = 9                                                             ; % Question whether to continue sampling or start choosing
-mrkAnswer   = 10                                                            ; % Show of selected answer to question
+mrkResult   = 8; % Feedback on the choice of preferred lottery
+mrkQuestion = 9; % Question whether to continue sampling or start choosing
+mrkAnswer   = 10; % Show of selected answer to question
 
 
-% set up the parallel port
-config_io                                                                   ; % The io64 module, see documentation
+% Set up the parallel port using the io64 module.
+config_io; 
 
 % Parallel port address
-ppAddress = hex2dec('D050')                                                 ; % do the hex2dec only once, because it is a slow function
+ppAddress = hex2dec('D050');
 
 %% Do the experimental flow
 
-vbl = Screen('Flip', window)                                                ; % Get initial system time
+% Get initial system time and assign to "vbl". We will keep updating vbl
+% upon each screen flip and use it to time accurately.
+vbl = Screen('Flip', window); 
 
+% As long as we have a trial left in our countdown, start a new "game"
 while trlCount > 0
 
-    % Inform about shuffled lotteries. But no need to actually shuffle anything
-    Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
-    DrawFormattedText(window,texts('shuffled'), 'center', 'center', white)      ; % The text is taken from our texts container created in the beginning
-    vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2)                          ; % Show that lotteries have been shuffled
+    % Inform about shuffled lotteries. But no need to actually
+    % shuffle anything
+    Screen('TextSize',window,50);
+    DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
+    vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(0.010)                                 ;
-    outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
+    outp(ppAddress,mrkShuffle); WaitSecs(0.010);
+    outp(ppAddress,0)         ; WaitSecs(0.001);
 
-    Screen('TextSize',window,25)                                                ; % Don't forget to reset the font
+    Screen('TextSize',window,25);
 
 
     for trial=1:trlCount
 
          % Drawing trial counter
-        trialCounter = sprintf('%d', sampIdx)                                      ; % Current trial 
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Trial counter is presented at the top of the screen
+        trialCounter = sprintf('%d', sampIdx);
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
         if trial==1
-            vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2)                    ; % draw it on an otherwise grey screen ... waiting for fixcross
+            vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
         else
-            vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2)                   ; % draw it on an otherwise grey screen ... waiting for fixcross
+            vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2);
         end
 
 
 
 
         % Fixation cross & choice selection
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Draw fixcross
-        vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2)                      ; % Show fixcross
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
+            white,[xCenter yCenter],2);
+        vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(0.010)                                ;
-        outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
+        outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
+        outp(ppAddress,0)          ; WaitSecs(0.001);
 
-        pickedLoc   = sampleMat(1,sampIdx)                                         ; % decide and see outcomes exactly as in recorded game
-        rt          = sampleMat(2,sampIdx)                                         ;
-        rewardBool  = sampleMat(4,sampIdx)                                         ;
-        sampIdx    = sampIdx+1                                                    ;
+        % Get the data from previously recorded mat
+        pickedLoc   = sampleMat(1,sampIdx);
+        rt          = sampleMat(2,sampIdx);
+        rewardBool  = sampleMat(4,sampIdx);
+        sampIdx    = sampIdx+1;
 
-        if rt <3
-            tWait = rt                                                              ; % wait the actual reaction time    
+        % Check whether actual RT is not too long and change it, if it is
+        % too long.
+        if rt < 3
+            tWait = rt; 
         else
-            tWait = 1+rand/2                                                        ; % unless it was unreasonably long ... then replace it
-        end
+            tWait = 1+rand/2;
+        end 
 
 
         % Feedback & possibly distractor
+        % On pDistr of all trials, replace the reward with a distractor
         if rand <= pDistr
-           rewardBool = 2                                                           ; % On pDistr of all trials, replace the reward with a distractor
+           rewardBool = 2; 
         end
 
-        DrawFormattedText(window, trialCounter, 'center', screenYpixels*0.45, white) ; % Redraw trial counter
-        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-        Screen('FillRect',window,reward(:,:,rewardBool+1),Stims.rectLocs(:,:,pickedLoc))  ; % Draw checkerboard at chosen location. Reward tells us the color                      
-        Screen('DrawTextures',window,Stims.maskTexture,[],Stims.maskLocs(:,:,pickedLoc))        ;                                
-        [vbl, stimOnset] = Screen('Flip',window,vbl+tWait+tDelayFeedback+rand/2)    ; % Show feedback
+        DrawFormattedText(window, trialCounter, 'center', ...
+            screenYpixels*0.45, white);
+        Screen('DrawLines',window,Stims.fixCoords, ...
+            Stims.fixWidth,white,[xCenter yCenter],2);
+        Screen('FillRect',window,reward(:,:,rewardBool+1), ...
+            Stims.rectLocs(:,:,pickedLoc));
+        Screen('DrawTextures',window,Stims.maskTexture, ...
+            [],Stims.maskLocs(:,:,pickedLoc));
+        [vbl, stimOnset] = Screen('Flip',window, ...
+            vbl+tWait+tDelayFeedback+rand/2);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(0.010)                                ;
-        outp(ppAddress,0)          ; WaitSecs(0.001)                                ;
+        outp(ppAddress,mrkFeedback); WaitSecs(0.010);
+        outp(ppAddress,0)          ; WaitSecs(0.001);
 
+        % If this trial is a distractor trial, we measure the RT to it and
+        % note the current trial. We also increment our distractor counter.
+        % Else if this was a usual trial, we wait for a certain time.
         if rewardBool == 2
-            % If a distractor occurred, measure the RT to it
-            respToBeMade = true                                                     ; % condition for while loop
+            respToBeMade = true;
             while respToBeMade            
-            [~,tEnd,keyCode] = KbCheck                                              ; % PTB inquiry to keyboard including time when button is pressed
+            [~,tEnd,keyCode] = KbCheck;
                 if keyCode(spaceKey)
-                    % Write EEG Marker --> button press, a distractor was seen
-                    outp(ppAddress,mrkDistr); WaitSecs(0.010)                       ;
-                    outp(ppAddress,0)       ; WaitSecs(0.001)                       ;            
-                    rt = tEnd - stimOnset                                           ; % Measure timing
-                    respToBeMade = false                                            ; % stop checking
-                end
-            end
-            SPdistrMat(distrIdx) = rt                                               ;
-            SPdistrInsertMat(trial) = 1                                             ; % insert trial, where a distractor occurred
-            tWait = SPdistrMat(distrIdx) + rand/2                                   ;
-            distrIdx = distrIdx + 1                                                 ;
+                    % Write EEG Marker --> button press, distractor seen
+                    outp(ppAddress,mrkDistr); WaitSecs(0.010);
+                    outp(ppAddress,0)       ; WaitSecs(0.001);            
+                    rt = tEnd - stimOnset;
+                    respToBeMade = false;
+                end % End to check whether specific key has been pressed 
+            end % End of while loop continuing until keypress detected
+            SPdistrMat(distrIdx) = rt;
+            SPdistrInsertMat(trial) = 1;
+            tWait = SPdistrMat(distrIdx) + rand/2;
+            distrIdx = distrIdx + 1;
         else
-            tWait = tShowFeedback+rand/2                                            ; % Else, just display the feedback for a bit
-        end
+            tWait = tShowFeedback+rand/2; 
+        end % End of checking whether distractor trial or not
+   
 
-        % Check, whether there are more trials remaining. If not, no need to ask
-        % whether to continue to sample or make a choice. Then it will be only
-        % choice.
+        % Check, whether there are more trials remaining. If not, no need 
+        % to ask whether to continue to sample or make a choice. Then it
+        % will be only choice.
         if sampIdx > nTrials
-            Screen('TextSize',window,50)                                            ; % If we draw text, make font a bit bigger
+            Screen('TextSize',window,50);
             DrawFormattedText(window, texts('aSPfinal'), 'center', ...
-                'center',white)                                                     ; % If the last trial has been reached, tell the subject so
-            vbl = Screen('Flip',window,vbl+tWait)                                   ;
-            WaitSecs(1+rand/2)                                                      ;
-            break                                                                   ; % no more trials available ... the same as choosing "choice" 
+                'center',white);
+            vbl = Screen('Flip',window,vbl+tWait);
+            WaitSecs(1+rand/2);
+            break;
         else    
-            % Decision process whether to continue to sample or make a choice    
-            Screen('TextSize',window,50)                                            ; % If we draw text, make font a bit bigger
+            % Decision process whether to continue to sample or make a 
+            % choice    
+            Screen('TextSize',window,50);
             DrawFormattedText(window,'Do you want to','center', ...
-                .25*screenYpixels,white)                                            ;                       
+                .25*screenYpixels,white);
             DrawFormattedText(window,'draw another sample','center', ...
                 'center',white, ...
-                [], [], [], [], [], textwin1)                                       ;
+                [], [], [], [], [], textwin1);
             DrawFormattedText(window,'make a choice','center','center', ...
-                white,[], [], [], [], [], textwin2)                                 ;
-            vbl = Screen('Flip',window,vbl+tWait)                                   ;    
+                white,[], [], [], [], [], textwin2);
+            vbl = Screen('Flip',window,vbl+tWait);
 
-            % Write EEG Marker --> Question whether to continue sampling or choose
-            outp(ppAddress,mrkQuestion); WaitSecs(0.010)                            ;
-            outp(ppAddress,0)          ; WaitSecs(0.001)                            ;    
+            % Write EEG Marker --> Question whether to continue sampling 
+            % or choose
+            outp(ppAddress,mrkQuestion); WaitSecs(0.010);
+            outp(ppAddress,0)          ; WaitSecs(0.001);
 
-            rt          = questionMat(1,quesIdx)                                   ;
-            pickedLoc   = questionMat(2,quesIdx)                                   ;
-            quesIdx    = quesIdx+1                                                ;
+            % Get data from previously recorded mats
+            rt          = questionMat(1,quesIdx);
+            pickedLoc   = questionMat(2,quesIdx);
+            quesIdx     = quesIdx+1;
 
-            if rt <3
-                tWait = rt                                                          ; % wait the actual reaction time    
+            
+            % Check whether actual RT is not too long and change it, if 
+            % it is too long.
+            if rt < 3
+                tWait = rt; 
             else
-                tWait = 1+rand/2                                                    ; % unless it was unreasonably long ... then replace it
-            end
+                tWait = 1+rand/2;
+            end 
 
-
+            
             if pickedLoc == 1
-                DrawFormattedText(window,'draw another sample','center', ...
-                    'center',white, [], [], [], [], [],textwin1)                    ; % Pick sampling
-                vbl = Screen('Flip',window,vbl+tWait*1.1)                           ;
-                % Write EEG Marker --> Selection screen of answer to question
-                outp(ppAddress,mrkAnswer); WaitSecs(0.010)                          ;
-                outp(ppAddress,0)        ; WaitSecs(0.001)                          ;       
-                Screen('TextSize',window,25)                                        ; % Reset font size
+                DrawFormattedText(window,'draw another sample', ...
+                    'center', 'center',white, [], [], [], [], [],textwin1);
+                vbl = Screen('Flip',window,vbl+tWait*1.1);
+                % Write EEG Marker --> Selection screen: answer to question
+                outp(ppAddress,mrkAnswer); WaitSecs(0.010);
+                outp(ppAddress,0)        ; WaitSecs(0.001);       
+                Screen('TextSize',window,25);
 
             elseif pickedLoc == 2
-                DrawFormattedText(window,'make a choice','center','center', ...
-                    white,[], [], [], [], [],textwin2)                              ; % Pick choice
-                vbl = Screen('Flip',window,vbl+tWait*1.1)                           ; 
-                % Write EEG Marker --> Selection screen of answer to question
-                outp(ppAddress,mrkAnswer); WaitSecs(0.010)                          ;
-                outp(ppAddress,0)        ; WaitSecs(0.001)                          ;               
-                break                                                               ; % The subject selected "choice", so we break the sampling loop and enter the choice loop
+                DrawFormattedText(window,'make a choice','center', ...
+                    'center', white,[], [], [], [], [],textwin2);
+                vbl = Screen('Flip',window,vbl+tWait*1.1);
+                % Write EEG Marker --> Selection screen: answer to question
+                outp(ppAddress,mrkAnswer); WaitSecs(0.010);
+                outp(ppAddress,0)        ; WaitSecs(0.001);
+                % subject selected choice ... break sampling loop
+                break;
             end
         end
 
@@ -299,60 +338,68 @@ while trlCount > 0
     end % end of sampling loop
 
 
-    % Update trial counter ... if it becomes zero, we are done
-    trlCount = trlCount - trial                                                 ; % Deduct the number of trials from overall remaining trials
+    % Update trial counter ... if it becomes zero, we are done. Deduct the
+    % number of trials from overall remaining trials
+    trlCount = trlCount - trial;
 
     % Let the participant make a choice
-    DrawFormattedText(window,texts('aSPchoice'),'center','center',white)        ; % Prompt for making a choice [left] or [right]
-    vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2)                       ; % Print it to the screen
+    DrawFormattedText(window,texts('aSPchoice'),'center','center',white);
+    vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2);
 
     % Write EEG Marker --> the preferred lottery is being inquired
-    outp(ppAddress,mrkPrefLot); WaitSecs(0.010)                                 ;
-    outp(ppAddress,0)         ; WaitSecs(0.001)                                 ;
+    outp(ppAddress,mrkPrefLot); WaitSecs(0.010);
+    outp(ppAddress,0)         ; WaitSecs(0.001);
 
-    Screen('TextSize',window,25)                                                ; % After a lot of text, don't forget to reset font size
+    Screen('TextSize',window,25);
+
+    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white, ...
+        [xCenter yCenter],2);
+    Screen('DrawingFinished', window);
+
+    pickedLoc   = choiceMat(1,choiIdx);
+    rt          = choiceMat(2,choiIdx);
+    rewardBool  = choiceMat(4,choiIdx);
+    choiIdx    = choiIdx+1;
 
 
-    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % After pick, show fixation cross    
-    Screen('DrawingFinished', window)                                           ; % This can speed up PTB while we do some other stuff before flipping the screen
-
-    pickedLoc   = choiceMat(1,choiIdx)                                         ;
-    rt          = choiceMat(2,choiIdx)                                         ;
-    rewardBool  = choiceMat(4,choiIdx)                                         ;
-    choiIdx    = choiIdx+1                                                    ;
-
-    if rt <3
-        tWait = rt                                                              ; % wait the actual reaction time    
+    % Check whether actual RT is not too long and change it, if it is
+    % too long.
+    if rt < 3
+        tWait = rt; 
     else
-        tWait = 1+rand/2                                                        ; % unless it was unreasonably long ... then replace it
+        tWait = 1+rand/2;
     end
-
-    vbl = Screen('Flip',window,vbl+tWait*1.1)                                   ;
+    
+    
+    vbl = Screen('Flip',window,vbl+tWait*1.1);
 
 
     % Feedback
-    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white,[xCenter yCenter],2)     ; % Redraw fixcross
-    Screen('FillRect',window,reward(:,:,rewardBool+1),Stims.rectLocs(:,:,pickedLoc))  ; % Drawing the checkerboard stim at the chosen location. The reward_bool % tells us win(1) or loss(0) ... we add 1 so we get win=2, loss=1
-    Screen('DrawTextures',window,Stims.maskTexture,[],Stims.maskLocs(:,:,pickedLoc))        ;
-    vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2)                       ;
+    Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth,white, ...
+        [xCenter yCenter],2);
+    Screen('FillRect',window,reward(:,:,rewardBool+1), ...
+        Stims.rectLocs(:,:,pickedLoc));
+    Screen('DrawTextures',window,Stims.maskTexture,[], ...
+        Stims.maskLocs(:,:,pickedLoc));
+    vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
 
     % Write EEG Marker --> Result of the choice process is presented
-    outp(ppAddress,mrkResult); WaitSecs(0.010)                                  ;
-    outp(ppAddress,0)        ; WaitSecs(0.001)                                  ;
+    outp(ppAddress,mrkResult); WaitSecs(0.010);
+    outp(ppAddress,0)        ; WaitSecs(0.001);
 
 
     % Tell the subject how much she has earned 
-    Screen('TextSize',window,50)                                                ; % Make font size bigger for text
-    payoff = rewardBool                                                         ; % The subject earned as much as the reward bool of the choice outcome indicated
-    payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff))                  ;
-    DrawFormattedText(window,payoffStr,'center','center',white)                 ;
-    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2)                        ;
+    Screen('TextSize',window,50);
+    payoff = rewardBool;
+    payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff));
+    DrawFormattedText(window,payoffStr,'center','center',white);
+    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(0.010)                                  ;
-    outp(ppAddress,0)        ; WaitSecs(0.001)                                  ;
+    outp(ppAddress,mrkPayoff); WaitSecs(0.010);
+    outp(ppAddress,0)        ; WaitSecs(0.001);
 
-    Screen('TextSize',window,25)                                                ; % Reset font size
+    Screen('TextSize',window,25);
 
 
 
@@ -360,23 +407,27 @@ end % end of choice loop (while loop)
 
 
 
-% Save the RT data to the distractors
-SPdistrMat(isnan(SPdistrMat)) = []                                          ; % Drop those preallocated spaces we didn't fill
-dataDir = fullfile(pwd)                                                    ; % Puts the data where the script is
-curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS')                               ; % the current time and date                                          
+% Save all the data to same directory of the function. Use a file name
+% consisting of subj_id and datetime to avoid overwriting files. Also drop
+% the NANs corresponding to preallocated space we did not fill.
+SPdistrMat(isnan(SPdistrMat)) = [];
+dataDir = fullfile(pwd);
+curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname = fullfile(dataDir,strcat('spReplay_subj_', ...
-    sprintf('%03d_',ID),curTime))                                          ; % fname consists of subj_id and datetime to avoid overwriting files
-save(fname, 'SPdistrMat', 'SPdistrInsertMat')                               ; % save it!
-
-% Time for a break :-)
-Screen('TextSize',window,50)                                                ; % If we draw text, make font a bit bigger
-DrawFormattedText(window,texts('end'),'center','center',white)              ; % Some nice words
-Screen('Flip',window,vbl+tShowPayoff+rand/2)                                ;
-KbStrokeWait                                                                ;
-Priority(0)                                                                 ; % Reset priority level to 0
-ShowCursor                                                                  ;
-sca                                                                         ;
+    sprintf('%03d_',ID),curTime));
+save(fname, 'SPdistrMat', 'SPdistrInsertMat');
 
 
-%% Function end
-end
+% Print that it's time for a break, reset priority level, and clean the
+% screen (sca).
+Screen('TextSize',window,50);
+DrawFormattedText(window,texts('end'),'center','center',white);
+Screen('Flip',window,vbl+rt);
+KbStrokeWait;
+Priority(0);
+ShowCursor;
+sca;
+
+
+
+end % Function end

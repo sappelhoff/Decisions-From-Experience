@@ -105,6 +105,7 @@ tShowTrialCount = 0;
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
+tShowChosenOpt = 0.75;
 
 % Shuffle the random number generator
 rng('shuffle');
