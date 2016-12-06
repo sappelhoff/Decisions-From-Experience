@@ -89,11 +89,15 @@ lotteryOption2 = 1-lotteryOption1;
 leftKey  = KbName('LeftArrow'); % choose left lottery
 rightKey = KbName('RightArrow'); % choose right lottery
 
+% Sampling rate of the EEG in Hz. important for timing of markers
+sampRate = 500;
+
 % Timings in seconds
 tShowShuffled   = 1;
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
+mrkWait         = 1/sampRate*2; % for safety, take twice the time needed
 
 % Shuffle the random number generator
 rng('shuffle');
@@ -162,7 +166,7 @@ for game = 1:nGames
     vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(0.010);
+    outp(ppAddress,mrkShuffle); WaitSecs(mrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
     Screen('TextSize',window,25);
 
@@ -180,7 +184,7 @@ for game = 1:nGames
         [vbl, stimOnset] = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
+        outp(ppAddress,mrkFixOnset); WaitSecs(mrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         % Inquire the answer with a loop and PTB call to the keyboard.
@@ -190,14 +194,14 @@ for game = 1:nGames
             [~,tEnd,keyCode] = KbCheck; 
                 if keyCode(leftKey)
                     % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(0.010);
+                    outp(ppAddress,mrkChoice); WaitSecs(mrkWait);
                     outp(ppAddress,0)        ; WaitSecs(0.001);
                     rt = tEnd - stimOnset;
                     pickedLoc = 1;
                     respToBeMade = false;
                 elseif keyCode(rightKey)
                     % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(0.010);
+                    outp(ppAddress,mrkChoice); WaitSecs(mrkWait);
                     outp(ppAddress,0)        ; WaitSecs(0.001);            
                     rt = tEnd - stimOnset;
                     pickedLoc = 2;
@@ -240,7 +244,7 @@ for game = 1:nGames
         vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(0.010);
+        outp(ppAddress,mrkFeedback); WaitSecs(mrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
     end % End of trial loop
@@ -256,7 +260,7 @@ for game = 1:nGames
     vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(0.010);
+    outp(ppAddress,mrkPayoff); WaitSecs(mrkWait);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
     % Ask about preferred lottery
@@ -264,7 +268,7 @@ for game = 1:nGames
     [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 
     % Write EEG Marker --> the preferred lottery is being inquired
-    outp(ppAddress,mrkPrefLot); WaitSecs(0.010);
+    outp(ppAddress,mrkPrefLot); WaitSecs(mrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
@@ -275,14 +279,14 @@ for game = 1:nGames
         [~,tEnd,keyCode] = KbCheck; 
             if keyCode(leftKey)
                 % Write EEG Marker --> button press, selection done
-                outp(ppAddress,mrkSelect); WaitSecs(0.010);
+                outp(ppAddress,mrkSelect); WaitSecs(mrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 1; % 1 = left
                 respToBeMade = false;
             elseif keyCode(rightKey)
                 % Write EEG Marker --> button press, selection done
-                outp(ppAddress,mrkSelect); WaitSecs(0.010);
+                outp(ppAddress,mrkSelect); WaitSecs(mrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 2; % 2 = right

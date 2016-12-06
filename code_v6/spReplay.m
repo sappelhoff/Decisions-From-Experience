@@ -103,13 +103,16 @@ pDistr = 0.2;
 % Keyboard information
 spaceKey = KbName('space');
 
+% Sampling rate of the EEG in Hz. important for timing of markers
+sampRate = 500;
+
 % Timings in seconds
 tShowShuffled   = 1;
-tShowTrialCount = 0; 
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
-tShowChosenOpt = 0.75;
+tShowChosenOpt  = 0.75;
+mrkWait         = 1/sampRate*2; % for safety, take twice the time needed
 
 % Variables we get from our input matrices
 nTrials = size(sampleMat,2);
@@ -184,7 +187,7 @@ while trlCount > 0
     vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(0.010);
+    outp(ppAddress,mrkShuffle); WaitSecs(mrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
     Screen('TextSize',window,25);
@@ -196,6 +199,9 @@ while trlCount > 0
         trialCounter = sprintf('%d/X', sampIdx);
         DrawFormattedText(window, trialCounter, 'center', ...
             screenYpixels*0.41, white);
+        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
+            white,[xCenter yCenter],2);
+
         if trial==1
             vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
         else
@@ -203,17 +209,8 @@ while trlCount > 0
         end
 
 
-
-
-        % Fixation cross & choice selection
-        DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.41, white);
-        Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
-            white,[xCenter yCenter],2);
-        vbl = Screen('Flip',window,vbl+tShowTrialCount);
-
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
+        outp(ppAddress,mrkFixOnset); WaitSecs(mrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         % Get the data from previously recorded mat
@@ -249,7 +246,7 @@ while trlCount > 0
             vbl+tWait+tDelayFeedback+rand/2);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(0.010);
+        outp(ppAddress,mrkFeedback); WaitSecs(mrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         % If this trial is a distractor trial, we measure the RT to it and
@@ -261,7 +258,7 @@ while trlCount > 0
             [~,tEnd,keyCode] = KbCheck;
                 if keyCode(spaceKey)
                     % Write EEG Marker --> button press, distractor seen
-                    outp(ppAddress,mrkDistr); WaitSecs(0.010);
+                    outp(ppAddress,mrkDistr); WaitSecs(mrkWait);
                     outp(ppAddress,0)       ; WaitSecs(0.001);            
                     rt = tEnd - stimOnset;
                     respToBeMade = false;
@@ -301,7 +298,7 @@ while trlCount > 0
 
             % Write EEG Marker --> Question whether to continue sampling 
             % or choose
-            outp(ppAddress,mrkQuestion); WaitSecs(0.010);
+            outp(ppAddress,mrkQuestion); WaitSecs(mrkWait);
             outp(ppAddress,0)          ; WaitSecs(0.001);
 
             % Get data from previously recorded mats
@@ -324,7 +321,7 @@ while trlCount > 0
                     'center', 'center',white, [], [], [], [], [],textwin1);
                 vbl = Screen('Flip',window,vbl+tWait*1.1);
                 % Write EEG Marker --> Selection screen: answer to question
-                outp(ppAddress,mrkAnswer); WaitSecs(0.010);
+                outp(ppAddress,mrkAnswer); WaitSecs(mrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);       
                 Screen('TextSize',window,25);
 
@@ -333,7 +330,7 @@ while trlCount > 0
                     'center', white,[], [], [], [], [],textwin2);
                 vbl = Screen('Flip',window,vbl+tWait*1.1);
                 % Write EEG Marker --> Selection screen: answer to question
-                outp(ppAddress,mrkAnswer); WaitSecs(0.010);
+                outp(ppAddress,mrkAnswer); WaitSecs(mrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);
                 % subject selected choice ... break sampling loop
                 break;
@@ -353,7 +350,7 @@ while trlCount > 0
     vbl = Screen('Flip',window,vbl+tShowChosenOpt+rand/2);
 
     % Write EEG Marker --> the preferred lottery is being inquired
-    outp(ppAddress,mrkPrefLot); WaitSecs(0.010);
+    outp(ppAddress,mrkPrefLot); WaitSecs(mrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
     Screen('TextSize',window,25);
@@ -390,7 +387,7 @@ while trlCount > 0
     vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
 
     % Write EEG Marker --> Result of the choice process is presented
-    outp(ppAddress,mrkResult); WaitSecs(0.010);
+    outp(ppAddress,mrkResult); WaitSecs(mrkWait);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
 
@@ -402,7 +399,7 @@ while trlCount > 0
     vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(0.010);
+    outp(ppAddress,mrkPayoff); WaitSecs(mrkWait);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
     Screen('TextSize',window,25);

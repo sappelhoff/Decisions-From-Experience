@@ -89,16 +89,12 @@ pDistr = 0.2;
 % Keyboard information
 spaceKey = KbName('space'); % detect distractor
 
-% Sampling rate of the EEG in Hz. important for timing of markers
-sampRate = 500;
-
 % Timings in seconds
 tShowShuffled   = 1;
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
-mrkWait         = 1/sampRate*2; % for safety, take twice the time needed 
-
+trigWait = 1000/500/1000  
 % Get the nTrials and nGames from dataMat
 [~, nTrials, nGames] = size(choiceMat);
 
@@ -155,7 +151,7 @@ for game=1:nGames
     Screen('TextSize',window,25);
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(mrkWait);
+    outp(ppAddress,mrkShuffle); WaitSecs(0.004);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
@@ -173,7 +169,7 @@ for game=1:nGames
  
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFixOnset); WaitSecs(0.004);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         
@@ -212,7 +208,7 @@ for game=1:nGames
             vbl+tWait+tDelayFeedback+rand/2);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFeedback); WaitSecs(0.004);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
 
@@ -227,7 +223,7 @@ for game=1:nGames
             [~,tEnd,keyCode] = KbCheck;
                 if keyCode(spaceKey)
                     % Write EEG Marker --> button press, distractor seen
-                    outp(ppAddress,mrkDistr); WaitSecs(mrkWait);
+                    outp(ppAddress,mrkDistr); WaitSecs(0.004);
                     outp(ppAddress,0)       ; WaitSecs(0.001);            
                     rt = tEnd - stimOnset;
                     respToBeMade = false;
@@ -254,7 +250,7 @@ for game=1:nGames
     Screen('TextSize',window,25);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(mrkWait);
+    outp(ppAddress,mrkPayoff); WaitSecs(0.004);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
     % We do not ask about the preferred lottery, this is a replay.
