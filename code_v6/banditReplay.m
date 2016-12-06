@@ -129,7 +129,7 @@ mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 config_io; 
 
 % Parallel port address
-ppAddress = hex2dec('D050');
+ppAddress = hex2dec('378');
 
 %% Doing the experimental flow
 

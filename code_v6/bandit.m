@@ -129,7 +129,7 @@ mrkSelect   = 7; % Button press upon selection of the preferred lottery
 config_io; 
 
 % Parallel port address
-ppAddress = hex2dec('D050');
+ppAddress = hex2dec('378');
 
 
 %% Doing the experimental flow

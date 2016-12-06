@@ -158,7 +158,7 @@ mrkAnswer   = 10; % Show of selected answer to question
 config_io; 
 
 % Parallel port address
-ppAddress = hex2dec('D050');
+ppAddress = hex2dec('378');
 
 %% Do the experimental flow
 
