@@ -138,10 +138,11 @@ texts('shuffled')  = sprintf('The lotteries have been shuffled.');
 texts('payoff')    = sprintf('You earned: ');
 texts('end')       = sprintf(['This task is done.\n\nThank you so far!',...
     '\n\n\nPress a key to close.']);
-texts('aSPchoice') = sprintf(['From which lottery do\nyou want to draw',...
-    'your payoff?\nPress [left] or [right]']);
-texts('aSPfinal')  = sprintf(['You have reached the final\ntrial. You', ...
-    'are granted one\nlast choice towards your payoff.\nPress any key.']);
+texts('aSPchoice') = sprintf(['From which lottery do\n\nyou want to', ...
+    ' draw your payoff?\n\nPress [left] or [right]']);
+texts('aSPfinal')  = sprintf(['You have reached the final\n\ntrial.', ...
+    ' You are granted one\n\nlast choice towards your payoff.\n\n', ...
+    ' Press any key.']);
 
 % EEG markers
 mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
@@ -187,9 +188,9 @@ while trlCount > 0
     for trial=1:trlCount
 
          % Drawing trial counter
-        trialCounter = sprintf('%d', sampIdx);
+        trialCounter = sprintf('%d/X', sampIdx);
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         if trial==1
             vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
         else
@@ -201,10 +202,10 @@ while trlCount > 0
 
         % Fixation cross & choice selection
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
-        vbl = Screen('Flip',window,vbl+tShowTrialCount+rand/2);
+        vbl = Screen('Flip',window,vbl+tShowTrialCount);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
@@ -232,7 +233,7 @@ while trlCount > 0
         end
 
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords, ...
             Stims.fixWidth,white,[xCenter yCenter],2);
         Screen('FillRect',window,reward(:,:,rewardBool+1), ...
@@ -427,6 +428,7 @@ KbStrokeWait;
 Priority(0);
 ShowCursor;
 sca;
+clear io64;
 
 
 

@@ -114,7 +114,7 @@ texts('end')      = sprintf(['This task is done.\n\nThank you so far!',...
 texts('shuffled') = sprintf('The lotteries have been shuffled.');
 texts('payoff')   = sprintf('You earned: ');
 texts('prefLot')  = sprintf(['Which lottery do you think was more', ...
-    'profitable?\nPress [left] or [right].']); 
+    ' profitable?\n\nPress [left] or [right].']); 
 
 % EEG markers
 mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
@@ -167,7 +167,7 @@ for game = 1:nGames
         % Drawing trial counter as current trial out of all trials
         trialCounter = strcat(num2str(trial),'/',num2str(nTrials));
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
         
@@ -175,11 +175,11 @@ for game = 1:nGames
         % then present a fixation cross, which acts as an inviation to make
         % a choice.
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
         [vbl, stimOnset] = Screen('Flip',window, ...
-            vbl+tShowTrialCount+rand/2);
+            vbl+tShowTrialCount);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
@@ -221,7 +221,7 @@ for game = 1:nGames
         % 'DrawingFinished' can speed up PTB, when we do other computations
         % before flipping to the screen.
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
         Screen('FillRect',window,reward(:,:,rewardBool+1), ...
@@ -322,6 +322,7 @@ KbStrokeWait;
 Priority(0);
 ShowCursor;
 sca;
+clear io64;
 
 
 

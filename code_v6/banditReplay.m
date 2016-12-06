@@ -156,17 +156,17 @@ for game=1:nGames
         % drawing trialcounter as current trial out of all trials
         trialCounter = strcat(num2str(trial),'/',num2str(nTrials)); 
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
 
         % Fixation cross & recall of previous choice
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords, ...
             Stims.fixWidth,white,[xCenter yCenter],2);
         vbl = Screen('Flip',window, ...
-            vbl+tShowTrialCount+rand/2); 
+            vbl+tShowTrialCount); 
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(0.010);
@@ -197,7 +197,7 @@ for game=1:nGames
         end
 
         DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.45, white);
+            screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
         Screen('FillRect',window,reward(:,:,rewardBool+1), ...
@@ -276,5 +276,6 @@ KbStrokeWait;
 Priority(0);
 ShowCursor;
 sca;
+clear io64;
 
 end % function end
