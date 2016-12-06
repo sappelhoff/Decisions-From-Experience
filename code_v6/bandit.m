@@ -91,7 +91,6 @@ rightKey = KbName('RightArrow'); % choose right lottery
 
 % Timings in seconds
 tShowShuffled   = 1;
-tShowTrialCount = 0; 
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
@@ -134,6 +133,12 @@ ppAddress = hex2dec('378');
 
 %% Doing the experimental flow
 
+% Ready? ... press any key to start
+DrawFormattedText(window,'READY', 'center', 'center', white);
+Screen(Flip,window);
+KbStrokeWait;
+
+
 % Get initial system time and assign to "vbl". We will keep updating vbl
 % upon each screen flip and use it to time accurately.
 vbl = Screen('Flip', window); 
@@ -164,22 +169,15 @@ for game = 1:nGames
 
     for trial = 1:nTrials
 
-        % Drawing trial counter as current trial out of all trials
+        % Drawing trial counter as current trial out of all trials. Then
+        % also a fixation cross. Subjects can immediately start to react
+        % with left or right key.
         trialCounter = strcat(num2str(trial),'/',num2str(nTrials));
-        DrawFormattedText(window, trialCounter, 'center', ...
-            screenYpixels*0.41, white);
-        vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
-
-        
-        % Fixation cross & choice selection. Redraw the trial counter and
-        % then present a fixation cross, which acts as an inviation to make
-        % a choice.
         DrawFormattedText(window, trialCounter, 'center', ...
             screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
-        [vbl, stimOnset] = Screen('Flip',window, ...
-            vbl+tShowTrialCount);
+        [vbl, stimOnset] = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(0.010);

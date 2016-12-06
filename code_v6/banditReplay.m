@@ -133,6 +133,11 @@ ppAddress = hex2dec('378');
 
 %% Doing the experimental flow
 
+% Ready? ... press any key to start
+DrawFormattedText(window,'READY', 'center', 'center', white);
+Screen(Flip,window);
+KbStrokeWait;
+
 % Get initial system time and assign to "vbl". We will keep updating vbl
 % upon each screen flip and use it to time accurately.
 vbl = Screen('Flip', window);
