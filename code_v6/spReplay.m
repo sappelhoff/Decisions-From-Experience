@@ -41,7 +41,7 @@ white = WhiteIndex(screenNumber);
 % Open an on screen window and get its size and center in pixels. Set the
 % standard background to white/2, which is grey.
 [window, windowRect] = PsychImaging('OpenWindow',screenNumber,white/2);
-[~,screenYpixels] = Screen('WindowSize',window);
+[screenXpixels,screenYpixels] = Screen('WindowSize',window);
 [xCenter,yCenter] = RectCenter(windowRect);
 
 % Make transparency possible with RGBA tuples and for textures. A=0 means
@@ -159,9 +159,14 @@ mrkResult   = 8; % Feedback on the choice of preferred lottery
 mrkQuestion = 9; % Question whether to continue sampling or start choosing
 mrkAnswer   = 10; % Show of selected answer to question
 
-
-% Set up the parallel port using the io64 module.
-config_io; 
+% Set up the parallel port using the io64 module. If it's not working,
+% still run the script and replace trigger functions by a bogus function.
+try
+    config_io; 
+catch
+    warning('io64 module not working. No triggers will be sent');
+    outp = @(x,y) x*y; 
+end
 
 % Parallel port address
 ppAddress = hex2dec('378');
@@ -169,8 +174,9 @@ ppAddress = hex2dec('378');
 %% Do the experimental flow
 
 % Ready? ... press any key to start
+Screen('TextSize',window,50);
 DrawFormattedText(window,'READY', 'center', 'center', white);
-Screen(Flip,window);
+Screen('Flip',window);
 KbStrokeWait;
 
 % Get initial system time and assign to "vbl". We will keep updating vbl
@@ -182,7 +188,6 @@ while trlCount > 0
 
     % Inform about shuffled lotteries. But no need to actually
     % shuffle anything
-    Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 

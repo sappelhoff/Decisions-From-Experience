@@ -88,6 +88,8 @@ pDistr = 0.2;
 
 % Keyboard information
 spaceKey = KbName('space'); % detect distractor
+scanList = zeros(1,256);
+scanList(spaceKey) = 1;
 
 % Sampling rate of the EEG in Hz. important for timing of markers
 sampRate = 500;
@@ -97,7 +99,7 @@ tShowShuffled   = 1;
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
-mrkWait         = 1/sampRate*2; % for safety, take twice the time needed 
+tMrkWait        = 1/sampRate*2; % for safety, take twice the time needed 
 
 % Get the nTrials and nGames from dataMat
 [~, nTrials, nGames] = size(choiceMat);
@@ -128,8 +130,14 @@ mrkDistr    = 3; % Button press upon choice of a lottery
 mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 
-% Set up the parallel port using the io64 module.
-config_io; 
+% Set up the parallel port using the io64 module. If it's not working,
+% still run the script and replace trigger functions by a bogus function.
+try
+    config_io; 
+catch
+    warning('io64 module not working. No triggers will be sent');
+    outp = @(x,y) x*y; 
+end
 
 % Parallel port address
 ppAddress = hex2dec('378');
@@ -137,8 +145,9 @@ ppAddress = hex2dec('378');
 %% Doing the experimental flow
 
 % Ready? ... press any key to start
+Screen('TextSize',window,50);
 DrawFormattedText(window,'READY', 'center', 'center', white);
-Screen(Flip,window);
+Screen('Flip',window);
 KbStrokeWait;
 
 % Get initial system time and assign to "vbl". We will keep updating vbl
@@ -149,13 +158,12 @@ for game=1:nGames
 
     % Inform about shuffled lotteries, no need to actually shuffle them. We
     % just replay.
-    Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
     Screen('TextSize',window,25);
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(mrkWait);
+    outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
@@ -173,7 +181,7 @@ for game=1:nGames
  
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         
@@ -212,7 +220,7 @@ for game=1:nGames
             vbl+tWait+tDelayFeedback+rand/2);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
 
@@ -224,10 +232,10 @@ for game=1:nGames
         if rewardBool == 2
             respToBeMade = true;
             while respToBeMade            
-            [~,tEnd,keyCode] = KbCheck;
+            [~,tEnd,keyCode] = KbCheck([], scanList);
                 if keyCode(spaceKey)
                     % Write EEG Marker --> button press, distractor seen
-                    outp(ppAddress,mrkDistr); WaitSecs(mrkWait);
+                    outp(ppAddress,mrkDistr); WaitSecs(tMrkWait);
                     outp(ppAddress,0)       ; WaitSecs(0.001);            
                     rt = tEnd - stimOnset;
                     respToBeMade = false;
@@ -254,7 +262,7 @@ for game=1:nGames
     Screen('TextSize',window,25);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(mrkWait);
+    outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
     % We do not ask about the preferred lottery, this is a replay.

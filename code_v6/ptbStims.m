@@ -165,7 +165,7 @@ Stims.maskLocs = cat(3, leftMask, rightMask, centerMask);
 % 5) We turn transparency levels for "grey" to 1 again ... 0% transparent
 % ... the interior stays 100% transparent
 
-mask        = Circle(100);
+mask        = Circle(300);
 mask(:,:,2) = mask; 
 mask        = ~mask;
 mask        = double(mask) * white/2;

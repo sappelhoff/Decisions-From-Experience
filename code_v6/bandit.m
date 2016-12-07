@@ -86,8 +86,10 @@ lotteryOption1 = 0.7;
 lotteryOption2 = 1-lotteryOption1;
 
 % Keyboard information
-leftKey  = KbName('LeftArrow'); % choose left lottery
-rightKey = KbName('RightArrow'); % choose right lottery
+leftKey = KbName('LeftArrow');
+rightKey = KbName('RightArrow');
+scanList = zeros(1,256);
+scanList([leftKey, rightKey]) = 1;
 
 % Sampling rate of the EEG in Hz. important for timing of markers
 sampRate = 500;
@@ -97,7 +99,7 @@ tShowShuffled   = 1;
 tDelayFeedback  = 1; 
 tShowFeedback   = 1; 
 tShowPayoff     = 1; 
-mrkWait         = 1/sampRate*2; % for safety, take twice the time needed
+tMrkWait        = 1/sampRate*2; % for safety, take twice the time needed
 
 % Shuffle the random number generator
 rng('shuffle');
@@ -128,8 +130,14 @@ mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
 mrkSelect   = 7; % Button press upon selection of the preferred lottery
 
-% Set up the parallel port using the io64 module.
-config_io; 
+% Set up the parallel port using the io64 module. If it's not working,
+% still run the script and replace trigger functions by a bogus function.
+try
+    config_io; 
+catch
+    warning('io64 module not working. No triggers will be sent');
+    outp = @(x,y) x*y; 
+end
 
 % Parallel port address
 ppAddress = hex2dec('378');
@@ -138,8 +146,9 @@ ppAddress = hex2dec('378');
 %% Doing the experimental flow
 
 % Ready? ... press any key to start
+Screen('TextSize',window,50);
 DrawFormattedText(window,'READY', 'center', 'center', white);
-Screen(Flip,window);
+Screen('Flip',window);
 KbStrokeWait;
 
 
@@ -161,12 +170,11 @@ for game = 1:nGames
     end % end shuffling lotteries
 
 
-    Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
 
     % Write EEG Marker --> lotteries have been shuffled
-    outp(ppAddress,mrkShuffle); WaitSecs(mrkWait);
+    outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
     Screen('TextSize',window,25);
 
@@ -184,24 +192,24 @@ for game = 1:nGames
         [vbl, stimOnset] = Screen('Flip',window,vbl+tShowShuffled+rand/2);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
-        outp(ppAddress,mrkFixOnset); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
         % Inquire the answer with a loop and PTB call to the keyboard.
         % Stop the loop only, once a keypress has been noticed.
         respToBeMade = true;
         while respToBeMade            
-            [~,tEnd,keyCode] = KbCheck; 
+            [~,tEnd,keyCode] = KbCheck([], scanList); 
                 if keyCode(leftKey)
                     % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(mrkWait);
+                    outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
                     outp(ppAddress,0)        ; WaitSecs(0.001);
                     rt = tEnd - stimOnset;
                     pickedLoc = 1;
                     respToBeMade = false;
                 elseif keyCode(rightKey)
                     % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(mrkWait);
+                    outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
                     outp(ppAddress,0)        ; WaitSecs(0.001);            
                     rt = tEnd - stimOnset;
                     pickedLoc = 2;
@@ -244,7 +252,7 @@ for game = 1:nGames
         vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt);
 
         % Write EEG Marker --> the feedback is presented
-        outp(ppAddress,mrkFeedback); WaitSecs(mrkWait);
+        outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
     end % End of trial loop
@@ -260,7 +268,7 @@ for game = 1:nGames
     vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2);
 
     % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(mrkWait);
+    outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
     outp(ppAddress,0)        ; WaitSecs(0.001);
 
     % Ask about preferred lottery
@@ -268,7 +276,7 @@ for game = 1:nGames
     [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2);
 
     % Write EEG Marker --> the preferred lottery is being inquired
-    outp(ppAddress,mrkPrefLot); WaitSecs(mrkWait);
+    outp(ppAddress,mrkPrefLot); WaitSecs(tMrkWait);
     outp(ppAddress,0)         ; WaitSecs(0.001);
 
 
@@ -276,17 +284,17 @@ for game = 1:nGames
     % Stop the loop only, once a keypress has been noticed.
     respToBeMade = true;
     while respToBeMade            
-        [~,tEnd,keyCode] = KbCheck; 
+        [~,tEnd,keyCode] = KbCheck([], scanList); 
             if keyCode(leftKey)
                 % Write EEG Marker --> button press, selection done
-                outp(ppAddress,mrkSelect); WaitSecs(mrkWait);
+                outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 1; % 1 = left
                 respToBeMade = false;
             elseif keyCode(rightKey)
                 % Write EEG Marker --> button press, selection done
-                outp(ppAddress,mrkSelect); WaitSecs(mrkWait);
+                outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
                 outp(ppAddress,0)        ; WaitSecs(0.001);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 2; % 2 = right
@@ -319,14 +327,12 @@ save(fname, 'choiceMat', 'prefMat');
 % screen (sca).
 Screen('TextSize',window,50);
 DrawFormattedText(window,texts('end'),'center','center',white);
-Screen('Flip',window,vbl+rt);
+Screen('Flip',window,vbl+rt+0.01);
 KbStrokeWait;
 Priority(0);
 ShowCursor;
 sca;
 clear io64;
-
-
 
 
 end % function end
