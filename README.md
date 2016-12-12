@@ -7,7 +7,7 @@ Matlab code relying on [Psychtoolbox 3](http://psychtoolbox.org) to execute an e
 - code_v2 --> same as v2 but with improved timing
 - code_v4 --> same as v3 but with EEG markers
 - code_v5 --> same as v4 functionally ... but in a different style. Also, requires Statistics Toolbox (for binornd function)
-- code v6 --> bigger stims, working markers, ...
+- code v6 --> bigger stims, working markers, in SP: decide for sample/choice using the down arrow. 
 
 For more information, [read the documentation!](documentation/DFE_docu.pdf)
 
