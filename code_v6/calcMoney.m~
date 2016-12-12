@@ -19,7 +19,7 @@ function calcMoney(ID)
 % Check that there is only data of current subject in working dir
 if length(dir('*.mat')) ~=4
     error(['There are not exactly four data files in the working', ...
-        ' directory. There must be the following .mat files:', ...
+        ' directory. There must be .mat files for one subject only!', ...
         ' bandit*.mat, banditReplay*.mat, sp*.mat, and spReplay*.mat'])
 end
 
@@ -32,7 +32,6 @@ showUpMoney = 18;
 banditMoney = 4;
 spMoney     = 4;
 rtMoney     = 4;
-
 
 
 % Start calculating how much mney was earned
@@ -78,12 +77,9 @@ spPerc = sum(choices)/length(choices);
 moneyEarned = moneyEarned + spPerc * spMoney;
 
 % Added money from replays is calculated by taking percentage of all RTs
-% that were below a threshold defined in seconds.
-threshRT = 0.4;
-
-allRTs = [bReplay.BdistrMat, spReplay.SPdistrMat];
-allRTs(isnan(allRTs)) = [];
-rtPerc = sum(allRTs < threshRT)/length(allRTs);
+% that were below a threshold
+allRTs = [bReplay.BdistrMat, spReplay.SPdistrMat]
+allRT
 moneyEarned = moneyEarned + rtPerc * rtMoney;
 
 % Lastly, we round up the earned money 
@@ -97,6 +93,6 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('money_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'moneyEarned', 'hours', 'banditPerc', 'spPerc', 'rtPerc');
+save(fname, 'moneyEarned', 'hours', 'banditPerc', 'spPerc');
 
 end % function end
