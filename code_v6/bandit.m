@@ -169,7 +169,7 @@ for game = 1:nGames
         rightLottery = lotteryOption1;
     end % end shuffling lotteries
 
-
+    Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
 
