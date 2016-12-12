@@ -126,7 +126,7 @@ texts('end')      = sprintf(['This task is done.\n\nThank you so far!' ,...
 % EEG markers
 mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
 mrkFixOnset = 2; % Onset of fixation cross during new trial
-mrkDistr    = 3; % Button press upon choice of a lottery
+mrkDistr    = 3; % Button press upon detection of a distractor
 mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 
@@ -223,16 +223,14 @@ for game=1:nGames
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(0.001);
 
-
-        
-        
+   
         % If this trial is a distractor trial, we measure the RT to it and
         % note the current trial. We also increment our distractor counter.
         % Else if this was a usual trial, we wait for a certain time.
         if rewardBool == 2
             respToBeMade = true;
             while respToBeMade            
-            [~,tEnd,keyCode] = KbCheck([], scanList);
+                [~,tEnd,keyCode] = KbCheck([], scanList);
                 if keyCode(spaceKey)
                     % Write EEG Marker --> button press, distractor seen
                     outp(ppAddress,mrkDistr); WaitSecs(tMrkWait);

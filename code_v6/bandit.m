@@ -83,7 +83,7 @@ end % end defining winning stimulus
 % We generally have a good lottery at p(win)=0.7 and a bad lottery at
 % p(win)=0.3
 lotteryOption1 = 0.7;
-lotteryOption2 = 1-lotteryOption1;
+lotteryOption2 = 1 - lotteryOption1;
 
 % Keyboard information
 leftKey = KbName('LeftArrow');
@@ -333,6 +333,5 @@ Priority(0);
 ShowCursor;
 sca;
 clear io64;
-
 
 end % function end
