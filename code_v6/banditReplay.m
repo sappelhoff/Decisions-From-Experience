@@ -158,6 +158,7 @@ for game=1:nGames
 
     % Inform about shuffled lotteries, no need to actually shuffle them. We
     % just replay.
+    Screen('TextSize',window,50);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
     vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
     Screen('TextSize',window,25);

@@ -20,7 +20,8 @@ function calcMoney(ID)
 if length(dir('*.mat')) ~=4
     error(['There are not exactly four data files in the working', ...
         ' directory. There must be the following .mat files:', ...
-        ' bandit*.mat, banditReplay*.mat, sp*.mat, and spReplay*.mat'])
+        ' bandit*.mat, banditReplay*.mat, sp*.mat, and spReplay*.mat', ...
+        ' It might be the case that there is already a money*.mat file.'])
 end
 
 
@@ -38,11 +39,10 @@ rtMoney     = 4;
 % Start calculating how much mney was earned
 moneyEarned = showUpMoney;
 
-
 % Rest of earnings is calculated according to performance in bandit
 % paradigm and sp (sampling paradigm). First load the data into memory as
 % structures. Also make sure, that data fits to ID
-banditFile = dir('bandit*.mat');
+banditFile = dir('bandit_*.mat');
 banditName = char({banditFile.name});
 if sscanf(banditName,'bandit_subj_%d') == ID, bandit = load(banditName);
 else error('File name does not match up with ID (bandit).'), end
@@ -52,7 +52,7 @@ bReplayName = char({bReplayFile.name});
 if sscanf(bReplayName,'banditReplay_subj_%d')==ID,bReplay=load(bReplayName);
 else error('File name does not match up with ID (bandit replay).'), end
 
-spFile = dir('sp*.mat');
+spFile = dir('sp_*.mat');
 spName = char({spFile.name});
 if sscanf(spName,'sp_subj_%d') == ID, sp = load(spName);
 else error('File name does not match up with ID (sp).'), end
@@ -97,6 +97,6 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('money_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'moneyEarned', 'hours', 'banditPerc', 'spPerc', 'rtPerc');
+save(fname, 'moneyEarned', 'banditPerc', 'spPerc', 'rtPerc');
 
 end % function end
