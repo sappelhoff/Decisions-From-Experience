@@ -231,7 +231,6 @@ while trlCount <= nTrials
         if isFirstTrial
             [vbl,stimOnset] = Screen('Flip',window, ...
                 vbl+tShowShuffled+rand/2);
-            isFirstTrial = 0;
         else
             [vbl,stimOnset] = Screen('Flip',window, ...
                 vbl+tShowFeedback+rand/2);
@@ -257,6 +256,7 @@ while trlCount <= nTrials
                     rt = tEnd - stimOnset;
                     pickedLoc = 1;
                     respToBeMade = false;
+                    isFirstTrial = 0;
                 % sample right lottery
                 elseif keyCode(rightKey)
                     outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
@@ -264,6 +264,7 @@ while trlCount <= nTrials
                     rt = tEnd - stimOnset;
                     pickedLoc = 2;
                     respToBeMade = false;
+                    isFirstTrial = 0;
                 % stop sampling, start choice
                 elseif isFirstTrial~=1 && keyCode(downKey)
                     outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
