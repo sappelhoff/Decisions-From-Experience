@@ -47,9 +47,9 @@ We are interested in how humans make value based decisions and how these decisio
 \end{quotation}
 
 
-Our main interest for the present study are the neural mechanisms that underlie the sequential allocation of active sampling efforts to the choice options in question. Furthermore, we are interested in how humans arrive at a decision to terminate their information search. \\
+Our main interest for the present study are the neural mechanisms that underlie the sequential allocation of active sampling efforts to the choice options in question. Furthermore, we are interested in how humans arrive at a decision to terminate their information search. \vspace{\baselineskip}
 
-To study these mechanisms, we have devised a set of paradigms in which you have agreed to participate today. These paradigms represent the scenario described above in simple terms. You will always have to decide between two options that both represent a lottery. Each of these lotteries will have a probability to yield either a winning outcome or a losing outcome. However, these probabilities are unknown and have to be learned through sampling. \\
+To study these mechanisms, we have devised a set of paradigms in which you have agreed to participate today. These paradigms represent the scenario described above in simple terms. You will always have to decide between two options that both represent a lottery. Each of these lotteries will have a probability to yield either a winning outcome or a losing outcome. However, these probabilities are unknown and have to be learned through sampling. \vspace{\baselineskip}
 
 
 \begin{figure}[h!]
@@ -157,9 +157,9 @@ Although all tasks follow this general principle, there will be small difference
 \pagebreak
 \section{Bandit}
 
-This task consists out of a structure, where we have separate \textit{games}, in which a fixed number of \textit{trials} are nested. For each trial, you must choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. Your task is, to maximize the winning outcomes for each game that you play. This is most easily done by exploring the options a bit, and learning their underlying probabilities to yield winning or losing outcomes. However, it is important to realize that each outcome that you see contributes to your payoff.  \\
+This task consists out of a structure, where we have separate \textit{games}, in which a fixed number of \textit{trials} are nested. For each trial, you must choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. Your task is, to maximize the winning outcomes for each game that you play. This is most easily done by exploring the options a bit, and learning their underlying probabilities to yield winning or losing outcomes. However, it is important to realize that each outcome that you see contributes to your payoff.  \vspace{\baselineskip}
 
-Thus, it is a good strategy to try to balance exploration of the options and exploiting the knowledge you have already gained about the options. \\
+Thus, it is a good strategy to try to balance exploration of the options and exploiting the knowledge you have already gained about the options. \vspace{\baselineskip}
 
 You don’t know the probabilities of the lotteries in advance, but you do know that during one game with a fixed number of trials, the probabilities of the lotteries and their locations [left] and [right] remain stable. Once all trials within one game have been completed, the lotteries are shuffled and a new game is started.
 
@@ -179,10 +179,10 @@ At the end of the overall experiment, we will calculate the percentage of winnin
     {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{shuffled.jpg}}};
 
 \node[inner sep=0pt] (trialCount) at (0,-4)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{b_counter.jpg}}};    
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{bCounter.jpg}}};    
 
 \node[inner sep=0pt] (outcome) at (0,-8)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{red_right.jpg}}};
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{redRight.jpg}}};
  
 \node[inner sep=0pt] (earn) at (0,-12)
     {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{earned.jpg}}}; 
@@ -221,10 +221,10 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 
 
 % Drawing the bent arrows 
-\draw[->,thick] (outcome.west) to [out=180,in=180] node[text width=0.2\textwidth, left, fill=white, align=center]{$1250\pm250$ ms \\ Increment trial counter and repeat until max trial is reached} (trialCount.west) ;
+\draw[->,thick] (outcome.west) to [out=180,in=180] node[text width=0.2\textwidth, left, fill=white, align=center]{$1250\pm250$ ms \vspace{\baselineskip} Increment trial counter and repeat until max trial is reached} (trialCount.west) ;
 
 
-\draw[->,thick] (prefLot.west) to [out=180,in=180] node[text width=0.2\textwidth, near start, fill=white, align=center] {t depends on RT \\ Increment game counter and repeat until max game is reached} (shuffled.west);
+\draw[->,thick] (prefLot.west) to [out=180,in=180] node[text width=0.2\textwidth, near start, fill=white, align=center] {t depends on RT \vspace{\baselineskip} Increment game counter and repeat until max game is reached} (shuffled.west);
 
 %--------------------------------------------------
 \end{tikzpicture}
@@ -241,16 +241,16 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 \pagebreak
 \section{Bandit Replay}
 
-This task is very similar to the task you have just performed. However, instead of choosing between options and learning their underlying probabilities to yield winning or losing outcomes, you are watching a replay. Your task is to fixate upon the fixation cross and experience the replay of the previous task. Importantly, there will be one addition: Occasionally, a known outcome will be replaced by a distractor outcome. As soon as you realize that such a distractor trial has happened, you have to press the [space] button. \\
+This task is very similar to the task you have just performed. However, instead of choosing between options and learning their underlying probabilities to yield winning or losing outcomes, you are watching a replay. Your task is to fixate upon the fixation cross and experience the replay of the previous task. Importantly, there will be one addition: Occasionally, a known outcome will be replaced by a distractor outcome. As soon as you realize that such a distractor trial has happened, you have to press the [space] button. \vspace{\baselineskip}
 
-At the end of the overall experiment, we will calculate your reaction time to the distractor trials. From all of these reaction times, we will calculate the percentage that were below a certain time threshold and we will multiply it with a monetary amount that you can earn in Euros additionally to your show up fee. \\
+At the end of the overall experiment, we will calculate your reaction time to the distractor trials. From all of these reaction times, we will calculate the percentage that were below a certain time threshold and we will multiply it with a monetary amount that you can earn in Euros additionally to your show up fee. \vspace{\baselineskip}
 
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.3]{distr_left.jpg}
+\includegraphics[scale=0.3]{distrLeft.jpg}
 \caption{An outcome during a distractor trial.}
-\label{distr_left}
+\label{distrLeft}
 \end{center}
 \end{figure}
 
@@ -259,11 +259,11 @@ At the end of the overall experiment, we will calculate your reaction time to th
 \pagebreak
 \section{Sampling Paradigm}
 
-This task consists out of a structure, where we have separate \textit{games}, in which \textit{trials} are nested. For each trial, you can choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. \\
+This task consists out of a structure, where we have separate \textit{games}, in which \textit{trials} are nested. For each trial, you can choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. \vspace{\baselineskip}
 
-However, you can also choose to not sample one of the options [left] or [right] and instead press [down]. When you press [down], you get to a stage of the game, where you must decide, which of the options [left] or [right] you find preferable. Then, an outcome will be generated from the option that you preferred. Your task is to maximize the winning outcomes that are obtained from this last game stage, after pressing [down]. \\
+However, you can also choose to not sample one of the options [left] or [right] and instead press [down]. When you press [down], you get to a stage of the game, where you must decide, which of the options [left] or [right] you find preferable. Then, an outcome will be generated from the option that you preferred. Your task is to maximize the winning outcomes that are obtained from this last game stage, after pressing [down]. \vspace{\baselineskip}
 
-Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \\
+Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \vspace{\baselineskip}
 
 At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.
 
@@ -280,37 +280,23 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 \node[inner sep=0pt] (shuffled) at (0,0)
     {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{shuffled.jpg}}};
 
-\node[inner sep=0pt] (trialCount) at (0,-3)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{sp_counter.jpg}}};    
+\node[inner sep=0pt] (trialCount) at (0,-4)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spCounter.jpg}}};    
 
-\node[inner sep=0pt] (outcome) at (-3,-6)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{red_left.jpg}}};
+\node[inner sep=0pt] (outcome) at (-4,-8)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{redLeft.jpg}}};
     
-\node[inner sep=0pt] (spChoice) at (3,-6)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{outRedLeft.jpg}}};
- 
-\node[inner sep=0pt] (question) at (0,-12)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestion.jpg}}}; 
-   
-\node[inner sep=0pt] (spQuestionSample) at (-4,-15)
-    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestionSample.jpg}}};
-
-\node[inner sep=0pt] (spQuestionChoice) at (4,-15)
-    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{spQuestionChoice.jpg}}};
-
-\node[inner sep=0pt] (noTrials) at (8,-15)
-    {\fcolorbox{green}{green}{\includegraphics[width=\imgSize]{spNoTrials.jpg}}}; 
-
-\node[inner sep=0pt] (spChoice) at (4,-18)
+\node[inner sep=0pt] (spChoice) at (4,-8)
     {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{spChoice.jpg}}};
+ 
+\node[inner sep=0pt] (spOutcome) at (4,-12)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{blueRightSp.jpg}}}; 
+   
+\node[inner sep=0pt] (earned) at (4,-16)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{earned.jpg}}};
 
-\node[inner sep=0pt] (outcomeChoice) at (4,-21)
-    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{outBlueRight.jpg}}};
-    
-\node[inner sep=0pt] (earn) at (4,-24)
-    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{earnZero.jpg}}};
-
-
+\node[inner sep=0pt] (final) at (-4,-12)
+    {\fcolorbox{green}{green}{\includegraphics[width=\imgSize]{final.jpg}}};
 
 
 
@@ -318,25 +304,15 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 % Drawing all nodes between pictures
 \draw[->,thick] (shuffled) -- (trialCount)
     node [midway,fill=white] {$1250\pm250$ ms};
-
-\draw[->,thick] (trialCount) -- (fixcross)
-    node [midway,fill=white] {$1250\pm250$ ms};
     
-\draw[->,thick] (fixcross) -- (outcome)
+\draw[->,thick] (outcome) -- (final)
     node [midway,fill=white] {t depends on RT};
     
-\draw[->,thick] (outcome) -- (question)
+\draw[->,thick] (spChoice) -- (spOutcome)
     node [midway,fill=white] {$1250\pm250$ ms};
 
-\draw[->,thick] (spQuestionChoice) -- (spChoice)
+\draw[->,thick] (spOutcome) -- (earned)
     node [midway,fill=white] {$750\pm250$ ms};
-    
-\draw[->,thick] (spChoice) -- (outcomeChoice)
-    node [midway,fill=white] {$1250\pm250$ ms};
-
-\draw[->,thick] (outcomeChoice) -- (earn)
-    node [midway,fill=white] {$1250\pm250$ ms};
-
 
 
 % Inserting describing text next to pictures
@@ -364,23 +340,21 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 
 
 % describing text for double bent arrow
-\node at (0,-15.2) [text width=\descrTextWidth, align=center] {t depends on RT};
+\node at (0,-8.2) [text width=\descrTextWidth, align=center] {t depends on RT};
 
 
 % Drawing the bent arrows 
 
-\draw[->,thick] (outcome.east) to [out=0, in=90] node [text width=0.2\textwidth, midway,fill=white] {If trial counter is at max, there is one last choice.} (noTrials.north);
+\draw[->,thick] (trialCount.south) to [out=270, in=0] (outcome.east);
 
-\draw[->,thick] (noTrials.south) to [out=270, in=360] node [near start,fill=white] {t depends on RT} (spChoice.east);
+\draw[->,thick] (trialCount.south) to [out=270, in=180] (spChoice.west);
 
-\draw[->,thick] (question.south) to [out=270, in=180] node []{} (spQuestionChoice.west);    
 
-\draw[->,thick] (question.south) to [out=270, in=0] node []{} (spQuestionSample.east);
+\draw[->,thick] (outcome.north) to [out=90, in=180] node [text width=0.2\textwidth, midway,fill=white] {$1250\pm250$ ms} (trialCount.west);
 
-\draw[->,thick] (spQuestionSample.north) to [out=90,in=180] node[text width=0.2\textwidth, midway, fill=white, align=center]{$750\pm250$ ms \\ Increment trial counter} (trialCount.west) ;
+\draw[->,thick] (final.east) to [out=0, in=180] node [text width=0.2\textwidth, midway,fill=white] {t depends on RT} (spChoice.west);
 
-\draw[->,thick] (earn.east) to [out=0,in=0] node[text width=0.2\textwidth, near end, fill=white, align=center] {t depends on RT \\ Trial counter is not incremented. If trial counter at max, paradigm is stopped.} (shuffled.east);
-
+\draw[->,thick] (earned.east) to [out=0, in=0] node [text width=0.2\textwidth, midway,fill=white] {After a choice, a new game is started.} (shuffled.east);
 
 %--------------------------------------------------
 \end{tikzpicture}
@@ -396,19 +370,19 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 \pagebreak
 \section{Sampling Paradigm Replay}
 
-This task consists out of a structure, where we have separate \textit{games}, in which \textit{trials} are nested. For each trial, you can choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. \\
+This task consists out of a structure, where we have separate \textit{games}, in which \textit{trials} are nested. For each trial, you can choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. \vspace{\baselineskip}
 
-However, you can also choose to not sample one of the options [left] or [right] and instead press [down]. When you press [down], you get to a stage of the game, where you must decide, which of the options [left] or [right] you find preferable. Then, an outcome will be generated from the option that you preferred. Your task is to maximize the winning outcomes that are obtained from this last game stage, after pressing [down]. \\
+However, you can also choose to not sample one of the options [left] or [right] and instead press [down]. When you press [down], you get to a stage of the game, where you must decide, which of the options [left] or [right] you find preferable. Then, an outcome will be generated from the option that you preferred. Your task is to maximize the winning outcomes that are obtained from this last game stage, after pressing [down]. \vspace{\baselineskip}
 
-Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \\
+Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \vspace{\baselineskip}
 
-At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee. \\
+At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee. \vspace{\baselineskip}
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.3]{distr_right.jpg}
+\includegraphics[scale=0.3]{distrRight.jpg}
 \caption{An outcome during a distractor trial.}
-\label{distr_right}
+\label{distrRight}
 \end{center}
 \end{figure}
 
