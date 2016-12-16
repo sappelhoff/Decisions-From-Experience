@@ -248,7 +248,7 @@ At the end of the overall experiment, we will calculate your reaction time to th
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.3]{distrLeft.jpg}
+\includegraphics[scale=0.2]{distrLeft.jpg}
 \caption{An outcome during a distractor trial.}
 \label{distrLeft}
 \end{center}
@@ -306,41 +306,32 @@ At the end of the overall experiment, we will calculate the percentage of winnin
     node [midway,fill=white] {$1250\pm250$ ms};
     
 \draw[->,thick] (outcome) -- (final)
-    node [midway,fill=white] {t depends on RT};
+    node [midway,fill=white] {$1250\pm250$ ms};
     
 \draw[->,thick] (spChoice) -- (spOutcome)
-    node [midway,fill=white] {$1250\pm250$ ms};
+    node [midway,fill=white] {t depends on RT};
 
 \draw[->,thick] (spOutcome) -- (earned)
-    node [midway,fill=white] {$750\pm250$ ms};
+    node [midway,fill=white] {$1250\pm250$ ms};
 
 
 % Inserting describing text next to pictures
 
-\node at (14,0) [text width=\descrTextWidth, align=left] {Options [left] and [right] are shuffled};
+\node at (13,0) [text width=\descrTextWidth, align=left] {Options [left] and [right] are shuffled};
 
-\node at (14,-3) [text width=\descrTextWidth, align=left] {Trial counter: Current trial only (no indication of maximum trials)};
+\node at (13,-4) [text width=\descrTextWidth, align=left] {Trial counter and fixation cross. Participants select an option by clicking [left] or [right].};
 
-\node at (14,-6) [text width=\descrTextWidth, align=left] {Fixation cross: Participants select an option by clicking [left] or [right]};
+\node at (13,-8) [text width=\descrTextWidth, align=left] {Depending on previous decision: Either get feedback on sampling or be allowed to make a choice.};
 
-\node at (14,-9) [text width=\descrTextWidth, align=left] {Outcome of sampling, or distractor};
+\node at (13,-12) [text width=\descrTextWidth, align=left] {Feedback on the choice. For last trial after taking a sample, you get the screen informing you about a final choice.};
 
-\node at (14,-12) [text width=\descrTextWidth, align=left] {Question whether to proceed with sampling (exploration) or make a choice (exploitation)};
-
-\node at (14,-15) [text width=\descrTextWidth, align=left] {Quick show of selection};
-
-\node at (14,-18) [text width=\descrTextWidth, align=left] {Which option to choose for exploitation};
-
-\node at (14,-21) [text width=\descrTextWidth, align=left] {Outcome of choice};
-
-\node at (14,-24) [text width=\descrTextWidth, align=left] {Earnings are displayed};
-
+\node at (13,-16) [text width=\descrTextWidth, align=left] {Display of what you have earned in your most recent choice.};
 
 
 
 
 % describing text for double bent arrow
-\node at (0,-8.2) [text width=\descrTextWidth, align=center] {t depends on RT};
+\node at (0,-8.06) [text width=\descrTextWidth, align=center] {t depends on RT};
 
 
 % Drawing the bent arrows 
@@ -354,7 +345,7 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 
 \draw[->,thick] (final.east) to [out=0, in=180] node [text width=0.2\textwidth, midway,fill=white] {t depends on RT} (spChoice.west);
 
-\draw[->,thick] (earned.east) to [out=0, in=0] node [text width=0.2\textwidth, midway,fill=white] {After a choice, a new game is started.} (shuffled.east);
+\draw[->,thick] (earned.east) to [out=0, in=0] node [text width=0.2\textwidth, midway,fill=white] {$1250\pm250$ ms After a choice, a new game is started.} (shuffled.east);
 
 %--------------------------------------------------
 \end{tikzpicture}
@@ -380,7 +371,7 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 
 \begin{figure}[h!]
 \begin{center}
-\includegraphics[scale=0.3]{distrRight.jpg}
+\includegraphics[scale=0.2]{distrRight.jpg}
 \caption{An outcome during a distractor trial.}
 \label{distrRight}
 \end{center}

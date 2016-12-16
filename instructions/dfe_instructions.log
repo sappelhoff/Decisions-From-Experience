@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.16)  16 DEC 2016 17:51
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.12.16)  16 DEC 2016 18:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -607,49 +607,49 @@ File: ./figures/distrLeft.jpg Graphic file (type jpg)
 
 <use ./figures/distrLeft.jpg>
 Package pdftex.def Info: ./figures/distrLeft.jpg used on input line 251.
-(pdftex.def)             Requested size: 385.44298pt x 240.90186pt.
+(pdftex.def)             Requested size: 256.95544pt x 160.59715pt.
  [5 <./figures/distrLeft.jpg>] [6]
 File: ./figures/shuffled.jpg Graphic file (type jpg)
 
 <use ./figures/shuffled.jpg>
-Package pdftex.def Info: ./figures/shuffled.jpg used on input line 361.
+Package pdftex.def Info: ./figures/shuffled.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 <./figures/spCounter.jpg, id=36, 1284.8pt x 803.0pt>
 File: ./figures/spCounter.jpg Graphic file (type jpg)
 
 <use ./figures/spCounter.jpg>
-Package pdftex.def Info: ./figures/spCounter.jpg used on input line 361.
+Package pdftex.def Info: ./figures/spCounter.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 <./figures/redLeft.jpg, id=37, 1284.8pt x 803.0pt>
 File: ./figures/redLeft.jpg Graphic file (type jpg)
  <use ./figures/redLeft.jpg>
-Package pdftex.def Info: ./figures/redLeft.jpg used on input line 361.
+Package pdftex.def Info: ./figures/redLeft.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 <./figures/spChoice.jpg, id=38, 1284.8pt x 803.0pt>
 File: ./figures/spChoice.jpg Graphic file (type jpg)
 
 <use ./figures/spChoice.jpg>
-Package pdftex.def Info: ./figures/spChoice.jpg used on input line 361.
+Package pdftex.def Info: ./figures/spChoice.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 <./figures/blueRightSp.jpg, id=39, 1284.8pt x 803.0pt>
 File: ./figures/blueRightSp.jpg Graphic file (type jpg)
 
 <use ./figures/blueRightSp.jpg>
-Package pdftex.def Info: ./figures/blueRightSp.jpg used on input line 361.
+Package pdftex.def Info: ./figures/blueRightSp.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 File: ./figures/earned.jpg Graphic file (type jpg)
  <use ./figures/earned.jpg>
-Package pdftex.def Info: ./figures/earned.jpg used on input line 361.
+Package pdftex.def Info: ./figures/earned.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 <./figures/final.jpg, id=40, 1284.8pt x 803.0pt>
 File: ./figures/final.jpg Graphic file (type jpg)
  <use ./figures/final.jpg>
-Package pdftex.def Info: ./figures/final.jpg used on input line 361.
+Package pdftex.def Info: ./figures/final.jpg used on input line 352.
 (pdftex.def)             Requested size: 89.62482pt x 56.00745pt.
 
 [7 <./figures/spCounter.jpg> <./figures/redLeft.jpg> <./figures/spChoice.jpg> <
@@ -658,35 +658,29 @@ Package pdftex.def Info: ./figures/final.jpg used on input line 361.
 File: ./figures/distrRight.jpg Graphic file (type jpg)
 
 <use ./figures/distrRight.jpg>
-Package pdftex.def Info: ./figures/distrRight.jpg used on input line 383.
-(pdftex.def)             Requested size: 385.44298pt x 240.90186pt.
-
-
-LaTeX Warning: `!h' float specifier changed to `!ht'.
-
-[8] [9 <./figures/distrRight.jpg>] (./dfe_instructions.aux)
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
- ) 
+Package pdftex.def Info: ./figures/distrRight.jpg used on input line 374.
+(pdftex.def)             Requested size: 256.95544pt x 160.59715pt.
+ [8 <./figures/distrRight.jpg>]
+(./dfe_instructions.aux) ) 
 Here is how much of TeX's memory you used:
- 15228 strings out of 493013
- 314915 string characters out of 6133342
+ 15219 strings out of 493013
+ 314755 string characters out of 6133342
  445189 words of memory out of 5000000
- 18525 multiletter control sequences out of 15000+600000
+ 18516 multiletter control sequences out of 15000+600000
  7925 words of font info for 28 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  64i,12n,60p,8827b,916s stack positions out of 5000i,500n,10000p,200000b,80000s
-</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb
-></usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb>
-</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></
-usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><
-/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></
-usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on dfe_instructions.pdf (9 pages, 826427 bytes).
+</usr/local/texlive/2016/texmf-dist/fonts/type1/publi
+c/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public
+/amsfonts/cm/cmmi12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/
+amsfonts/cm/cmr12.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmssbx10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/a
+msfonts/cm/cmsy10.pfb></usr/local/texlive/2016/texmf-dist/fonts/type1/public/am
+sfonts/cm/cmti12.pfb>
+Output written on dfe_instructions.pdf (8 pages, 825639 bytes).
 PDF statistics:
- 73 PDF objects out of 1000 (max. 8388607)
- 43 compressed objects within 1 object stream
+ 70 PDF objects out of 1000 (max. 8388607)
+ 41 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  73 words of extra memory for PDF output out of 10000 (max. 10000000)
 
