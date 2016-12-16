@@ -102,6 +102,53 @@ Although all tasks follow this general principle, there will be small difference
 
 
 
+\pagebreak
+
+
+% Stimuli figure
+\begin{figure}[h!]
+\begin{center}
+\resizebox{1\linewidth}{!}{%
+\begin{tikzpicture}[even odd rule]
+
+
+% Checkerboard for Stim 1: Red
+\foreach \x in {0,...,7} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "red" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+
+% Checkerboard for Stim2: Blue
+\foreach \x in {11,...,19} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "blue" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+
+% Checkerboard for Distractor Stim: Green
+\foreach \x in {22,...,30} \foreach \y in {0,...,7}
+{
+\pgfmathparse{mod(\x+\y,2) ? "green" : "white"}
+\edef\colour{\pgfmathresult}
+\path[fill=\colour] (\x,\y) rectangle ++ (1,1);
+}
+
+% Putting a mask with circle-holes around it: Gray
+\fill[fill=gray] (-1,-1) rectangle ++ (32,10) (4,4) circle (4cm) (15,4) circle (4cm) (26,4) circle (4cm);
+
+\end{tikzpicture}
+} % closing bracket from scaling
+
+\captionsetup{width=.9\linewidth, format=plain}
+\caption[Experimental Stimuli]{Three stimuli against a background as used in the experiment . The red and blue stimuli represent either a win or lose outcome. The green stimulus represents a distractor stimulus.}
+\label{fig:stimuli}
+\end{center}
+\end{figure}
 
 
 
@@ -118,6 +165,75 @@ You don’t know the probabilities of the lotteries in advance, but you do know 
 
 At the end of the overall experiment, we will calculate the percentage of winning outcomes to all outcomes and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.
 
+
+\pagebreak
+
+\begin{figure}[h!]
+\begin{center}
+\resizebox{.9\linewidth}{!}{%
+\begin{tikzpicture}
+
+%--------------------------------------------------
+% Insert all the pictures
+\node[inner sep=0pt] (shuffled) at (0,0)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{shuffled.jpg}}};
+
+\node[inner sep=0pt] (trialCount) at (0,-4)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{b_counter.jpg}}};    
+
+\node[inner sep=0pt] (outcome) at (0,-8)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{red_right.jpg}}};
+ 
+\node[inner sep=0pt] (earn) at (0,-12)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{earned.jpg}}}; 
+   
+\node[inner sep=0pt] (prefLot) at (0,-16)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{prefLot.jpg}}};
+
+
+
+% Drawing all nodes between pictures
+\draw[->,thick] (shuffled) -- (trialCount)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (trialCount) -- (outcome)
+    node [midway,fill=white] {t depends on RT};
+    
+\draw[->,thick] (outcome) -- (earn)
+    node [midway,fill=white] {$1250\pm250$ ms};
+    
+\draw[->,thick] (earn) -- (prefLot)
+    node [midway,fill=white] {$1250\pm250$ ms};
+    
+
+% Inserting describing text next to pictures
+
+\node at (3,0) [text width=\descrTextWidth, align=left, right] {Options [left] and [right] are shuffled};
+
+\node at (3,-4) [text width=\descrTextWidth, align=left, right] {Trial counter and fixation cross. Participants select an option by clicking [left] or [right]};
+
+
+\node at (3,-8) [text width=\descrTextWidth, align=left, right] {Outcome of the choice is presented as feedback};
+
+\node at (3,-12) [text width=\descrTextWidth, align=left, right] {Overall earnings are displayed};
+
+\node at (3,-16) [text width=\descrTextWidth, align=left, right] {Participants are asked, which option they deemed more profitable};
+
+
+% Drawing the bent arrows 
+\draw[->,thick] (outcome.west) to [out=180,in=180] node[text width=0.2\textwidth, left, fill=white, align=center]{$1250\pm250$ ms \\ Increment trial counter and repeat until max trial is reached} (trialCount.west) ;
+
+
+\draw[->,thick] (prefLot.west) to [out=180,in=180] node[text width=0.2\textwidth, near start, fill=white, align=center] {t depends on RT \\ Increment game counter and repeat until max game is reached} (shuffled.west);
+
+%--------------------------------------------------
+\end{tikzpicture}
+} % close the resize box
+\captionsetup{width=1\linewidth, format=plain}
+\caption[Flow Bandit Paradigm]{Experimental flow of the bandit paradigm. Red colors indicate the trial loop where participants explore and exploit the options. Once all trials have been spent within the trial loop, a transition to the blue game loop occurs, resetting the environment for a new game and leading to the trial loop again, until all games are exhausted. Note: RT=Reaction time, ms=miliseconds, t=time}
+\label{fig:banditFlow}
+\end{center}
+\end{figure}
 
 
 
@@ -151,8 +267,130 @@ Thus, the structure of the task is separated into two parts: During the first pa
 
 At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.
 
+\pagebreak
 
 
+\begin{figure}[h!]
+\begin{center}
+\resizebox{1\linewidth}{!}{%
+\begin{tikzpicture}
+%--------------------------------------------------
+
+% Insert all the pictures
+\node[inner sep=0pt] (shuffled) at (0,0)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{shuffled.jpg}}};
+
+\node[inner sep=0pt] (trialCount) at (0,-3)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{sp_counter.jpg}}};    
+
+\node[inner sep=0pt] (outcome) at (-3,-6)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{red_left.jpg}}};
+    
+\node[inner sep=0pt] (spChoice) at (3,-6)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{outRedLeft.jpg}}};
+ 
+\node[inner sep=0pt] (question) at (0,-12)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestion.jpg}}}; 
+   
+\node[inner sep=0pt] (spQuestionSample) at (-4,-15)
+    {\fcolorbox{red}{red}{\includegraphics[width=\imgSize]{spQuestionSample.jpg}}};
+
+\node[inner sep=0pt] (spQuestionChoice) at (4,-15)
+    {\fcolorbox{blue}{blue}{\includegraphics[width=\imgSize]{spQuestionChoice.jpg}}};
+
+\node[inner sep=0pt] (noTrials) at (8,-15)
+    {\fcolorbox{green}{green}{\includegraphics[width=\imgSize]{spNoTrials.jpg}}}; 
+
+\node[inner sep=0pt] (spChoice) at (4,-18)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{spChoice.jpg}}};
+
+\node[inner sep=0pt] (outcomeChoice) at (4,-21)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{outBlueRight.jpg}}};
+    
+\node[inner sep=0pt] (earn) at (4,-24)
+    {\fcolorbox{blue}{green}{\includegraphics[width=\imgSize]{earnZero.jpg}}};
+
+
+
+
+
+
+% Drawing all nodes between pictures
+\draw[->,thick] (shuffled) -- (trialCount)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (trialCount) -- (fixcross)
+    node [midway,fill=white] {$1250\pm250$ ms};
+    
+\draw[->,thick] (fixcross) -- (outcome)
+    node [midway,fill=white] {t depends on RT};
+    
+\draw[->,thick] (outcome) -- (question)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (spQuestionChoice) -- (spChoice)
+    node [midway,fill=white] {$750\pm250$ ms};
+    
+\draw[->,thick] (spChoice) -- (outcomeChoice)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+\draw[->,thick] (outcomeChoice) -- (earn)
+    node [midway,fill=white] {$1250\pm250$ ms};
+
+
+
+% Inserting describing text next to pictures
+
+\node at (14,0) [text width=\descrTextWidth, align=left] {Options [left] and [right] are shuffled};
+
+\node at (14,-3) [text width=\descrTextWidth, align=left] {Trial counter: Current trial only (no indication of maximum trials)};
+
+\node at (14,-6) [text width=\descrTextWidth, align=left] {Fixation cross: Participants select an option by clicking [left] or [right]};
+
+\node at (14,-9) [text width=\descrTextWidth, align=left] {Outcome of sampling, or distractor};
+
+\node at (14,-12) [text width=\descrTextWidth, align=left] {Question whether to proceed with sampling (exploration) or make a choice (exploitation)};
+
+\node at (14,-15) [text width=\descrTextWidth, align=left] {Quick show of selection};
+
+\node at (14,-18) [text width=\descrTextWidth, align=left] {Which option to choose for exploitation};
+
+\node at (14,-21) [text width=\descrTextWidth, align=left] {Outcome of choice};
+
+\node at (14,-24) [text width=\descrTextWidth, align=left] {Earnings are displayed};
+
+
+
+
+
+% describing text for double bent arrow
+\node at (0,-15.2) [text width=\descrTextWidth, align=center] {t depends on RT};
+
+
+% Drawing the bent arrows 
+
+\draw[->,thick] (outcome.east) to [out=0, in=90] node [text width=0.2\textwidth, midway,fill=white] {If trial counter is at max, there is one last choice.} (noTrials.north);
+
+\draw[->,thick] (noTrials.south) to [out=270, in=360] node [near start,fill=white] {t depends on RT} (spChoice.east);
+
+\draw[->,thick] (question.south) to [out=270, in=180] node []{} (spQuestionChoice.west);    
+
+\draw[->,thick] (question.south) to [out=270, in=0] node []{} (spQuestionSample.east);
+
+\draw[->,thick] (spQuestionSample.north) to [out=90,in=180] node[text width=0.2\textwidth, midway, fill=white, align=center]{$750\pm250$ ms \\ Increment trial counter} (trialCount.west) ;
+
+\draw[->,thick] (earn.east) to [out=0,in=0] node[text width=0.2\textwidth, near end, fill=white, align=center] {t depends on RT \\ Trial counter is not incremented. If trial counter at max, paradigm is stopped.} (shuffled.east);
+
+
+%--------------------------------------------------
+\end{tikzpicture}
+} % closing bracket from scaling
+
+\captionsetup{width=.9\linewidth, format=plain}
+\caption[Flow Sampling Paradigm]{Experimental flow of the sampling paradigm. Red colors indicate the sampling loop, from which one can transition to the blue choice loop, leading back to the sampling loop. Once the maximum of trials has been reached, a transition to the green loop for a last choice occurs. Note: RT=Reaction time, ms=miliseconds, t=time. }
+\label{fig:spFlow}
+\end{center}
+\end{figure}
 
 
 \pagebreak
