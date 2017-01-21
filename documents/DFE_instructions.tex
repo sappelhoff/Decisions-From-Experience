@@ -155,13 +155,13 @@ Although all tasks follow this general principle, there will be small difference
 
 
 \pagebreak
-\section{Bandit}
+\section{Bandit Paradigm}
 
-This task consists out of a structure, where we have separate \textit{games}, in which a fixed number of \textit{trials} are nested. For each trial, you must choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. Your task is, to maximize the winning outcomes for each game that you play. This is most easily done by exploring the options a bit, and learning their underlying probabilities to yield winning or losing outcomes. However, it is important to realize that each outcome that you see contributes to your payoff.  \vspace{\baselineskip}
+This task consists out of a structure, where we have 15 separate \textit{games}, in each of which 20 \textit{trials} are nested. For each trial, you must choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. Your task is, to maximize the winning outcomes for each game that you play. This is most easily done by exploring the options a bit, and learning their underlying probabilities to yield winning or losing outcomes. However, it is important to realize that each outcome that you see contributes to your payoff.  \vspace{\baselineskip}
 
 Thus, it is a good strategy to try to balance exploration of the options and exploiting the knowledge you have already gained about the options. \vspace{\baselineskip}
 
-You don’t know the probabilities of the lotteries in advance, but you do know that during one game with a fixed number of trials, the probabilities of the lotteries and their locations [left] and [right] remain stable. Once all trials within one game have been completed, the lotteries are shuffled and a new game is started.
+You don’t know the probabilities of the lotteries in advance, but you do know that during one game with all of its 20 trials, the probabilities of the lotteries and their locations [left] and [right] remain stable. Once all trials within one game have been completed, the lotteries are shuffled and a new game is started. Because there are 15 games, the lotteries will be shuffled 15 times and you will thus have 15 independent learning situations.
 
 At the end of the overall experiment, we will calculate the percentage of winning outcomes to all outcomes and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.
 
@@ -239,11 +239,11 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 
 
 \pagebreak
-\section{Bandit Replay}
+\section{Passive Condition}
 
-This task is very similar to the task you have just performed. However, instead of choosing between options and learning their underlying probabilities to yield winning or losing outcomes, you are watching a replay. Your task is to fixate upon the fixation cross and experience the replay of the previous task. Importantly, there will be one addition: Occasionally, a known outcome will be replaced by a distractor outcome. As soon as you realize that such a distractor trial has happened, you have to press the [space] button. \vspace{\baselineskip}
+This task is very similar to the Bandit task. However, instead of choosing between options and learning their underlying probabilities to yield winning or losing outcomes, you are watching a replay. Your task is to fixate upon the fixation cross and experience the replay of a Bandit task. Importantly, there will be one addition: Occasionally, a known outcome will be replaced by a distractor outcome (green). As soon as you realize that such a distractor trial has happened, you have to press the [space] button. \vspace{\baselineskip}
 
-At the end of the overall experiment, we will calculate your reaction time to the distractor trials. From all of these reaction times, we will calculate the percentage that were below a certain time threshold and we will multiply it with a monetary amount that you can earn in Euros additionally to your show up fee. \vspace{\baselineskip}
+At the end of the overall experiment, we will calculate your reaction time to the distractor trials. From all of these reaction times, we will calculate the percentage that were below a 400 miliseconds threshold and we will multiply it with a monetary amount that you can earn in Euros additionally to your show up fee. \vspace{\baselineskip}
 
 
 \begin{figure}[h!]
@@ -265,7 +265,9 @@ However, you can also choose to not sample one of the options [left] or [right] 
 
 Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \vspace{\baselineskip}
 
-At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.
+At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee.\vspace{\baselineskip}
+
+Overall you will be granted 300 trials in the exploration stage. The second stage (exploitation stage) does not count towards these trials. Note that a person who explores for 300 trials and makes only one choice in the second stage can still earn just as much money as a person who explores only for few trials and goes to the second stage very often.
 
 \pagebreak
 
@@ -354,26 +356,6 @@ At the end of the overall experiment, we will calculate the percentage of winnin
 \captionsetup{width=.9\linewidth, format=plain}
 \caption[Flow Sampling Paradigm]{Experimental flow of the sampling paradigm. Red colors indicate the sampling loop, from which one can transition to the blue choice loop, leading back to the sampling loop. Once the maximum of trials has been reached, a transition to the green loop for a last choice occurs. Note: RT=Reaction time, ms=miliseconds, t=time. }
 \label{fig:spFlow}
-\end{center}
-\end{figure}
-
-
-\pagebreak
-\section{Sampling Paradigm Replay}
-
-This task consists out of a structure, where we have separate \textit{games}, in which \textit{trials} are nested. For each trial, you can choose between two options [left] and [right]. These options represent binary lotteries, which have a certain probability to yield a winning outcome and a certain probability to yield a losing outcome. \vspace{\baselineskip}
-
-However, you can also choose to not sample one of the options [left] or [right] and instead press [down]. When you press [down], you get to a stage of the game, where you must decide, which of the options [left] or [right] you find preferable. Then, an outcome will be generated from the option that you preferred. Your task is to maximize the winning outcomes that are obtained from this last game stage, after pressing [down]. \vspace{\baselineskip}
-
-Thus, the structure of the task is separated into two parts: During the first part, you can freely sample the options [left] and [right] to learn their underlying probabilities to yield winning or losing outcomes. After learning the options to a sufficient degree, you can exploit your knowledge of the options and press [down]. This will bring you to the stage of the game, where you can decide for one lottery over the other and draw your outcome that counts towards your payoff. \vspace{\baselineskip}
-
-At the end of the overall experiment, we will calculate the percentage of winning outcomes in the final stage to all outcomes in the final stage and multiply it with a monetary amount, that you can earn in Euros additionally to your show up fee. \vspace{\baselineskip}
-
-\begin{figure}[h!]
-\begin{center}
-\includegraphics[scale=0.2]{distrRight.jpg}
-\caption{An outcome during a distractor trial.}
-\label{distrRight}
 \end{center}
 \end{figure}
 

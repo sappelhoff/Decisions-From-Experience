@@ -1,8 +1,8 @@
 function calcMoney(ID)
 
 % Calculates the money that a subject has earned after participating in the
-% four paradigms: bandit, banditReplay, sp, spReplay. Assumes that all data
-% of the subject are in the working directory.
+% three paradigms: bandit, replay, sp. Assumes that all data of the subject
+% are in the working directory.
 %
 % Author: Stefan Appelhoff (stefan.appelhoff@gmail.com)
 %
@@ -17,22 +17,22 @@ function calcMoney(ID)
 %% Function start
 
 % Check that there is only data of current subject in working dir
-if length(dir('*.mat')) ~=4
-    error(['There are not exactly four data files in the working', ...
+if length(dir('*.mat')) ~=3
+    error(['There are not exactly three data files in the working', ...
         ' directory. There must be the following .mat files:', ...
-        ' bandit*.mat, banditReplay*.mat, sp*.mat, and spReplay*.mat', ...
+        ' bandit*.mat, banditReplay*.mat, and sp*.mat', ...
         ' It might be the case that there is already a money*.mat file.'])
 end
 
 
 % Participants get a fixed amount for showing up. Furthermore, they
 % can earn a set maximum in each, bandit and sp, depending on their
-% performance. For the replays, they can earn a certain maximum depending
+% performance. For the replay, they can earn a certain maximum depending
 % on how well they reacted to distractors.
-showUpMoney = 18;
-banditMoney = 4;
-spMoney     = 4;
-rtMoney     = 4;
+showUpMoney = 19;
+banditMoney = 2;
+spMoney     = 2;
+rtMoney     = 2;
 
 
 
@@ -57,11 +57,6 @@ spName = char({spFile.name});
 if sscanf(spName,'sp_subj_%d') == ID, sp = load(spName);
 else error('File name does not match up with ID (sp).'), end
 
-spReplayFile = dir('spReplay*.mat');
-spReplayName = char({spReplayFile.name});
-if sscanf(spReplayName,'spReplay_subj_%d')==ID,spReplay=load(spReplayName);
-else error('File name does not match up with ID (sp replay).'), end
-
 
 % Added money from bandit is calculated by taking percentage rewarded
 % trials of bandit with the maximum of money that can be earned in the
@@ -81,7 +76,7 @@ moneyEarned = moneyEarned + spPerc * spMoney;
 % that were below a threshold defined in seconds.
 threshRT = 0.4;
 
-allRTs = [bReplay.BdistrMat, spReplay.SPdistrMat];
+allRTs = bReplay.BdistrMat;
 allRTs(isnan(allRTs)) = [];
 rtPerc = sum(allRTs < threshRT)/length(allRTs);
 moneyEarned = moneyEarned + rtPerc * rtMoney;
