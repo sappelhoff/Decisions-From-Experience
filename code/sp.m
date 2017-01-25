@@ -217,7 +217,7 @@ while trlCount <= nTrials
         
         % Present trial counter and fixation cross
         Screen('TextSize',window,25);
-        trialCounter = sprintf('%d/X',trlCount+1);
+        trialCounter = sprintf('%d/%d',trlCount+1,nTrials);
         DrawFormattedText(window,trialCounter,'center', ...
             screenYpixels*0.41,white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
