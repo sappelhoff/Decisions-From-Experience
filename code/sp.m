@@ -139,12 +139,13 @@ texts('aSPfinal')  = sprintf(['You have reached the final\n\ntrial.', ...
 % EEG markers
 mrkShuffle  = 1; % Onset of lotteries have been shuffled screen at of game
 mrkFixOnset = 2; % Onset of fixation cross during new trial
-mrkChoice   = 3; % Button press to either sample a lottery or go to choice
+mrkChoice   = 3; % Button press to sample either lottery
 mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
 mrkSelect   = 7; % Button press upon selection of the preferred lottery
 mrkResult   = 8; % Feedback on the choice of preferred lottery
+mrkStopSample = 9; % Button press to go to choice
 
 % Set up the parallel port using the io64 module. If it's not working,
 % still run the script and replace trigger functions by a bogus function.
@@ -263,8 +264,8 @@ while trlCount <= nTrials
                     isFirstTrial = 0;
                 % stop sampling, start choice
                 elseif isFirstTrial~=1 && keyCode(downKey)
-                    outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);
+                    outp(ppAddress,mrkStopSample); WaitSecs(tMrkWait);
+                    outp(ppAddress,0)            ; WaitSecs(0.001);
                     rt = tEnd - stimOnset;
                     pickedLoc = 3;
                     respToBeMade = false;

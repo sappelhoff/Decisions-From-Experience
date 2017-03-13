@@ -14,10 +14,12 @@ function [BdistrMat, BdistrInsertMat] = banditReplay(choiceMat,winStim, ID)
 % - ID: the ID of the subject. A three digit number.
 %
 % OUT:
-% - BdistrsMat: RTs to the distractor trials that happened during the
+% - BdistrMat: RTs to the distractor trials that happened during the
 % replay
-% - BdistrsInsertMat: a trialsXgames matrix of zeros. Ones, where distr was
+% - BdistrInsertMat: a trialsXgames matrix of zeros. Ones, where distr was
 % inserted
+% - BdistrFalsePositiveMat: a trialsXgames matrix of zeros. Ones, where a
+% participant responded to a distractor although no distractor was present.
 
 %% function start
 
@@ -114,6 +116,7 @@ rng('shuffle');
 BdistrMat = nan(1,nTrials*nGames);
 distrIdx = 1; 
 BdistrInsertMat = zeros(nTrials,nGames);
+BdistrFalsePositiveMat = zeros(nTrials,nGames);
 
 % All presentation texts
 texts             = containers.Map;
@@ -129,6 +132,7 @@ mrkFixOnset = 2; % Onset of fixation cross during new trial
 mrkDistr    = 3; % Button press upon detection of a distractor
 mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
+mrkOriginalResp = 6; % Marker, where the original response happened
 
 % Set up the parallel port using the io64 module. If it's not working,
 % still run the script and replace trigger functions by a bogus function.
@@ -197,6 +201,16 @@ for game=1:nGames
             tWait = 1+rand/2;
         end 
 
+        
+        % Here, the action in the original game would have happened. As
+        % this is a replay, we do not have an actual response, but we send
+        % a trigger to form ERPs later.
+        
+        vbl = WaitSecs(vbl+tWait);    
+        outp(ppAddress,mrkOriginalResp); WaitSecs(tMrkWait);
+        outp(ppAddress,0)              ; WaitSecs(0.001);
+        
+             
 
         % Feedback & possibly distractor. Namely, on pDistr of all trials,
         % replace the reward with a distractor. This means changing the
@@ -213,8 +227,7 @@ for game=1:nGames
             Stims.rectLocs(:,:,pickedLoc));
         Screen('DrawTextures',window,Stims.maskTexture,[], ...
             Stims.maskLocs(:,:,pickedLoc),[],0);                                
-        [vbl, stimOnset] = Screen('Flip',window, ...
-            vbl+tWait+tDelayFeedback+rand/2);
+        [vbl, stimOnset] = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
 
         % Write EEG Marker --> the feedback is presented
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
@@ -241,7 +254,13 @@ for game=1:nGames
             tWait = BdistrMat(distrIdx) + rand/2;
             distrIdx = distrIdx + 1; 
         else
-            tWait = tShowFeedback+rand/2; 
+            tRecFalsePos = stimOnset + tShowFeedback + rand/2;
+            while GetSecs < tRecFalsePos 
+                if keyCode(spaceKey)
+                    BdistrFalsePositiveMat(trial, game) = 1;
+                end
+            end
+            tWait = tRecFalsePos + 0.01;
         end % End of checking whether distractor trial or not
     end % End of trial loop
 
@@ -272,7 +291,7 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('banditReplay_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'BdistrMat', 'BdistrInsertMat');
+save(fname, 'BdistrMat', 'BdistrInsertMat', 'BdistrFalsePositiveMat');
 
 % Print that it's time for a break, reset priority level, and clean the
 % screen (sca).
