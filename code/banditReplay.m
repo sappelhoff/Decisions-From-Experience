@@ -203,7 +203,7 @@ for game=1:nGames
         % Here, the action in the original game would have happened. As
         % this is a replay, we do not have an actual response, but we send
         % a trigger to form ERPs later.
-        vbl = WaitSecs('UntilTime', vbl+tWait);    
+        vbl = WaitSecs('UntilTime', vbl+rt);    
         outp(ppAddress,mrkOriginalResp); WaitSecs(tMrkWait);
         outp(ppAddress,0)              ; WaitSecs(tMrkWait);
         
