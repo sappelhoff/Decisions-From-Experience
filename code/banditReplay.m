@@ -58,10 +58,6 @@ Screen('TextStyle',window,0);
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
-% Set Verbosity level to very low to speed up PTB. This makes only sense
-% once the code has been thoroughly tested.
-% Screen('Preference', 'Verbosity', 0);
-
 HideCursor;
 
 %-------------------------------------------------------------------------%
@@ -121,18 +117,21 @@ BdistrFalsePositiveMat = zeros(nTrials,nGames);
 % All presentation texts
 texts             = containers.Map;
 texts('shuffled') = sprintf('The lotteries have been shuffled.');
-texts('payoff')   = sprintf('You earned: ');
 texts('end')      = sprintf(['This task is done.\n\nThank you so far!' ,...
     '\n\n\nPress a key to close.']);
 
 
-% EEG markers
-mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
-mrkFixOnset = 2; % Onset of fixation cross during new trial
-mrkDistr    = 3; % Button press upon detection of a distractor
-mrkFeedback = 4; % Onset of feedback presentation
-mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
-mrkOriginalResp = 6; % Marker, where the original response happened
+% EEG markers common across conditions
+mrkShuffle      = 1; % Onset of lotteries shuffled screen at start of game
+mrkFixOnset     = 2; % Onset of fixation cross during new trial
+mrkOriginalResp = 3; % Where did the non-replay (original) response happen
+mrkFeedback     = 4; % Onset of feedback presentation
+mrkFeedbackStr  = 5; % Feedback at game end: detected/confused distractors
+
+% EEG markers specific to this condition
+mrkDistr    = 10; % Button press upon detection of a distractor
+mrkFalsePos = 11; % Button press upon detection of a false positive
+
 
 % Set up the parallel port using the io64 module.
 config_io; 
@@ -203,12 +202,10 @@ for game=1:nGames
         % Here, the action in the original game would have happened. As
         % this is a replay, we do not have an actual response, but we send
         % a trigger to form ERPs later.
-        
         vbl = WaitSecs('UntilTime', vbl+tWait);    
         outp(ppAddress,mrkOriginalResp); WaitSecs(tMrkWait);
         outp(ppAddress,0)              ; WaitSecs(tMrkWait);
         
-             
 
         % Feedback & possibly distractor. Namely, on pDistr of all trials,
         % replace the reward with a distractor. This means changing the
@@ -240,7 +237,8 @@ for game=1:nGames
             while respToBeMade            
                 [~,tEnd,keyCode] = KbCheck([], scanList);
                 if keyCode(spaceKey)
-                    % Write EEG Marker --> button press, distractor seen
+                    % Write EEG Marker --> button press, distractor
+                    % detected
                     outp(ppAddress,mrkDistr); WaitSecs(tMrkWait);
                     outp(ppAddress,0)       ; WaitSecs(tMrkWait);            
                     rt = tEnd - stimOnset;
@@ -259,6 +257,10 @@ for game=1:nGames
                 if keyCode(spaceKey) && falsePosFlag
                     BdistrFalsePositiveMat(trial, game) = 1;
                     falsePosFlag = 0;
+                    % Write EEG Marker --> button press, distractor
+                    % confused (false Positive)
+                    outp(ppAddress,mrkFalsePos); WaitSecs(tMrkWait);
+                    outp(ppAddress,0)          ; WaitSecs(tMrkWait);                                
                 end
             end
             tWait = 0.01;
@@ -276,9 +278,10 @@ for game=1:nGames
     vbl = Screen('Flip',window,vbl+tWait);
     Screen('TextSize',window,25);
 
-    % Write EEG Marker --> the payoff is shown
-    outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
-    outp(ppAddress,0)        ; WaitSecs(tMrkWait);
+    % Write EEG Marker --> a feedback about detecting/missing disctractors
+    % is presented
+    outp(ppAddress,mrkFeedbackStr); WaitSecs(tMrkWait);
+    outp(ppAddress,0)             ; WaitSecs(tMrkWait);
 
     % We do not ask about the preferred lottery, this is a replay.
 

@@ -52,9 +52,6 @@ Screen('TextStyle',window,0);
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
-% Set Verbosity level to very low to speed up PTB. This makes only sense
-% once the code has been thoroughly tested.
-% Screen('Preference', 'Verbosity', 0);
 
 HideCursor;
 
@@ -121,7 +118,7 @@ texts('payoff')   = sprintf('You earned: ');
 texts('prefLot')  = sprintf(['Which lottery do you think was more', ...
     ' profitable?\n\nPress [left] or [right].']); 
 
-% EEG markers
+% EEG markers common across conditions
 mrkShuffle  = 1; % Onset of lotteries shuffled screen at beginning of game
 mrkFixOnset = 2; % Onset of fixation cross during new trial
 mrkChoice   = 3; % Button press upon choice of a lottery

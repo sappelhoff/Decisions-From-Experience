@@ -51,10 +51,6 @@ Screen('TextStyle',window,0);
 topPriorityLevel = MaxPriority(window);
 Priority(topPriorityLevel);
 
-% Set Verbosity level to very low to speed up PTB. This makes only sense
-% once the code has been thoroughly tested.
-% Screen('Preference', 'Verbosity', 0);
-
 HideCursor;
 
 %--------------------------------------------------------------------------
@@ -136,15 +132,17 @@ texts('aSPfinal')  = sprintf(['You have reached the final\n\ntrial.', ...
     ' You are granted one\n\nlast choice towards your payoff.\n\n', ...
     ' Press any key.']);
 
-% EEG markers
-mrkShuffle  = 1; % Onset of lotteries have been shuffled screen at of game
+% EEG markers common across conditions
+mrkShuffle  = 1; % Onset of lotteries have been shuffled screen at start up
 mrkFixOnset = 2; % Onset of fixation cross during new trial
 mrkChoice   = 3; % Button press to sample either lottery
 mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
 mrkSelect   = 7; % Button press upon selection of the preferred lottery
-mrkResult   = 8; % Feedback on the choice of preferred lottery
+
+% EEG markers specific to this condition
+mrkResult     = 8; % Feedback on the choice of preferred lottery
 mrkStopSample = 9; % Button press to go to choice
 
 % Set up the parallel port using the io64 module. 
