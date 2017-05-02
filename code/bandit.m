@@ -196,21 +196,21 @@ for game = 1:nGames
         respToBeMade = true;
         while respToBeMade            
             [~,tEnd,keyCode] = KbCheck([], scanList); 
-                if keyCode(leftKey)
-                    % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);
-                    rt = tEnd - stimOnset;
-                    pickedLoc = 1;
-                    respToBeMade = false;
-                elseif keyCode(rightKey)
-                    % Write EEG Marker --> button press, choice done
-                    outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);            
-                    rt = tEnd - stimOnset;
-                    pickedLoc = 2;
-                    respToBeMade = false;            
-                end % end checking whether a keypress has been done
+            if keyCode(leftKey)
+                % Write EEG Marker --> button press, choice done
+                outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
+                outp(ppAddress,0)        ; WaitSecs(0.001);
+                rt = tEnd - stimOnset;
+                pickedLoc = 1;
+                respToBeMade = false;
+            elseif keyCode(rightKey)
+                % Write EEG Marker --> button press, choice done
+                outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
+                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                rt = tEnd - stimOnset;
+                pickedLoc = 2;
+                respToBeMade = false;            
+            end % end checking whether a keypress has been done
         end % end waiting for keypress
 
 
