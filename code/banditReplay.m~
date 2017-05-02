@@ -271,6 +271,13 @@ for game=1:nGames
     else
         feedbackStr = sprintf('You confused some distractors.');
     end
+    
+    % Present Earnings. First compute the sum over trials for all
+    % variables, then extract the sum of the rewardBools of the current
+    % game. Make a string out of it and present it.    
+    summa = sum(choiceMat,2); 
+    payoff = summa(4,:,game); 
+    payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff)); 
     Screen('TextSize',window,30); 
     DrawFormattedText(window, feedbackStr, 'center', 'center', white); 
     vbl = Screen('Flip',window,vbl+tWait);
