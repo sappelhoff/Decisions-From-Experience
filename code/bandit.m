@@ -130,9 +130,7 @@ mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 mrkPrefLot  = 6; % Onset of the question, which lottery was preferred
 mrkSelect   = 7; % Button press upon selection of the preferred lottery
 
-% Set up the parallel port using the io64 module. If it's not working,
-% still run the script and replace trigger functions by a bogus function.
-
+% Set up the parallel port using the io64 module. 
 config_io; 
 
 % Parallel port address

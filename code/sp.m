@@ -147,9 +147,7 @@ mrkSelect   = 7; % Button press upon selection of the preferred lottery
 mrkResult   = 8; % Feedback on the choice of preferred lottery
 mrkStopSample = 9; % Button press to go to choice
 
-% Set up the parallel port using the io64 module. If it's not working,
-% still run the script and replace trigger functions by a bogus function.
-
+% Set up the parallel port using the io64 module. 
 config_io; 
 
 % Parallel port address
