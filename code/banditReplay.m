@@ -266,7 +266,7 @@ for game=1:nGames
     end % End of trial loop
 
     % Present feedback how well distractors were detected
-    if sum(BdistrFalsePositiveMat(game,:)) == 0
+    if sum(BdistrFalsePositiveMat(:,game)) == 0
         feedbackStr = sprintf('You detected all distractors.');
     else
         feedbackStr = sprintf('You confused some distractors.');
