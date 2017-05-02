@@ -134,9 +134,7 @@ mrkFeedback = 4; % Onset of feedback presentation
 mrkPayoff   = 5; % Onset of payoff presentation at the end of one game
 mrkOriginalResp = 6; % Marker, where the original response happened
 
-% Set up the parallel port using the io64 module. If it's not working,
-% still run the script and replace trigger functions by a bogus function.
-
+% Set up the parallel port using the io64 module.
 config_io; 
 
 % Parallel port address
@@ -165,7 +163,7 @@ for game=1:nGames
 
     % Write EEG Marker --> lotteries have been shuffled
     outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
-    outp(ppAddress,0)         ; WaitSecs(0.001);
+    outp(ppAddress,0)         ; WaitSecs(tMrkWait);
 
 
     for trial=1:nTrials
@@ -183,7 +181,7 @@ for game=1:nGames
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
         
         % This is a replay, so we get the choice data by inquiring the data
@@ -208,7 +206,7 @@ for game=1:nGames
         
         vbl = WaitSecs(vbl+tWait);    
         outp(ppAddress,mrkOriginalResp); WaitSecs(tMrkWait);
-        outp(ppAddress,0)              ; WaitSecs(0.001);
+        outp(ppAddress,0)              ; WaitSecs(tMrkWait);
         
              
 
@@ -231,7 +229,7 @@ for game=1:nGames
 
         % Write EEG Marker --> the feedback is presented
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
    
         % If this trial is a distractor trial, we measure the RT to it and
@@ -244,7 +242,7 @@ for game=1:nGames
                 if keyCode(spaceKey)
                     % Write EEG Marker --> button press, distractor seen
                     outp(ppAddress,mrkDistr); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)       ; WaitSecs(0.001);            
+                    outp(ppAddress,0)       ; WaitSecs(tMrkWait);            
                     rt = tEnd - stimOnset;
                     respToBeMade = false;
                 end % End to check whether specific key has been pressed 
@@ -277,7 +275,7 @@ for game=1:nGames
 
     % Write EEG Marker --> the payoff is shown
     outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
-    outp(ppAddress,0)        ; WaitSecs(0.001);
+    outp(ppAddress,0)        ; WaitSecs(tMrkWait);
 
     % We do not ask about the preferred lottery, this is a replay.
 
