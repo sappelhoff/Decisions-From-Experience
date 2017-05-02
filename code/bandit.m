@@ -15,6 +15,7 @@ function [choiceMat, prefMat] = bandit(nGames, nTrials, winStim, ID)
 % OUT:
 % - choiceMat: data about the choice processes.
 % - prefMat: data about preferred lottery at end of each game.
+% - also saves the jitter timings
 
 %% function start
 
@@ -101,6 +102,13 @@ tMrkWait        = 1/sampRate*2; % for safety, take twice the time needed
 % Shuffle the random number generator
 rng('shuffle');
 
+% Generate random jitter timings to be used later. It's handy to save them.
+% For Bandit we need 2*nGames + 3*nGames*nTrials (check for yourself). Also
+% initialize a counter to get these timings.
+tJit = rand(1, 2*nGames + 3*nGames*nTrials)/2;
+jitCount = 1;
+
+
 % Matrices for saving the data (choiceMat). We save trial data in 2nd dim 
 % and separate games using the 3rd dim. The 1st dim describes
 % the choice per se, the RT, whether it was a good choice, and how it was
@@ -162,7 +170,8 @@ for game = 1:nGames
 
     Screen('TextSize',window,30);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
-    vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2); 
+    jitter = tJit(jitCount); jitCount = jitCount + 1;
+    vbl = Screen('Flip',window,vbl+tShowFeedback+jitter); 
 
     % Write EEG Marker --> lotteries have been shuffled
     outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
@@ -180,7 +189,8 @@ for game = 1:nGames
             screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords,Stims.fixWidth, ...
             white,[xCenter yCenter],2);
-        [vbl, stimOnset] = Screen('Flip',window,vbl+tShowShuffled+rand/2);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        [vbl, stimOnset] = Screen('Flip',window,vbl+tShowShuffled+jitter);
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
@@ -239,8 +249,9 @@ for game = 1:nGames
         choiceMat(2,trial,game) = rt; 
         choiceMat(3,trial,game) = (goodLotteryLoc == pickedLoc); 
         choiceMat(4,trial,game) = rewardBool; 
-
-        vbl = Screen('Flip', window, vbl+tDelayFeedback+rand/2+rt);
+        
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip', window, vbl+tDelayFeedback+jitter+rt);
 
         % Write EEG Marker --> the feedback is presented
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
@@ -256,7 +267,8 @@ for game = 1:nGames
     payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff));
     Screen('TextSize',window,30); 
     DrawFormattedText(window, payoffStr, 'center', 'center', white);
-    vbl = Screen('Flip', window, vbl+tShowFeedback+rand/2);
+    jitter = tJit(jitCount); jitCount = jitCount + 1;
+    vbl = Screen('Flip', window, vbl+tShowFeedback+jitter);
 
     % Write EEG Marker --> the payoff is shown
     outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
@@ -264,7 +276,8 @@ for game = 1:nGames
 
     % Ask about preferred lottery
     DrawFormattedText(window,texts('prefLot'),'center','center',white);
-    [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+rand/2);
+    jitter = tJit(jitCount); jitCount = jitCount + 1;
+    [vbl, stimOnset] = Screen('Flip',window,vbl+tShowPayoff+jitter);
 
     % Write EEG Marker --> the preferred lottery is being inquired
     outp(ppAddress,mrkPrefLot); WaitSecs(tMrkWait);
@@ -311,14 +324,14 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('bandit_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'choiceMat', 'prefMat');
+save(fname, 'choiceMat', 'prefMat', 'tJit');
 
 
 % Print that it's time for a break, reset priority level, and clean the
 % screen (sca).
 Screen('TextSize',window,30);
 DrawFormattedText(window,texts('end'),'center','center',white);
-Screen('Flip',window,vbl+rt+0.01);
+Screen('Flip',window,vbl+rt+0.1);
 KbStrokeWait;
 Priority(0);
 ShowCursor;

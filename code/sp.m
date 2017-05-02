@@ -15,6 +15,7 @@ function [decisionMat, sampleMat, choiceMat] = sp(nTrials, winStim, ID)
 % - decisionMat: data for each decision whether to sample or to choose
 % - sampleMat: data for each sampling round
 % - choiceMat: data for each choice round
+% - also saves the jitter timings
 
 %% Function start
 
@@ -99,6 +100,13 @@ tMrkWait        = 1/sampRate*2; % for safety, take twice the time needed
 
 % Shuffle the random number generator
 rng('shuffle');
+
+% Generate random jitter timings to be used later. It's handy to save them.
+% For SP cannot exactly know how many jitters we will need, so generate the
+% maximum possible number. Also initialize a counter to get these timings.
+tJit = rand(1, 2 + 3*nTrials + 2*nTrials*nTrials)/2;
+jitCount = 1;
+
 
 % Indices for the loops and assigning data to their places within matrices
 choiIdx     = 1;
@@ -195,8 +203,9 @@ while trlCount <= nTrials
 
         % Print out: lotteries have been shuffled. Send EEG markers
         DrawFormattedText(window,texts('shuffled'),'center','center', ...
-            white); 
-        vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
+            white);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip',window,vbl+tShowPayoff+jitter);
         outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
         outp(ppAddress,0)         ; WaitSecs(tMrkWait);
         isNewGame = 0;
@@ -221,12 +230,13 @@ while trlCount <= nTrials
             white,[xCenter yCenter],2);        
 
         % Timing of presentation depends on position in the loop.
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
         if isFirstTrial
             [vbl,stimOnset] = Screen('Flip',window, ...
-                vbl+tShowShuffled+rand/2);
+                vbl+tShowShuffled+jitter);
         else
             [vbl,stimOnset] = Screen('Flip',window, ...
-                vbl+tShowFeedback+rand/2);
+                vbl+tShowFeedback+jitter);
         end
 
         % Write EEG Marker --> Fixation cross onset, expect a response
@@ -317,7 +327,8 @@ while trlCount <= nTrials
         sampleMat(4,trlCount) = rewardBool;
 
         % Show feedback and write marker to EEG
-        vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2+rt);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip',window,vbl+tDelayFeedback+jitter+rt);
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
         outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
@@ -332,7 +343,8 @@ while trlCount <= nTrials
         if isLastTrial
             DrawFormattedText(window,texts('aSPfinal'),'center', ...
                 'center',white);
-            Screen('Flip',window,vbl+tShowFeedback+rand/2);
+            jitter = tJit(jitCount); jitCount = jitCount + 1;
+            Screen('Flip',window,vbl+tShowFeedback+jitter);
             vbl = KbStrokeWait;
             % If this is the last trial, we need to kill the paradigm while
             % loop by raising trlCount > nTrials
@@ -403,7 +415,8 @@ while trlCount <= nTrials
         Screen('DrawTextures',window,Stims.maskTexture,[], ...
             Stims.maskLocs(:,:,pickedLoc),[],0);
 
-        vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip',window,vbl+tDelayFeedback+jitter);
         outp(ppAddress,mrkResult); WaitSecs(tMrkWait);
         outp(ppAddress,0)        ; WaitSecs(tMrkWait);
 
@@ -411,7 +424,8 @@ while trlCount <= nTrials
         payoff = rewardBool;
         payoffStr = strcat(texts('payoff'), sprintf(' %d',payoff));
         DrawFormattedText(window,payoffStr,'center','center',white);
-        vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip',window,vbl+tShowFeedback+jitter);
         outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
         outp(ppAddress,0)        ; WaitSecs(tMrkWait);
     
@@ -428,13 +442,13 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname = fullfile(dataDir,strcat('sp_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'decisionMat', 'sampleMat', 'choiceMat');
+save(fname, 'decisionMat', 'sampleMat', 'choiceMat', 'tJit');
 
 
 % Print that it's time for a break, reset priority level, and clean the
 % screen (sca).
 DrawFormattedText(window,texts('end'),'center','center',white);
-Screen('Flip',window,vbl+tShowPayoff+rand/2);
+Screen('Flip',window,vbl+tShowPayoff+0.1);
 KbStrokeWait;
 Priority(0);
 ShowCursor;

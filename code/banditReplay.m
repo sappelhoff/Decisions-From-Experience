@@ -20,6 +20,7 @@ function [BdistrMat, BdistrInsertMat, BdistrFalsePositiveMat] = banditReplay(cho
 % inserted
 % - BdistrFalsePositiveMat: a trialsXgames matrix of zeros. Ones, where a
 % participant responded to a distractor although no distractor was present.
+% - also saves the jitter timings
 
 %% function start
 
@@ -105,6 +106,13 @@ tMrkWait        = 1/sampRate*2; % for safety, take twice the time needed
 % Shuffle the random number generator
 rng('shuffle');
 
+% Generate random jitter timings to be used later. It's handy to save them.
+% For Replay we need 1*nGames + 3*nGames*nTrials (check for yourself). Also
+% initialize a counter to get these timings.
+tJit = rand(1, 1*nGames + 3*nGames*nTrials)/2;
+jitCount = 1;
+
+
 % Matrices for saving the data. BdistrMat is preallocated generously ...
 % later on we will drop the NANs. The BdistrInsertMat is initialized as 0
 % for all trials across all games and a one will be put where a distractor
@@ -157,7 +165,8 @@ for game=1:nGames
     % just replay.
     Screen('TextSize',window,30);
     DrawFormattedText(window,texts('shuffled'), 'center', 'center', white);
-    vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
+    jitter = tJit(jitCount); jitCount = jitCount + 1;
+    vbl = Screen('Flip',window,vbl+tShowPayoff+jitter);
     Screen('TextSize',window,25);
 
     % Write EEG Marker --> lotteries have been shuffled
@@ -175,7 +184,8 @@ for game=1:nGames
             screenYpixels*0.41, white);
         Screen('DrawLines',window,Stims.fixCoords, ...
             Stims.fixWidth,white,[xCenter yCenter],2);        
-        vbl = Screen('Flip',window,vbl+tShowShuffled+rand/2);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        vbl = Screen('Flip',window,vbl+tShowShuffled+jitter);
  
 
         % Write EEG Marker --> Fixation cross onset, expect a response
@@ -188,15 +198,6 @@ for game=1:nGames
         pickedLoc   = choiceMat(1,trial,game); 
         rt          = choiceMat(2,trial,game); 
         rewardBool  = choiceMat(4,trial,game);
-
-        
-        % Check whether actual RT is not too long and change it, if it is
-        % too long.
-        if rt < 3
-            tWait = rt; 
-        else
-            tWait = 1+rand/2;
-        end 
 
         
         % Here, the action in the original game would have happened. As
@@ -222,7 +223,8 @@ for game=1:nGames
             Stims.rectLocs(:,:,pickedLoc));
         Screen('DrawTextures',window,Stims.maskTexture,[], ...
             Stims.maskLocs(:,:,pickedLoc),[],0);                                
-        [vbl, stimOnset] = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
+        jitter = tJit(jitCount); jitCount = jitCount + 1;
+        [vbl, stimOnset] = Screen('Flip',window,vbl+tDelayFeedback+jitter);
 
         % Write EEG Marker --> the feedback is presented
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
@@ -250,7 +252,8 @@ for game=1:nGames
             tWait = BdistrMat(distrIdx) + 0.01;
             distrIdx = distrIdx + 1; 
         else
-            tRecFalsePos = stimOnset + tShowFeedback + rand/2;
+            jitter = tJit(jitCount); jitCount = jitCount + 1;
+            tRecFalsePos = stimOnset + tShowFeedback + jitter;
             falsePosFlag = 1;
             while GetSecs < tRecFalsePos 
                 [~,~,keyCode] = KbCheck([], scanList);
@@ -295,13 +298,14 @@ dataDir = fullfile(pwd);
 curTime = datestr(now,'dd_mm_yyyy_HH_MM_SS');
 fname   = fullfile(dataDir,strcat('banditReplay_subj_', ...
     sprintf('%03d_',ID),curTime));
-save(fname, 'BdistrMat', 'BdistrInsertMat', 'BdistrFalsePositiveMat');
+save(fname, 'BdistrMat', 'BdistrInsertMat', 'BdistrFalsePositiveMat', ...
+    'tJit');
 
 % Print that it's time for a break, reset priority level, and clean the
 % screen (sca).
 Screen('TextSize',window,30);
 DrawFormattedText(window,texts('end'),'center','center',white); 
-Screen('Flip',window,vbl+tShowPayoff+rand/2);
+Screen('Flip',window,vbl+tShowPayoff+0.1);
 KbStrokeWait;
 Priority(0);
 ShowCursor;
