@@ -202,7 +202,7 @@ while trlCount <= nTrials
             white); 
         vbl = Screen('Flip',window,vbl+tShowPayoff+rand/2);
         outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
-        outp(ppAddress,0)         ; WaitSecs(0.001);
+        outp(ppAddress,0)         ; WaitSecs(tMrkWait);
         isNewGame = 0;
         isFirstTrial = 1;
     end
@@ -235,7 +235,7 @@ while trlCount <= nTrials
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
         % ------------------------------------------------------------    
         % Inquire the answer with a loop and PTB call to the keyboard.
@@ -249,7 +249,7 @@ while trlCount <= nTrials
                 % sample left lottery
                 if keyCode(leftKey)
                     outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);
+                    outp(ppAddress,0)        ; WaitSecs(tMrkWait);
                     rt = tEnd - stimOnset;
                     pickedLoc = 1;
                     respToBeMade = false;
@@ -257,7 +257,7 @@ while trlCount <= nTrials
                 % sample right lottery
                 elseif keyCode(rightKey)
                     outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);            
+                    outp(ppAddress,0)        ; WaitSecs(tMrkWait);            
                     rt = tEnd - stimOnset;
                     pickedLoc = 2;
                     respToBeMade = false;
@@ -265,7 +265,7 @@ while trlCount <= nTrials
                 % stop sampling, start choice
                 elseif isFirstTrial~=1 && keyCode(downKey)
                     outp(ppAddress,mrkStopSample); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)            ; WaitSecs(0.001);
+                    outp(ppAddress,0)            ; WaitSecs(tMrkWait);
                     rt = tEnd - stimOnset;
                     pickedLoc = 3;
                     respToBeMade = false;
@@ -323,7 +323,7 @@ while trlCount <= nTrials
         % Show feedback and write marker to EEG
         vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2+rt);
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
 
         
@@ -355,7 +355,7 @@ while trlCount <= nTrials
 
         % Write EEG Marker --> the preferred lottery is being inquired
         outp(ppAddress,mrkPrefLot); WaitSecs(tMrkWait);
-        outp(ppAddress,0)         ; WaitSecs(0.001);
+        outp(ppAddress,0)         ; WaitSecs(tMrkWait);
 
         % Inquire the answer with a loop and PTB call to the keyboard.
         % Stop the loop only, once a keypress has been noticed.
@@ -365,14 +365,14 @@ while trlCount <= nTrials
                 % Choose the left lottery
                 if keyCode(leftKey)
                     outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);
+                    outp(ppAddress,0)        ; WaitSecs(tMrkWait);
                     rt = tEnd - stimOnset;
                     pickedLoc = 1;
                     respToBeMade = false;
                 % Choose the right lottery
                 elseif keyCode(rightKey)
                     outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
-                    outp(ppAddress,0)        ; WaitSecs(0.001);            
+                    outp(ppAddress,0)        ; WaitSecs(tMrkWait);            
                     rt = tEnd - stimOnset;
                     pickedLoc = 2;
                     respToBeMade = false;            
@@ -409,7 +409,7 @@ while trlCount <= nTrials
 
         vbl = Screen('Flip',window,vbl+tDelayFeedback+rand/2);
         outp(ppAddress,mrkResult); WaitSecs(tMrkWait);
-        outp(ppAddress,0)        ; WaitSecs(0.001);
+        outp(ppAddress,0)        ; WaitSecs(tMrkWait);
 
         % Tell the subject how much she has earned and send EEG markers
         payoff = rewardBool;
@@ -417,7 +417,7 @@ while trlCount <= nTrials
         DrawFormattedText(window,payoffStr,'center','center',white);
         vbl = Screen('Flip',window,vbl+tShowFeedback+rand/2);
         outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
-        outp(ppAddress,0)        ; WaitSecs(0.001);
+        outp(ppAddress,0)        ; WaitSecs(tMrkWait);
     
         % After a choice, we start a new game
         isNewGame = 1;

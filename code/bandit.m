@@ -171,7 +171,7 @@ for game = 1:nGames
 
     % Write EEG Marker --> lotteries have been shuffled
     outp(ppAddress,mrkShuffle); WaitSecs(tMrkWait);
-    outp(ppAddress,0)         ; WaitSecs(0.001);
+    outp(ppAddress,0)         ; WaitSecs(tMrkWait);
     Screen('TextSize',window,25);
 
 
@@ -189,7 +189,7 @@ for game = 1:nGames
 
         % Write EEG Marker --> Fixation cross onset, expect a response
         outp(ppAddress,mrkFixOnset); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
         % Inquire the answer with a loop and PTB call to the keyboard.
         % Stop the loop only, once a keypress has been noticed.
@@ -199,14 +199,14 @@ for game = 1:nGames
             if keyCode(leftKey)
                 % Write EEG Marker --> button press, choice done
                 outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                outp(ppAddress,0)        ; WaitSecs(0.001);
+                outp(ppAddress,0)        ; WaitSecs(tMrkWait);
                 rt = tEnd - stimOnset;
                 pickedLoc = 1;
                 respToBeMade = false;
             elseif keyCode(rightKey)
                 % Write EEG Marker --> button press, choice done
                 outp(ppAddress,mrkChoice); WaitSecs(tMrkWait);
-                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                outp(ppAddress,0)        ; WaitSecs(tMrkWait);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 2;
                 respToBeMade = false;            
@@ -249,7 +249,7 @@ for game = 1:nGames
 
         % Write EEG Marker --> the feedback is presented
         outp(ppAddress,mrkFeedback); WaitSecs(tMrkWait);
-        outp(ppAddress,0)          ; WaitSecs(0.001);
+        outp(ppAddress,0)          ; WaitSecs(tMrkWait);
 
     end % End of trial loop
 
@@ -265,7 +265,7 @@ for game = 1:nGames
 
     % Write EEG Marker --> the payoff is shown
     outp(ppAddress,mrkPayoff); WaitSecs(tMrkWait);
-    outp(ppAddress,0)        ; WaitSecs(0.001);
+    outp(ppAddress,0)        ; WaitSecs(tMrkWait);
 
     % Ask about preferred lottery
     DrawFormattedText(window,texts('prefLot'),'center','center',white);
@@ -273,7 +273,7 @@ for game = 1:nGames
 
     % Write EEG Marker --> the preferred lottery is being inquired
     outp(ppAddress,mrkPrefLot); WaitSecs(tMrkWait);
-    outp(ppAddress,0)         ; WaitSecs(0.001);
+    outp(ppAddress,0)         ; WaitSecs(tMrkWait);
 
 
     % Inquire about the answer with a loop and PTB call to the keyboard.
@@ -284,14 +284,14 @@ for game = 1:nGames
             if keyCode(leftKey)
                 % Write EEG Marker --> button press, selection done
                 outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
-                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                outp(ppAddress,0)        ; WaitSecs(tMrkWait);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 1; % 1 = left
                 respToBeMade = false;
             elseif keyCode(rightKey)
                 % Write EEG Marker --> button press, selection done
                 outp(ppAddress,mrkSelect); WaitSecs(tMrkWait);
-                outp(ppAddress,0)        ; WaitSecs(0.001);            
+                outp(ppAddress,0)        ; WaitSecs(tMrkWait);            
                 rt = tEnd - stimOnset;
                 pickedLoc = 2; % 2 = right
                 respToBeMade = false;            
