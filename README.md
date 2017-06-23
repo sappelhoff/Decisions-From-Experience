@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/71231959.svg)](https://zenodo.org/badge/latestdoi/71231959)
+
+
 # Decisions From Experience
 ---
 Matlab code relying on [Psychtoolbox 3](http://psychtoolbox.org) and the Statistics Toolbox to execute an experiment. This is an EEG experiment. To send markers, you should use the [io64 module](http://apps.usd.edu/coglab/psyc770/IO64.html) - however, you will need Windows and a parallel port for that.
